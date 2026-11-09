@@ -150,7 +150,7 @@ internal static class ThemeChecks
         Check(Show("DOWNDSPEED", true) == "888KB/s" && Math.Abs(ThemeData.Read("DOWNDSPEED", null, false, c).Number!.Value - 888) < 1e-6, "Network shows KB/s below 1 MB/s");
         Check(Show("TIME", format: "h:m:s") == "12:00:00" && Show("TIME", format: "h:m") == "12:00" &&
               Show("DATE", format: "Y.M.D") == "2020.12.31" && Show("DAY") == "Thu", "Time and date follow the theme's format tokens");
-        Check(Show("RAM_GB", true) == "10.8GB" && Show("FPS_AVG") == "118" && Show("GPUMODEL") == "NVIDIA GeForce RTX 5070 Ti",
+        Check(Show("RAM_GB", true) == "10.8GB" && Show("FPS_AVG") == "118" && Show("GPUMODEL") == "RTX 5070 Ti",
             "Memory, average FPS and model names come from the context");
         var empty = new ThemeDataContext();
         Check(ThemeData.Display(ThemeData.Read("GPUTEMP", null, false, empty), true) == "--" && Show("RAMMODEL") == "--" && Show("NOT_A_SOURCE") == "--",

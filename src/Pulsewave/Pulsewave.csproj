@@ -9,7 +9,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>Pulsewave</AssemblyName>
-    <Version>0.10.0</Version>
+    <Version>0.11.0</Version>
     <RootNamespace>Pulsewave</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\Pulsewave-logo.ico</ApplicationIcon>

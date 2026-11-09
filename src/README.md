@@ -1,4 +1,12 @@
-# Pulsewave System Monitor V0.10.0
+# Pulsewave System Monitor V0.11.0
+
+## V0.11.0 - Frame time, RTSS's 1% low and shortcut lists
+
+**Frame time.** Halo Gaming's chart shows frame time ("FRAME TIME · SAMPLED") with a dashed 60 FPS guide, a scale never below 25 ms and an amber line above 33 ms. Sensor Manager → Auto-pair now pairs RTSS's "Frame Time" and "Framerate 1% Low"; with them the chart and the 1% low are RTSS's own.
+
+**Shortcut lists.** Tray → Shortcuts → List: tick and order shortcuts for Gaming and Productivity. Halo Gaming and Halo Productivity show their list on their tiles and first in their app drawer; other themes keep the main list. Nothing changes until you tick something.
+
+**From the design audit.** No sun after dark; LAST PLAYED shows the last session and no stale FPS; charts fill from the start; unexported clocks and a media source without a timeline leave no empty slots; "RTX 5070 Ti" as the GPU name; video thumbnails shown whole; a tighter Lifestyle Column with two rows of favourites; larger small text.
 
 ## V0.10.0 - The HUD picks the theme for the moment
 

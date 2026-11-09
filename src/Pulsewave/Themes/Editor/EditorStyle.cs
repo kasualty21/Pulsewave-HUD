@@ -177,9 +177,9 @@ public static class ThemeDataGroups
         "CPU_LIMIT" or "GPU_LIMIT" => "Performance limits",
         _ when name.StartsWith("CPU", StringComparison.Ordinal) => "CPU",
         _ when name.StartsWith("GPU", StringComparison.Ordinal) => "GPU",
-        _ when name.StartsWith("FPS", StringComparison.Ordinal) => "Frame rate",
+        _ when name.StartsWith("FPS", StringComparison.Ordinal) || name == "FRAMETIME" => "Frame rate",
         _ when name.StartsWith("RAM", StringComparison.Ordinal) => "Memory",
-        "DRVLOAD" or "HDDTEMP" or "HDDUSED" or "DRIVE_FREE" or "DRIVE_USED_PCT" => "Drives",
+        "DRVLOAD" or "HDDTEMP" or "HDDUSED" or "DRIVE_FREE" or "DRIVE_USED_PCT" or "DRIVE_USED_OF" => "Drives",
         "WATERPUMP" or "CASEFAN1" or "CASEFAN2" => "Cooling",
         "DOWNDSPEED" or "UPSPEED" => "Network",
         "TIME" or "DATE" or "DAY" or "APM" => "Clock",
@@ -220,6 +220,7 @@ public static class ThemeEditorDefaults
         "HDDTEMP" => (70, 80),
         _ when data?.StartsWith("CLAUDE", StringComparison.Ordinal) == true || data?.StartsWith("CODEX", StringComparison.Ordinal) == true => (75, 90),
         "GAME_FPS_LOW_PCT" => (60, 40),
+        "FRAMETIME" => (33, 50), // ms: below 30 FPS, then below 20
         _ => (85, 95)
     };
 }

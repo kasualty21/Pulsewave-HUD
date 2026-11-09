@@ -118,11 +118,11 @@ public static class ThemeData
         ["CPUCLOCK"] = "CpuClock", ["CPUCLOCK_G"] = "CpuClock", ["CPUVOLTAGE"] = "CpuVoltage",
         ["GPUTEMP"] = "GpuTemp", ["GPULOAD"] = "GpuLoad", ["GPUPWR"] = "GpuPower", ["GPUFAN"] = "GpuFan",
         ["GPUCLOCK"] = "GpuClock", ["GPUCLOCK_G"] = "GpuClock", ["GPUVOLTAGE"] = "GpuVoltage",
-        ["GPURAMLOAD"] = "GpuVramLoad", ["GPURAM"] = "GpuVram", ["FPS"] = "GpuFps", ["FPS_AVG"] = "GpuFps",
+        ["GPURAMLOAD"] = "GpuVramLoad", ["GPURAM"] = "GpuVram", ["FPS"] = "GpuFps", ["FPS_AVG"] = "GpuFps", ["FRAMETIME"] = "GpuFps",
         ["RAMLOAD"] = "MemoryLoad", ["WATERPUMP"] = "PumpRpm", ["CASEFAN1"] = "CaseFan1", ["CASEFAN2"] = "CaseFan2",
         ["DRVLOAD"] = "DriveLoad", ["HDDTEMP"] = "DriveTemp", ["HDDUSED"] = "DriveUsed",
         ["UPSPEED"] = "NetUpload", ["DOWNDSPEED"] = "NetDownload",
-        ["CPU_LIMIT"] = "CpuThermalLimit", ["GPU_LIMIT"] = "GpuPowerLimit", ["CPUFAN_STATE"] = "CpuFan"
+        ["CPU_LIMIT"] = "CpuThermalLimit", ["GPU_LIMIT"] = "GpuPowerLimit", ["CPUFAN_STATE"] = "CpuFan", ["CPUFAN_ALERT"] = "CpuFan"
     };
 
     /// <summary>The Pulsewave sensor a data name reads, or null for clock, memory and names.</summary>
@@ -131,18 +131,18 @@ public static class ThemeData
     /// <summary>Data names the editor offers, with friendly labels.</summary>
     public static readonly IReadOnlyList<(string Name, string Label)> Catalog =
     [
-        ("CPUTEMP", "CPU temperature"), ("CPULOAD", "CPU load %"), ("CPUPWR", "CPU power (W)"), ("CPUFAN", "CPU fan (RPM)"), ("CPUFAN_STATE", "CPU fan: OK / STOPPED"),
+        ("CPUTEMP", "CPU temperature"), ("CPULOAD", "CPU load %"), ("CPUPWR", "CPU power (W)"), ("CPUFAN", "CPU fan (RPM)"), ("CPUFAN_STATE", "CPU fan: OK / STOPPED"), ("CPUFAN_ALERT", "CPU fan: STOPPED, else blank (show the row only then)"),
         ("CPUCLOCK_G", "CPU clock (GHz)"), ("CPUCLOCK", "CPU clock (MHz)"), ("CPUVOLTAGE", "CPU voltage"), ("CPUMODEL", "CPU name"),
         ("GPUTEMP", "GPU temperature"), ("GPULOAD", "GPU load %"), ("GPUPWR", "GPU power (W)"), ("GPUFAN", "GPU fan (RPM)"),
         ("GPUCLOCK_G", "GPU clock (GHz)"), ("GPUCLOCK", "GPU clock (MHz)"), ("GPUVOLTAGE", "GPU voltage"),
         ("GPURAMLOAD", "GPU memory load %"), ("GPURAM", "GPU memory used (MB)"), ("GPURAM_GB_OF", "GPU memory used of total (8.6 / 16 GB)"), ("GPUMODEL", "GPU name"),
-        ("FPS", "FPS"), ("FPS_AVG", "Average FPS (last minute)"),
+        ("FPS", "FPS"), ("FPS_AVG", "Average FPS (last minute)"), ("FRAMETIME", "Frame time (ms): RTSS's when paired, else from FPS"),
         ("RAMLOAD", "Memory load %"), ("RAM_GB", "Memory used (GB)"), ("RAMVALID_GB", "Memory free (GB)"), ("RAMTOTAL_GB", "Memory total (GB)"),
         ("WATERPUMP", "Pump (RPM)"), ("CASEFAN1", "Case fan 1 (RPM)"), ("CASEFAN2", "Case fan 2 (RPM)"),
         ("DRVLOAD", "Drive activity %"), ("HDDTEMP", "Drive temperature"), ("HDDUSED", "Drive used %"),
         ("DOWNDSPEED", "Download speed"), ("UPSPEED", "Upload speed"),
         ("SENSOR_STATUS", "Sensor feed: SENSORS PAUSED / OFFLINE (blank while live)"),
-        ("MEDIA_ALBUM", "Now playing: album"), ("DRIVE_FREE", "Drive free space (format: drive letter; blank = Windows drive)"),
+        ("MEDIA_ALBUM", "Now playing: album"), ("DRIVE_FREE", "Drive free space (format: drive letter; blank = Windows drive)"), ("DRIVE_USED_OF", "Drive used of total (1.5 / 2 TB)"),
         ("DRIVE_USED_PCT", "Drive used % (format: drive letter)"),
         ("TIMER_ACTION", "Timer: Start / Pause (for its button)"), ("STOPWATCH_ACTION", "Stopwatch: Start / Pause (for its button)"),
         ("TIMER_PHASE", "Timer: FOCUS / BREAK during a Pomodoro"),
@@ -171,7 +171,7 @@ public static class ThemeData
         ("VOLUME", "Volume %"), ("VOLUME_ICON", "Volume: speaker/mute icon"),
         ("TIMER", "Timer: time left"), ("STOPWATCH", "Stopwatch: elapsed"),
         ("GAME_NAME", "Gaming: game being played (or the last one)"), ("GAME_STATE", "Gaming: PLAYING / LAST PLAYED"),
-        ("GAME_SESSION", "Gaming: this session's length"), ("GAME_FPS_AVG", "Gaming: session average FPS"), ("GAME_FPS_LOW", "Gaming: session 1% low FPS"),
+        ("GAME_SESSION", "Gaming: this session's length (the last one's after it)"), ("GAME_FPS", "Gaming: live FPS while a game runs (blank otherwise)"), ("GAME_FPS_AVG", "Gaming: session average FPS"), ("GAME_FPS_LOW", "Gaming: session 1% low FPS"),
         ("GAME_PEAK_CPU", "Gaming: session peak CPU temperature"), ("GAME_PEAK_GPU", "Gaming: session peak GPU temperature"),
         ("GAME_TODAY", "Gaming: play time today (minutes for bars)"), ("GAME_WEEK", "Gaming: play time, last 7 days"),
         ("WEATHER", "Weather: temperature and conditions"), ("WEATHER_TEMP", "Weather: temperature"), ("WEATHER_TEXT", "Weather: conditions"),
@@ -231,6 +231,8 @@ public static class ThemeData
             "CPUFAN" => Num(S("CpuFan"), "RPM"),
             // The fan only matters when it stops: "OK" while it turns, "STOPPED" (number 100, for a critical color) at 0 RPM.
             "CPUFAN_STATE" => S("CpuFan") is { } rpm ? new(rpm < 1 ? "STOPPED" : "OK", rpm < 1 ? 100 : 0, "") : new(Missing, null, ""),
+            // Only a problem is worth a slot: blank (no number) while the fan turns.
+            "CPUFAN_ALERT" => S("CpuFan") is < 1 ? new("STOPPED", 100, "") : new("", null, ""),
             "CPUCLOCK" => Num(S("CpuClock"), "MHz"),
             "CPUCLOCK_G" => Num(S("CpuClock") / 1000, "GHz", "F2"),
             "CPUVOLTAGE" => Num(S("CpuVoltage"), "V", "F3"),
@@ -251,9 +253,10 @@ public static class ThemeData
             "GPURAM_GB_OF" => VramMb(c.Sensors) is { } vram
                 ? new(S("GpuVramLoad") is { } vload and > 0 ? $"{vram / 1024:F1} / {Math.Round(vram / 1024 / (vload / 100)):0} GB" : $"{vram / 1024:F1} GB", vram / 1024, "")
                 : new(Missing, null, ""),
-            "GPUMODEL" => Text(c.GpuName),
+            "GPUMODEL" => Text(HardwareNameReader.Short(c.GpuName)),
             "FPS" => Num(S("GpuFps"), "FPS"),
             "FPS_AVG" => Num(c.AverageFps, "FPS"),
+            "FRAMETIME" => Num(FrameTime(S("GpuFrameTime"), S("GpuFps")), "ms", "F1"),
             "RAMLOAD" => Num(S("MemoryLoad"), "%"),
             "RAM" => Num(memory?.UsedMb, "MB"),
             "RAMVALID" => Num(memory?.FreeMb, "MB"),
@@ -306,15 +309,24 @@ public static class ThemeData
             "FOCUS_ACTION" => new((c.StopwatchShown ? c.StopwatchRunning : c.TimerRunning) ? "Pause" : "Start", null, ""),
             "FOCUS_SWITCH" => new(c.StopwatchShown ? "Timer" : "Stopwatch", null, ""),
             "DRIVE_FREE" => Drive(c, format) is { } d ? new($"{d.FreeGb:F0}", d.FreeGb, "GB free") : new(Missing, null, "GB free"),
+            // Like memory: used of total, in TB from 1 TB ("1.5 / 2 TB", "180 / 500 GB").
+            "DRIVE_USED_OF" => Drive(c, format) is { TotalGb: > 0 } du ? new(UsedOf(du.TotalGb - du.FreeGb, du.TotalGb), du.TotalGb - du.FreeGb, "") : new(Missing, null, ""),
             "DRIVE_USED_PCT" => Drive(c, format) is { } u && u.TotalGb > 0 ? Num((u.TotalGb - u.FreeGb) / u.TotalGb * 100, "%") : new(Missing, null, "%"),
             "MEDIA_ALBUM" => new(c.Media?.Album ?? "", null, ""),
             var w when IsWeather(w) => Weather(w, fahrenheit, c.Weather, c.Now),
-            var g when IsGaming(g) => Gaming(g, fahrenheit, c.Gaming, format),
+            var g when IsGaming(g) => Gaming(g, fahrenheit, c.Gaming, format, S("GpuFps")),
             _ => new(Missing, null, "")
         };
     }
 
     /// <summary>Whether a data name shows gaming (the game being played, its session, play time).</summary>
+    /// <summary>
+    /// Frame time in ms: RTSS's own reading when it is paired, else worked out from FPS. Either way it is one
+    /// reading per poll, so it shows sustained stutter rather than every single slow frame.
+    /// </summary>
+    internal static double? FrameTime(double? rtss, double? fps) =>
+        rtss is > 0 and < 10000 ? rtss : fps is > 0 and < 10000 ? 1000 / fps : null;
+
     public static bool IsGaming(string? name) => name?.StartsWith("GAME_", StringComparison.OrdinalIgnoreCase) == true;
 
     /// <summary>"2h 14m", "45m" or "0m".</summary>
@@ -328,6 +340,9 @@ public static class ThemeData
     private static readonly Dictionary<string, (DateTime At, (double, double)? Space)> DriveCache = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Free and total space in GB of a drive (format "D" for D:, blank for the Windows drive), read at most every 30 s.</summary>
+    internal static string UsedOf(double usedGb, double totalGb) =>
+        totalGb >= 1000 ? $"{usedGb / 1000:F1} / {Math.Round(totalGb / 1000, totalGb < 10000 ? 1 : 0):0.#} TB" : $"{usedGb:F0} / {totalGb:F0} GB";
+
     private static (double FreeGb, double TotalGb)? Drive(ThemeDataContext c, string? format)
     {
         string letter = format?.Trim().TrimEnd(':', '\\') ?? "";
@@ -348,7 +363,7 @@ public static class ThemeData
         }
     }
 
-    private static ThemeValue Gaming(string name, bool fahrenheit, GamingSnapshot? g, string? format = null)
+    private static ThemeValue Gaming(string name, bool fahrenheit, GamingSnapshot? g, string? format = null, double? live = null)
     {
         ThemeValue Fps(double? v) => v is { } f ? new(f.ToString("F0", CultureInfo.CurrentCulture), f, "FPS") : new(Missing, null, "FPS");
         ThemeValue Temp(double? c) => c is not { } t ? new(Missing, null, fahrenheit ? "°F" : "°C")
@@ -359,7 +374,11 @@ public static class ThemeData
             "GAME_NAME" => new(g?.Game ?? "", null, ""),
             "GAME_STATE" => new(g == null || g.Game == null ? "NO GAME YET" : g.Playing ? "PLAYING" : "LAST PLAYED", null, ""),
             // Format "short" matches the play-time totals ("1h 24m"); the default ticks the seconds ("1:24:10").
-            "GAME_SESSION" => g?.Session is { } s ? new(format == "short" ? PlayTime(s) : TouchTimers.Format(s), s.TotalMinutes, "") : new(g?.Game == null ? Missing : "", null, ""),
+            // While playing, this session; afterwards the last session's length (as the Gaming page shows it).
+            "GAME_SESSION" => g?.Session is { } s ? new(format == "short" ? PlayTime(s) : TouchTimers.Format(s), s.TotalMinutes, "")
+                : g?.Recent.FirstOrDefault() is { } last ? new(PlayTime(last.Length), last.Length.TotalMinutes, "") : new(g?.Game == null ? Missing : "", null, ""),
+            // Live FPS only while a game runs: after it the FPS sensor still reads (the desktop, a launcher), which isn't the game's.
+            "GAME_FPS" => g is { Playing: true } ? Fps(live) : Fps(null),
             "GAME_FPS_AVG" => Fps(g?.AvgFps),
             "GAME_FPS_LOW" => Fps(g?.LowFps),
             // The 1% low as a share of the average: low numbers mean stutter (for warning colors).
@@ -378,6 +397,13 @@ public static class ThemeData
         w.Sunrise is { } rise && now < rise ? (rise, "SUNRISE")
         : w.Sunset is { } set && now < set ? (set, "SUNSET")
         : (w.SunriseTomorrow ?? w.Sunrise?.AddDays(1), "SUNRISE");
+
+    /// <summary>
+    /// Whether it is daytime now: between today's sunrise and sunset when the report has them for today, else what the
+    /// report said when fetched (it can be up to half an hour old, which put a sun up after sunset).
+    /// </summary>
+    internal static bool IsDay(WeatherReport w, DateTime now) =>
+        w.Sunrise is { } rise && w.Sunset is { } set && rise.Date == now.Date ? now >= rise && now < set : w.IsDay;
 
     /// <summary>"Rain from 15:00", "Rain until 17:00", or "No rain in the next 12 h", from the hourly forecast.</summary>
     internal static string RainLine(WeatherReport w, DateTime now)
@@ -404,6 +430,7 @@ public static class ThemeData
         WeatherDay? Day(int n) => w.Days.Count > n ? w.Days[n] : null;
         WeatherHour? Hour(int n) => w.Hours.Where(h => h.Time > now).Skip((n - 1) * 3).FirstOrDefault();
         string Clock(DateTime? t) => t?.ToString("HH:mm", CultureInfo.InvariantCulture) ?? Missing;
+        bool day = IsDay(w, now);
         return name switch
         {
             "WEATHER" => Text($"{T(w.TempC).Text}° {WeatherClient.Describe(w.Code)}"),
@@ -411,13 +438,13 @@ public static class ThemeData
             "WEATHER_FEELS" => T(w.FeelsC),
             // Only when it differs: within 2 °C it would just repeat the temperature.
             "WEATHER_FEELS_NOTE" => Math.Abs(w.FeelsC - w.TempC) >= 2 ? Text($"Feels {T(w.FeelsC).Text}°") : Text(""),
-            "WEATHER_KIND" => new("", WeatherClient.Kind(w.Code, w.IsDay), ""),
+            "WEATHER_KIND" => new("", WeatherClient.Kind(w.Code, day), ""),
             "WEATHER_RAIN" => Text(RainLine(w, now)),
             "WEATHER_HIGH" => T(w.HighC),
             "WEATHER_LOW" => T(w.LowC),
             "WEATHER_TEXT" => Text(WeatherClient.Describe(w.Code)),
             // Number: 1 by day, 0 at night (so a theme can color the symbol for night).
-            "WEATHER_ICON" => new(WeatherClient.Symbol(w.Code, w.IsDay), w.IsDay ? 1 : 0, ""),
+            "WEATHER_ICON" => new(WeatherClient.Symbol(w.Code, day), day ? 1 : 0, ""),
             "WEATHER_SUN_NEXT" => Text(Clock(NextSun(w, now).At)),
             "WEATHER_SUN_NEXT_LABEL" => Text(NextSun(w, now).Label),
             "WEATHER_CITY" => Text(w.City),

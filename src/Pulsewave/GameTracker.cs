@@ -366,6 +366,8 @@ public sealed class GameTracker
     private readonly string? _file;
     private readonly List<GameSession> _history;
     private readonly List<double> _fps = new();
+    // RTSS's own "Framerate 1% Low" readings this session (when paired in Sensor Manager).
+    private readonly List<double> _rtssLow = new();
     private string? _key, _name;
     private DateTime _start, _lastSeen;
     private double? _peakCpu, _peakGpu;
@@ -387,10 +389,10 @@ public sealed class GameTracker
     public string? CurrentKey => _key;
 
     /// <summary>
-    /// One look at what is running (null: no known game), with this second's FPS and temperatures.
-    /// Returns the session that just ended, if any.
+    /// One look at what is running (null: no known game), with this second's FPS and temperatures, and RTSS's
+    /// 1% low when it is paired. Returns the session that just ended, if any.
     /// </summary>
-    public GameSession? Update(DateTime now, string? key, string? name, double? fps, double? cpuC, double? gpuC)
+    public GameSession? Update(DateTime now, string? key, string? name, double? fps, double? cpuC, double? gpuC, double? rtssLow = null)
     {
         GameSession? ended = null;
         if (key != null && key != _key) ended = End();
@@ -399,6 +401,7 @@ public sealed class GameTracker
             if (_key == null) { _key = key; _name = name ?? key; _start = now; }
             _lastSeen = now;
             if (fps is > 0 and < 1000) _fps.Add(fps.Value);
+            if (rtssLow is > 0 and < 1000) _rtssLow.Add(rtssLow.Value);
             if (cpuC is > 0 and < 150) _peakCpu = Math.Max(_peakCpu ?? 0, cpuC.Value);
             if (gpuC is > 0 and < 150) _peakGpu = Math.Max(_peakGpu ?? 0, gpuC.Value);
         }
@@ -410,9 +413,10 @@ public sealed class GameTracker
     public GameSession? End()
     {
         if (_key == null) return null;
-        var session = new GameSession(_key, _name ?? _key, _start, _lastSeen, Average(_fps), Low(_fps), _peakCpu, _peakGpu);
+        var session = new GameSession(_key, _name ?? _key, _start, _lastSeen, Average(_fps), SessionLow(), _peakCpu, _peakGpu);
         _key = _name = null;
         _fps.Clear();
+        _rtssLow.Clear();
         _peakCpu = _peakGpu = null;
         if (session.Length < Shortest) return null;
         _history.Add(session);
@@ -432,6 +436,18 @@ public sealed class GameTracker
         return Math.Round(sorted[(int)Math.Floor((sorted.Count - 1) * 0.01)]);
     }
 
+    /// <summary>
+    /// The 1% low to show: RTSS's latest reading while playing (<paramref name="live"/>) or the median of its readings
+    /// for the finished session, when RTSS is paired; else the slowest 1% of the session's seconds.
+    /// </summary>
+    private double? SessionLow(bool live = false)
+    {
+        if (_rtssLow.Count == 0) return Low(_fps);
+        if (live) return Math.Round(_rtssLow[^1]);
+        var sorted = _rtssLow.OrderBy(v => v).ToList();
+        return Math.Round(sorted[sorted.Count / 2]);
+    }
+
     /// <summary>What to show at <paramref name="now"/>; <paramref name="tileFor"/> makes the cover/icon tile for a game key (cached).</summary>
     public GamingSnapshot Snapshot(DateTime now, Func<string, ShortcutView?>? tileFor = null)
     {
@@ -447,7 +463,7 @@ public sealed class GameTracker
             .Select(g => (g.Key, TimeSpan.FromTicks(g.Sum(s => Math.Max(0, (Min(s.End, now) - Max(s.Start, week)).Ticks)))))
             .OrderByDescending(g => g.Item2).ToList();
         return new GamingSnapshot(playing ? _name : last?.Name, playing, playing ? now - _start : null,
-            playing ? Average(_fps) : last?.AvgFps, playing ? Low(_fps) : last?.LowFps,
+            playing ? Average(_fps) : last?.AvgFps, playing ? SessionLow(live: true) : last?.LowFps,
             playing ? _peakCpu : last?.PeakCpuC, playing ? _peakGpu : last?.PeakGpuC,
             Within(today), Within(week), _tile, byGame, _history.AsEnumerable().Reverse().Take(30).ToList());
     }

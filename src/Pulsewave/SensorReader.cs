@@ -29,7 +29,9 @@ public static class SensorIds
         ("DriveTemp", "Drive temperature"), ("DriveLoad", "Drive activity"), ("DriveUsed", "Drive used space"),
         // HWiNFO's Yes/No limit flags (tick them for the gadget in HWiNFO): why clocks and FPS are being held back.
         ("CpuThermalLimit", "CPU thermal throttling"), ("CpuPowerLimit", "CPU power limit"),
-        ("GpuThermalLimit", "GPU thermal limit"), ("GpuPowerLimit", "GPU power limit"), ("GpuVoltageLimit", "GPU voltage limit")
+        ("GpuThermalLimit", "GPU thermal limit"), ("GpuPowerLimit", "GPU power limit"), ("GpuVoltageLimit", "GPU voltage limit"),
+        // RivaTuner Statistics Server's readings through HWiNFO: frame time for the chart, its 1% low for the session.
+        ("GpuFrameTime", "Frame time (RTSS, ms)"), ("GpuFpsLow", "FPS 1% low (RTSS)")
     ];
 
     public static bool IsCore(string id) => Core.Contains(id, StringComparer.OrdinalIgnoreCase);

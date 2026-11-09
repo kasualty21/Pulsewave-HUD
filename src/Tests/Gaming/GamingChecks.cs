@@ -109,6 +109,62 @@ internal static class GamingChecks
               GameTracker.Low(Enumerable.Repeat(100.0, 59).ToList()) == null,
             "Sessions are saved and read back; a damaged file starts empty; 1% low needs a minute of samples");
 
+        // RTSS's 1% low, when paired, wins: its latest reading while playing, the median of its readings once saved.
+        var rtss = new GameTracker(null);
+        for (int s = 0; s < 120; s++) rtss.Update(t0.AddSeconds(s), "steam:3", "Rtss Game", 120, null, null, s < 40 ? 70 : s < 119 ? 80 : 55);
+        var rtssLive = rtss.Snapshot(t0.AddSeconds(119));
+        var rtssDone = rtss.End();
+        var unpaired = new GameTracker(null);
+        for (int s = 0; s < 120; s++) unpaired.Update(t0.AddSeconds(s), "steam:4", "No Rtss", s % 100 == 0 ? 30 : 90, null, null, s % 2 == 0 ? 0 : null);
+        Check(rtssLive.LowFps == 55 && rtssDone is { LowFps: 80 } && unpaired.End() is { LowFps: 30 },
+            "With RTSS's \"Framerate 1% Low\" paired the 1% low is RTSS's (latest while playing, the session's median once saved); " +
+            "without it (or with RTSS reading 0) it is still the slowest 1% of seconds");
+
+        // After a game: the last session's length, and no live FPS (the sensor now reads the desktop or a launcher).
+        var afterGame = new ThemeDataContext { Gaming = tracker.Snapshot(new DateTime(2026, 11, 10, 9, 0, 0)), Sensors = new SensorSnapshot() };
+        afterGame.Sensors.Values["GpuFps"] = 173;
+        var playing = new ThemeDataContext { Gaming = live, Sensors = afterGame.Sensors };
+        string G(string n, ThemeDataContext x) => ThemeData.Display(ThemeData.Read(n, null, false, x), true);
+        Check(G("GAME_STATE", afterGame) == "LAST PLAYED" && G("GAME_SESSION", afterGame) == "59m" && G("GAME_FPS", afterGame).StartsWith("--", StringComparison.Ordinal) &&
+              G("GAME_FPS", playing) == "173FPS" && G("GAME_SESSION", playing) == "59:59",
+            "After a game the session shows the last one's length and the live FPS is blank, so the desktop's frame rate never reads as the game's");
+        Check(HardwareNameReader.Short("NVIDIA GeForce RTX 5070 Ti") == "RTX 5070 Ti" && HardwareNameReader.Short("AMD Radeon RX 7900 XTX") == "RX 7900 XTX" &&
+              HardwareNameReader.Short("Intel(R) Arc(TM) A770 Graphics") == "Arc A770 Graphics" && HardwareNameReader.Short("NVIDIA") == "NVIDIA",
+            "Themes show the GPU without the vendor's brand words (RTX 5070 Ti)");
+        var named = new SensorSnapshot();
+        named.SourceGroups["GpuLoad"] = "dGPU [#2]: NVIDIA GeForce RTX 5070 Ti: GIGABYTE GeForce RTX 5070 Ti AERO OC 16G (GV-N507TAERO OC-16GD)";
+        var clocks = new SensorSnapshot();
+        clocks.Values["CpuClock"] = 4800;
+        Check(HardwareNameReader.Gpu(named, new MonitorSettings()) == "NVIDIA GeForce RTX 5070 Ti" &&
+              !ThemeView.Shows("CPUCLOCK_G", new ThemeDataContext { Sensors = new SensorSnapshot() }) && ThemeView.Shows("CPUCLOCK_G", new ThemeDataContext { Sensors = clocks }) &&
+              !ThemeView.Shows("MEDIA_PROGRESS", new ThemeDataContext()),
+            "HWiNFO's board-partner name after a second colon is dropped (the model isn't said twice); a clock HWiNFO doesn't export and a media source without a timeline count as nothing to show");
+        var fan = new SensorSnapshot();
+        fan.Values["CpuFan"] = 1183;
+        bool turning = !ThemeView.Shows("CPUFAN_ALERT", new ThemeDataContext { Sensors = fan });
+        fan.Values["CpuFan"] = 0;
+        var wide = BitmapSource.Create(160, 90, 96, 96, PixelFormats.Bgra32, null, new byte[160 * 90 * 4], 160 * 4);
+        var square = BitmapSource.Create(90, 90, 96, 96, PixelFormats.Bgra32, null, new byte[90 * 90 * 4], 90 * 4);
+        Check(turning && ThemeData.Display(ThemeData.Read("CPUFAN_ALERT", null, false, new ThemeDataContext { Sensors = fan }), true) == "STOPPED" &&
+              ThemeData.UsedOf(1500, 1907) == 1.5.ToString("F1") + " / " + 1.9.ToString("0.#") + " TB" && ThemeData.UsedOf(180, 500) == "180 / 500 GB" &&
+              ThemeView.ShowsWhole(true, wide) && !ThemeView.ShowsWhole(true, square) && !ThemeView.ShowsWhole(false, wide),
+            "The CPU fan takes a slot only when it stops; drives read used of total like memory (1.5 / 1.9 TB); a video's wide thumbnail in a round frame is shown whole, covers stay round");
+
+        // Frame time: RTSS's reading when paired, else from FPS; the chart scale never drops below its minimum.
+        var sensors = new SensorSnapshot();
+        sensors.Values["GpuFps"] = 125;
+        string Frame() => ThemeData.Display(ThemeData.Read("FRAMETIME", null, false, new ThemeDataContext { Sensors = sensors }), true);
+        string fromFps = Frame();
+        sensors.Values["GpuFrameTime"] = 41.25;
+        string fromRtss = Frame();
+        sensors.Values["GpuFrameTime"] = null; sensors.Values["GpuFps"] = null;
+        string neither = Frame();
+        var chart = new ThemeElement { Kind = ThemeElementKind.Chart, Maximum = 0, MinimumScale = 25 };
+        Check(fromFps == 8.0.ToString("F1") + "ms" && fromRtss == 41.25.ToString("F1") + "ms" && neither.StartsWith("--", StringComparison.Ordinal) &&
+              ThemeView.ChartScale(chart, 8) == 25 && Math.Abs(ThemeView.ChartScale(chart, 40) - 46) < 1e-9 &&
+              ThemeView.ChartScale(new ThemeElement { Maximum = 100, MinimumScale = 25 }, 300) == 100,
+            "FRAMETIME is RTSS's frame time when paired, else 1000 / FPS (125 FPS = 8.0 ms), blank with neither; an auto-scaled chart never scales below its minimum");
+
         // Theme values.
         var c = new ThemeDataContext { Gaming = live };
         string V(string n) => ThemeData.Display(ThemeData.Read(n, null, false, c), true);
@@ -156,6 +212,48 @@ internal static class GamingChecks
                     }
                     view.Close();
                     Check(fits && shows, $"The {w}x{h} Gaming page shows the session, play time, per-game time and recent sessions within the screen");
+                }
+
+                // Halo Gaming's frame-time chart, fed a minute of readings: amber only where frames took over 33 ms.
+                foreach (var name in new[] { "30-halo-gaming", "31-halo-gaming-column" })
+                {
+                    string dir = BuiltInTemplates.Ensure(BuiltInTemplates.Prefix + name, Path.Combine(root, "templates"))!;
+                    var theme = ThemeStore.Load(dir);
+                    var chart = theme.Elements.Single(e => e.Kind == ThemeElementKind.Chart && e.DataName == "FRAMETIME");
+                    int Amber(bool spikes)
+                    {
+                        var data = ThemeSampleData.Uniform();
+                        var view = new ThemeView(theme, dir, playVideo: false);
+                        view.Measure(new Size(theme.Width, theme.Height)); view.Arrange(new Rect(0, 0, theme.Width, theme.Height)); view.UpdateLayout();
+                        for (int s = 0; s < 60; s++)
+                        {
+                            // 120 FPS (8.3 ms) with, when spiking, a few seconds at 20 FPS (50 ms).
+                            data.Sensors.Values["GpuFps"] = spikes && s % 15 is 10 or 11 ? 20 : 120;
+                            view.Update(data);
+                        }
+                        view.UpdateLayout();
+                        var bitmap = new RenderTargetBitmap(theme.Width, theme.Height, 96, 96, PixelFormats.Pbgra32);
+                        bitmap.Render(view);
+                        if (shots != null)
+                        {
+                            var png = new PngBitmapEncoder();
+                            png.Frames.Add(BitmapFrame.Create(bitmap));
+                            Directory.CreateDirectory(shots);
+                            using var output = File.Create(Path.Combine(shots, $"{name}-frame-time{(spikes ? "-stutter" : "")}.png"));
+                            png.Save(output);
+                        }
+                        int x0 = (int)chart.X, y0 = (int)chart.Y, cw = (int)chart.Width, ch = (int)chart.Height;
+                        var pixels = new byte[cw * ch * 4];
+                        bitmap.CopyPixels(new Int32Rect(x0, y0, cw, ch), pixels, cw * 4, 0);
+                        int amber = 0;
+                        for (int i = 0; i < pixels.Length; i += 4)
+                            if (pixels[i + 2] > 220 && pixels[i + 1] is > 150 and < 205 && pixels[i] < 110) amber++; // BGRA near #FFB547
+                        view.Dispose();
+                        return amber;
+                    }
+                    int calm = Amber(false), stutter = Amber(true);
+                    Check(calm == 0 && stutter > 20 && chart is { MinimumScale: 25, GuideAt: 16.7, WarnAt: 33, Maximum: 0 },
+                        $"{theme.Name} charts frame time with a 16.7 ms guide and a 25 ms floor: a steady 120 FPS stays its own color, seconds at 20 FPS turn the line amber");
                 }
             }
             catch (Exception ex) { failure = ex; }

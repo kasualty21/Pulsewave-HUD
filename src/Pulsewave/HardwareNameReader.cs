@@ -34,6 +34,18 @@ internal static class HardwareNameReader
             CustomFallback(settings.GpuName, DefaultGpuName, "GPU");
     }
 
+    /// <summary>
+    /// A GPU name without the vendor's brand words, for themes' small headers: "NVIDIA GeForce RTX 5070 Ti" is
+    /// "RTX 5070 Ti", "AMD Radeon RX 7900 XTX" is "RX 7900 XTX", "Intel(R) Arc(TM) A770" is "Arc A770".
+    /// </summary>
+    public static string Short(string? name)
+    {
+        string n = (name ?? "").Replace("(R)", "", StringComparison.OrdinalIgnoreCase).Replace("(TM)", "", StringComparison.OrdinalIgnoreCase).Trim();
+        foreach (var brand in new[] { "NVIDIA GeForce ", "NVIDIA ", "AMD Radeon ", "AMD ", "Intel " })
+            if (n.StartsWith(brand, StringComparison.OrdinalIgnoreCase) && n.Length > brand.Length + 2) { n = n[brand.Length..]; break; }
+        return string.Join(' ', n.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+    }
+
     private static string? FromSensorGroup(SensorSnapshot snapshot, string metric, string kind)
     {
         if (!snapshot.SourceGroups.TryGetValue(metric, out var group)) return null;
@@ -42,6 +54,10 @@ internal static class HardwareNameReader
         // sensor-family prefix so the 8-inch dashboard shows the actual model.
         int separator = group.IndexOf(':');
         if (separator >= 0) group = group[(separator + 1)..].Trim();
+        // HWiNFO can add the board partner's full name after another colon
+        // ("NVIDIA GeForce RTX 5070 Ti: GIGABYTE GeForce RTX 5070 Ti AERO OC 16G"): the model is enough.
+        separator = group.IndexOf(':');
+        if (separator > 0) group = group[..separator].Trim();
         if (group.Length == 0 || group.Equals(kind, StringComparison.OrdinalIgnoreCase) ||
             group.StartsWith(kind + " [", StringComparison.OrdinalIgnoreCase) ||
             kind == "GPU" && IsRemoteOrVirtual(group)) return null;

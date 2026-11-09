@@ -113,7 +113,9 @@ if(args.Contains("--form-shots"))
         {
             ("themes", new ThemesForm(settings, themes, _ => { }, displaySize: () => (682, 2560))),
             ("playlist", new PlaylistForm(settings, Pulsewave.Themes.ThemeCycle.Available(themes), _ => [], displaySize: () => (682, 2560))),
-            ("shortcuts", new ShortcutsForm(settings.Shortcuts, _ => null)),
+            ("shortcuts", new ShortcutsForm(settings.Shortcuts, settings.ShortcutLists, (_, _) => null)),
+            ("shortcuts-gaming", new ShortcutsForm([..settings.Shortcuts, new AppShortcut{Name="Steam",Target="steam://open/main"}, new AppShortcut{Name="Discord mute",Kind=AppShortcut.KeysKind,Target="Ctrl+Shift+M"}],
+                new Dictionary<string, List<int>>{["Gaming"]=[3,4]}, (_, _) => null, ShortcutLists.Gaming)),
             ("lights", new LightsForm(new LightsSettings(), _ => { }, () => { }, () => null)),
             ("schedule", new ScheduleForm([new ScheduleRule{Screen=true,Theme="builtin:36-paper"},new ScheduleRule{Off="09:00",On="17:00",Lights=false,Days=62,Theme="builtin:32-halo-productivity"}], _ => null, "", themes: Pulsewave.Themes.ThemeCycle.Available(System.IO.Path.Combine(System.IO.Path.GetTempPath(),"pw-form-shots-themes")).Select(x => (x.Id, x.Name)).ToList())),
             ("weather", new WeatherForm(new WeatherSettings{City="San Francisco",Latitude=37.8,Longitude=-122.4}, () => null)),

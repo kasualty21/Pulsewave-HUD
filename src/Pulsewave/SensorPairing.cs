@@ -38,7 +38,8 @@ public static class SensorPairing
             "CpuFan" or "GpuFan" or "PumpRpm" or "CaseFan1" or "CaseFan2" => unit == "rpm" ? 1 : null,
             "CpuPower" or "GpuPower" => unit == "w" ? 1 : null,
             "CpuLoad" or "GpuLoad" or "MemoryLoad" or "GpuVramLoad" or "DriveLoad" => unit == "%" ? 1 : null,
-            "GpuFps" => unit == "fps" ? 1 : null,
+            "GpuFps" or "GpuFpsLow" => unit == "fps" ? 1 : null,
+            "GpuFrameTime" => unit switch { "ms" => 1, "s" => 1000, _ => null },
             "CpuClock" or "GpuClock" => unit switch { "mhz" => 1, "ghz" => 1000, _ => null },
             "CpuVoltage" or "GpuVoltage" => unit switch { "v" => 1, "mv" => 0.001, _ => null },
             _ => 1
@@ -62,6 +63,12 @@ public static class SensorPairing
             "GpuFps" when Has("framerate displayed") || Has("frame rate displayed") => 115,
             "GpuFps" when label is "framerate" or "frame rate" or "fps" => 110,
             "GpuFps" when Has("framerate") || Has("frame rate") || Has("fps") => 105,
+            // RTSS's frame time (not its averages or lows) and its 1% low FPS ("0.1% low" contains "1% low").
+            "GpuFrameTime" when Has("low") || Has("avg") || Has("average") || Has("max") || Has("min") => -1,
+            "GpuFrameTime" when label is "frame time" or "frametime" => 110,
+            "GpuFrameTime" when Has("frame time") || Has("frametime") => 105,
+            "GpuFpsLow" when Has("0.1%") => -1,
+            "GpuFpsLow" when (Has("framerate") || Has("frame rate") || Has("fps")) && Has("1% low") => 110,
             "GpuVram" when gpu && (Has("dedicated memory used") || Has("gpu memory allocated") ||
                                     Has("memory allocated") || Has("memory used")) => 110,
             "GpuVram" when gpu && (Has("video memory") || Has("vram")) => 95,

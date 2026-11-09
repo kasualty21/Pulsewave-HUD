@@ -88,9 +88,13 @@ public sealed class AppDrawerView : Grid
     }
 
     /// <summary>Fills the drawer with the shortcuts (slot order; empty slots are left out) and restarts the idle timer.</summary>
-    public void Open(IReadOnlyList<ShortcutView?> slots)
+    public void Open(IReadOnlyList<ShortcutView?> slots) => Open(slots, Enumerable.Range(1, slots.Count).ToList());
+
+    /// <summary>Fills the drawer with the shortcuts in <paramref name="order"/> (1-based slots; empty ones are left out).</summary>
+    public void Open(IReadOnlyList<ShortcutView?> slots, IReadOnlyList<int> order)
     {
-        _shortcuts = slots.Select((view, i) => (View: view!, Slot: i + 1)).Where(s => s.View != null).ToList();
+        _shortcuts = order.Where(slot => slot >= 1 && slot <= slots.Count && slots[slot - 1] != null)
+            .Select(slot => (View: slots[slot - 1]!, Slot: slot)).ToList();
         ShowPage(0);
     }
 

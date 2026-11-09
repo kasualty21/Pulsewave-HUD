@@ -69,6 +69,74 @@ public sealed class AppShortcut
     }
 }
 
+/// <summary>
+/// The Gaming and Productivity shortcut lists: an ordered pick of the user's shortcuts (by 1-based slot) for themes
+/// that follow that list, such as Halo Gaming and Halo Productivity. Their tiles show the picks in order (tile 1 is the
+/// first pick); their app drawer shows the picks first, then every other shortcut. A list with no picks behaves like
+/// the main list, so nothing changes until the user picks.
+/// </summary>
+public static class ShortcutLists
+{
+    public const string Gaming = "Gaming", Productivity = "Productivity";
+    public static readonly string[] Names = [Gaming, Productivity];
+
+    /// <summary>The list's real name ("Gaming") for a theme's ShortcutList, or null for the main list.</summary>
+    public static string? Canonical(string? name) =>
+        Names.FirstOrDefault(n => n.Equals(name?.Trim(), StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>The list's picks that still point at a shortcut, in order, without repeats.</summary>
+    public static List<int> Valid(IReadOnlyList<AppShortcut> all, IEnumerable<int>? picks) =>
+        (picks ?? []).Where(slot => slot >= 1 && slot <= all.Count && !all[slot - 1].IsEmpty).Distinct().ToList();
+
+    /// <summary>The picks of <paramref name="list"/> in <paramref name="lists"/>, or none for the main list.</summary>
+    public static List<int> PicksOf(IReadOnlyDictionary<string, List<int>>? lists, IReadOnlyList<AppShortcut> all, string? list) =>
+        Canonical(list) is { } name && lists != null && lists.TryGetValue(name, out var picks) ? Valid(all, picks) : [];
+
+    /// <summary>The slot each tile opens (tile 1 first): the picks, or with none every slot in order.</summary>
+    public static List<int> TileSlots(IReadOnlyList<AppShortcut> all, IReadOnlyList<int> picks) =>
+        picks.Count > 0 ? picks.ToList() : Enumerable.Range(1, all.Count).ToList();
+
+    /// <summary>The app drawer's order: the picks, then every other shortcut by slot.</summary>
+    public static List<int> DrawerSlots(IReadOnlyList<AppShortcut> all, IReadOnlyList<int> picks) =>
+        picks.Concat(Enumerable.Range(1, all.Count).Where(slot => !all[slot - 1].IsEmpty && !picks.Contains(slot))).ToList();
+
+    /// <summary>Keeps known lists only, with picks in range and without repeats (older settings have none).</summary>
+    public static Dictionary<string, List<int>> Normalize(IDictionary<string, List<int>>? lists)
+    {
+        var clean = new Dictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (key, picks) in lists ?? new Dictionary<string, List<int>>())
+            if (Canonical(key) is { } name && picks != null)
+                clean[name] = picks.Where(slot => slot is >= 1 and <= AppShortcut.MaxCount).Distinct().ToList();
+        return clean;
+    }
+
+    // Keeping picks on the same shortcuts while the main list changes (the Shortcuts window's buttons).
+
+    /// <summary>Slots <paramref name="a"/> and <paramref name="b"/> swapped places.</summary>
+    public static void Swapped(IDictionary<string, List<int>> lists, int a, int b)
+    {
+        foreach (var picks in lists.Values)
+            for (int i = 0; i < picks.Count; i++)
+                picks[i] = picks[i] == a ? b : picks[i] == b ? a : picks[i];
+    }
+
+    /// <summary>Slot <paramref name="slot"/> was removed: later shortcuts moved up one.</summary>
+    public static void Removed(IDictionary<string, List<int>> lists, int slot)
+    {
+        foreach (var picks in lists.Values)
+        {
+            picks.Remove(slot);
+            for (int i = 0; i < picks.Count; i++) if (picks[i] > slot) picks[i]--;
+        }
+    }
+
+    /// <summary>Slot <paramref name="slot"/> now holds a different shortcut (or none): no list keeps it.</summary>
+    public static void Replaced(IDictionary<string, List<int>> lists, int slot)
+    {
+        foreach (var picks in lists.Values) picks.Remove(slot);
+    }
+}
+
 /// <summary>Icons for shortcuts, from the documented shell image factory (the same icons Explorer shows).</summary>
 public static class ShortcutIcons
 {

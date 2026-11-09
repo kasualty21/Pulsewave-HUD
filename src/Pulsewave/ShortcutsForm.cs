@@ -7,7 +7,8 @@ namespace Pulsewave;
 
 /// <summary>
 /// Shortcuts the HUD can open: programs, games (.exe, Start menu and Steam/Epic shortcuts),
-/// folders and links. Their order is the slot number themes refer to.
+/// folders and links. Their order is the slot number themes refer to. The Gaming and Productivity
+/// lists pick and order some of them for the themes that follow those lists (Halo Gaming, Halo Productivity).
 /// </summary>
 public sealed class ShortcutsForm : Forms.Form
 {
@@ -15,7 +16,14 @@ public sealed class ShortcutsForm : Forms.Form
     protected override void OnLoad(EventArgs e) { DesktopStyle.Apply(this); base.OnLoad(e); }
 
     private readonly List<AppShortcut> _items;
-    private readonly Func<List<AppShortcut>, string?> _save;
+    private readonly Dictionary<string, List<int>> _lists = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Func<List<AppShortcut>, Dictionary<string, List<int>>, string?> _save;
+    private readonly Forms.ComboBox _listPicker = new();
+    private readonly Forms.Label _listNote = new();
+    private readonly List<Forms.Control> _mainOnly = [];
+    // The list being edited (null: all shortcuts) and which shortcut (0-based) each row shows.
+    private string? _shownList;
+    private List<int> _rows = [];
     private readonly Forms.ListView _list = new();
     private readonly Forms.ImageList _icons = new() { ImageSize = new Size(32, 32), ColorDepth = Forms.ColorDepth.Depth32Bit };
     private readonly Forms.TextBox _name = new(), _target = new(), _arguments = new(), _icon = new();
@@ -23,15 +31,19 @@ public sealed class ShortcutsForm : Forms.Form
     private readonly Forms.Panel _editor = new();
     private bool _loading;
 
-    /// <param name="save">Saves the list; returns why it could not, or null.</param>
-    public ShortcutsForm(IEnumerable<AppShortcut> shortcuts, Func<List<AppShortcut>, string?> save)
+    /// <param name="lists">The Gaming and Productivity lists (1-based slots).</param>
+    /// <param name="save">Saves the shortcuts and lists; returns why it could not, or null.</param>
+    /// <param name="list">The list to show first ("Gaming", "Productivity"); null shows all shortcuts.</param>
+    public ShortcutsForm(IEnumerable<AppShortcut> shortcuts, IReadOnlyDictionary<string, List<int>> lists,
+        Func<List<AppShortcut>, Dictionary<string, List<int>>, string?> save, string? list = null)
     {
         _items = shortcuts.Select(s => s.Copy()).ToList();
+        CopyLists(lists);
         _save = save;
         Text = "Pulsewave · Shortcuts";
         StartPosition = Forms.FormStartPosition.CenterScreen;
-        Size = new Size(980, 600);
-        MinimumSize = new Size(820, 480);
+        Size = new Size(980, 640);
+        MinimumSize = new Size(820, 520);
         BackColor = Color.FromArgb(19, 27, 37);
         ForeColor = Color.FromArgb(232, 242, 249);
         Font = new Font("Segoe UI", 9.5f);
@@ -59,6 +71,7 @@ public sealed class ShortcutsForm : Forms.Form
         _list.ForeColor = ForeColor;
         _list.BorderStyle = Forms.BorderStyle.None;
         _list.SelectedIndexChanged += (_, _) => ShowSelected();
+        _list.ItemChecked += (_, e) => { if (!_loading) Pick(e.Item.Index, e.Item.Checked); };
         // Drop .exe/.lnk/.url files, folders or a web/steam:// address: onto a row to put it in that slot, elsewhere to add it.
         AllowDrop = _list.AllowDrop = true;
         _list.DragEnter += (_, e) => e.Effect = Dropped(e.Data).Count > 0 ? Forms.DragDropEffects.Copy : Forms.DragDropEffects.None;
@@ -70,6 +83,27 @@ public sealed class ShortcutsForm : Forms.Form
         };
         DragEnter += (_, e) => e.Effect = Dropped(e.Data).Count > 0 ? Forms.DragDropEffects.Copy : Forms.DragDropEffects.None;
         DragDrop += (_, e) => AddDropped(Dropped(e.Data), 0);
+
+        // Which list: all shortcuts (slot order, used by Halo Lifestyle and most themes) or a theme list.
+        var listBar = new Forms.FlowLayoutPanel
+        {
+            Dock = Forms.DockStyle.Top, Height = 44, Padding = new Forms.Padding(14, 6, 14, 0),
+            FlowDirection = Forms.FlowDirection.LeftToRight, WrapContents = false
+        };
+        listBar.Controls.Add(new Forms.Label { Text = "List", AutoSize = true, ForeColor = Color.FromArgb(176, 196, 209), Margin = new Forms.Padding(0, 8, 8, 0) });
+        _listPicker.DropDownStyle = Forms.ComboBoxStyle.DropDownList;
+        _listPicker.Width = 330;
+        _listPicker.BackColor = Color.FromArgb(14, 21, 30);
+        _listPicker.ForeColor = ForeColor;
+        _listPicker.FlatStyle = Forms.FlatStyle.Flat;
+        _listPicker.Items.AddRange(["All shortcuts (Halo Lifestyle and most themes)", "Gaming (Halo Gaming)", "Productivity (Halo Productivity)"]);
+        _listPicker.SelectedIndex = 0;
+        _listPicker.SelectedIndexChanged += (_, _) => ShowList(_listPicker.SelectedIndex switch { 1 => ShortcutLists.Gaming, 2 => ShortcutLists.Productivity, _ => null });
+        _listNote.AutoSize = true;
+        _listNote.Text = MainNote;
+        _listNote.ForeColor = Color.FromArgb(150, 170, 185);
+        _listNote.Margin = new Forms.Padding(12, 8, 0, 0);
+        listBar.Controls.AddRange([_listPicker, _listNote]);
 
         _editor.Dock = Forms.DockStyle.Right;
         _editor.Width = 330;
@@ -121,18 +155,19 @@ public sealed class ShortcutsForm : Forms.Form
         var close = Button("Close", Color.FromArgb(44, 62, 83));
         var remove = Button("Remove", Color.FromArgb(110, 52, 52));
         var clear = Button("Clear slot", Color.FromArgb(44, 62, 83));
-        clear.Click += (_, _) => { if (Index is int i) { _items[i] = new AppShortcut(); Reload(i); } };
+        clear.Click += (_, _) => { if (Index is int i) { _items[i] = new AppShortcut(); ShortcutLists.Replaced(_lists, i + 1); Reload(i); } };
         var down = Button("Move down", Color.FromArgb(44, 62, 83));
         var up = Button("Move up", Color.FromArgb(44, 62, 83));
         saveButton.Click += (_, _) => Save();
         close.Click += (_, _) => Close();
-        remove.Click += (_, _) => { if (Index is int i) { _items.RemoveAt(i); Reload(Math.Min(i, _items.Count - 1)); } };
+        remove.Click += (_, _) => { if (Index is int i) { _items.RemoveAt(i); ShortcutLists.Removed(_lists, i + 1); Reload(Math.Min(i, _items.Count - 1)); } };
         up.Click += (_, _) => MoveSelected(-1);
         down.Click += (_, _) => MoveSelected(+1);
         _status.AutoSize = true;
         _status.ForeColor = Color.FromArgb(176, 196, 209);
         _status.Margin = new Forms.Padding(12, 10, 0, 0);
         footer.Controls.AddRange([saveButton, close, remove, clear, down, up, _status]);
+        _mainOnly.AddRange([remove, clear]);
 
         var add = new Forms.FlowLayoutPanel
         {
@@ -157,26 +192,76 @@ public sealed class ShortcutsForm : Forms.Form
         actions.Items.Add("Sleep PC", null, (_, _) => AddItem(new AppShortcut { Name = "Sleep", Kind = AppShortcut.SystemKind, Target = "Sleep" }));
         addAction.Click += (_, _) => actions.Show(addAction, new Point(0, addAction.Height));
         add.Controls.AddRange([addProgram, addStart, addLink, addSteam, addAction]);
+        _mainOnly.Add(add);
 
         Controls.Add(_list);
         Controls.Add(_editor);
         Controls.Add(add);
         Controls.Add(footer);
+        Controls.Add(listBar);
         Controls.Add(title);
         FormClosed += (_, _) => { foreach (var image in _icons.Images.Cast<Image>().ToList()) image.Dispose(); _icons.Dispose(); };
         Reload(_items.Count > 0 ? 0 : -1);
+        if (ShortcutLists.Canonical(list) is { } shown) _listPicker.SelectedIndex = Array.IndexOf(ShortcutLists.Names, shown) + 1;
     }
 
     /// <summary>Shows shortcuts saved elsewhere (dropped onto the HUD) while this window is open.</summary>
-    public void ShowSaved(IEnumerable<AppShortcut> shortcuts)
+    public void ShowSaved(IEnumerable<AppShortcut> shortcuts, IReadOnlyDictionary<string, List<int>> lists)
     {
         _items.Clear();
         _items.AddRange(shortcuts.Select(s => s.Copy()));
+        CopyLists(lists);
         Reload(Index ?? (_items.Count > 0 ? 0 : -1));
     }
 
-    private int? Index => _list.SelectedIndices.Count == 1 ? _list.SelectedIndices[0] : null;
+    private void CopyLists(IReadOnlyDictionary<string, List<int>> lists)
+    {
+        _lists.Clear();
+        foreach (var name in ShortcutLists.Names)
+            _lists[name] = lists.TryGetValue(name, out var picks) ? picks.ToList() : [];
+    }
+
+    /// <summary>The selected shortcut's index in the full list (0-based), whichever list is shown.</summary>
+    private int? Index => _list.SelectedIndices.Count == 1 && _list.SelectedIndices[0] < _rows.Count ? _rows[_list.SelectedIndices[0]] : null;
     private AppShortcut? Selected => Index is int i ? _items[i] : null;
+
+    /// <summary>The picks of the list being edited (1-based slots), without ones that point at nothing.</summary>
+    private List<int> Picks => _shownList == null ? [] : _lists[_shownList] = ShortcutLists.Valid(_items, _lists[_shownList]);
+
+    /// <summary>Shows all shortcuts (null) or a list's picks in order, ticked, then the rest unticked.</summary>
+    private void ShowList(string? list)
+    {
+        _shownList = list;
+        SetCheckBoxes(list != null);
+        foreach (var control in _mainOnly) control.Enabled = list == null;
+        _listNote.Text = list == null ? MainNote
+            : $"Tick shortcuts for {list}; Move up / down sets the tile order (tile 1 first).";
+        _status.Text = "";
+        Reload(Index ?? (_items.Count > 0 ? 0 : -1));
+    }
+
+    private const string MainNote = "Halo Gaming and Halo Productivity can show their own picks instead (pick the list).";
+
+    private void SetCheckBoxes(bool on)
+    {
+        _loading = true;
+        _list.CheckBoxes = on;
+        _list.Columns[0].Text = on ? "Tile" : "Slot";
+        _list.Columns[0].Width = on ? 104 : 56; // a tick box and the icon before the number
+        _loading = false;
+    }
+
+    /// <summary>Ticking adds a shortcut to the end of the list being edited; unticking takes it out.</summary>
+    private void Pick(int row, bool picked)
+    {
+        if (_shownList == null || row < 0 || row >= _rows.Count) return;
+        var picks = Picks;
+        int slot = _rows[row] + 1;
+        picks.Remove(slot);
+        if (picked) picks.Add(slot);
+        _lists[_shownList] = picks;
+        BeginInvoke(() => Reload(_rows[row]));
+    }
 
     private static Forms.Button Button(string text, Color color) => new()
     {
@@ -292,11 +377,13 @@ public sealed class ShortcutsForm : Forms.Form
     /// <summary>The first dropped item goes in <paramref name="slot"/> (0 = first free); the rest fill free slots after it.</summary>
     private void AddDropped(List<AppShortcut> dropped, int slot)
     {
+        if (_shownList != null) { _listPicker.SelectedIndex = 0; slot = 0; } // drops go into all shortcuts
         int last = -1;
         foreach (var shortcut in dropped)
         {
             int used = AppShortcut.Assign(_items, shortcut, slot);
             if (used == 0) { _status.Text = $"Up to {AppShortcut.MaxCount} shortcuts."; break; }
+            ShortcutLists.Replaced(_lists, used);
             last = used - 1;
             slot = 0;
         }
@@ -305,32 +392,57 @@ public sealed class ShortcutsForm : Forms.Form
 
     private void MoveSelected(int step)
     {
-        if (Index is not int i || i + step < 0 || i + step >= _items.Count) return;
+        if (Index is not int i) return;
+        if (_shownList != null)
+        {
+            // In a list, moving changes the tile order of its picks only.
+            var picks = Picks;
+            int at = picks.IndexOf(i + 1);
+            if (at < 0 || at + step < 0 || at + step >= picks.Count) return;
+            (picks[at], picks[at + step]) = (picks[at + step], picks[at]);
+            _lists[_shownList] = picks;
+            Reload(i);
+            return;
+        }
+        if (i + step < 0 || i + step >= _items.Count) return;
         (_items[i], _items[i + step]) = (_items[i + step], _items[i]);
+        ShortcutLists.Swapped(_lists, i + 1, i + step + 1);
         Reload(i + step);
     }
 
+    /// <summary>Fills the rows (all shortcuts, or a list's picks then the rest) and selects the shortcut at <paramref name="select"/>.</summary>
     private void Reload(int select)
     {
+        _loading = true;
+        var picks = Picks;
+        _rows = _shownList == null ? Enumerable.Range(0, _items.Count).ToList()
+            : picks.Select(slot => slot - 1).Concat(Enumerable.Range(0, _items.Count).Where(i => !_items[i].IsEmpty && !picks.Contains(i + 1))).ToList();
         _list.BeginUpdate();
         _list.Items.Clear();
         foreach (var image in _icons.Images.Cast<Image>().ToList()) image.Dispose();
         _icons.Images.Clear();
-        for (int i = 0; i < _items.Count; i++)
+        for (int row = 0; row < _rows.Count; row++)
         {
+            int i = _rows[row];
+            int tile = picks.IndexOf(i + 1) + 1;
             _icons.Images.Add(IconFor(_items[i]));
-            _list.Items.Add(new Forms.ListViewItem([(i + 1).ToString(), _items[i].IsEmpty ? "(empty slot)" : _items[i].DisplayName, _items[i].Target], i)
-                { ForeColor = _items[i].IsEmpty ? Color.FromArgb(130, 150, 165) : _list.ForeColor });
+            string number = _shownList == null ? (i + 1).ToString() : tile > 0 ? tile.ToString() : "";
+            _list.Items.Add(new Forms.ListViewItem([number, _items[i].IsEmpty ? "(empty slot)" : _items[i].DisplayName, _items[i].Target], row)
+                { ForeColor = _items[i].IsEmpty || _shownList != null && tile == 0 ? Color.FromArgb(130, 150, 165) : _list.ForeColor, Checked = tile > 0 });
         }
         _list.EndUpdate();
-        if (select >= 0 && select < _items.Count) { _list.Items[select].Selected = true; _list.Items[select].EnsureVisible(); }
+        int selectRow = _rows.IndexOf(select);
+        if (selectRow >= 0) { _list.Items[selectRow].Selected = true; _list.Items[selectRow].EnsureVisible(); }
+        _loading = false;
         ShowSelected();
+        if (_shownList != null) _status.Text = picks.Count == 0 ? $"Nothing ticked: {_shownList} themes show all shortcuts in slot order." : $"{picks.Count} on {_shownList} · Save to keep";
     }
 
-    private void RefreshRow(int i)
+    private void RefreshRow(int row)
     {
-        _list.Items[i].SubItems[1].Text = _items[i].IsEmpty ? "(empty slot)" : _items[i].DisplayName;
-        _list.Items[i].SubItems[2].Text = _items[i].Target;
+        int i = _rows[row];
+        _list.Items[row].SubItems[1].Text = _items[i].IsEmpty ? "(empty slot)" : _items[i].DisplayName;
+        _list.Items[row].SubItems[2].Text = _items[i].Target;
     }
 
     private void ShowSelected()
@@ -356,7 +468,8 @@ public sealed class ShortcutsForm : Forms.Form
             _status.Text = $"'{bad.Target}' is not a key combination (try Ctrl+Shift+M, F9 or MediaPlayPause).";
             return;
         }
-        string? error = _save(_items.Select(s => new AppShortcut { Name = s.Name.Trim(), Kind = s.Kind, Target = s.Target.Trim(), Arguments = s.Arguments.Trim(), IconFile = s.IconFile }).ToList());
+        string? error = _save(_items.Select(s => new AppShortcut { Name = s.Name.Trim(), Kind = s.Kind, Target = s.Target.Trim(), Arguments = s.Arguments.Trim(), IconFile = s.IconFile }).ToList(),
+            _lists.ToDictionary(p => p.Key, p => ShortcutLists.Valid(_items, p.Value), StringComparer.OrdinalIgnoreCase));
         Reload(Index ?? (_items.Count > 0 ? 0 : -1));
         int count = _items.Count(s => !s.IsEmpty);
         _status.Text = error ?? $"Saved · {count} shortcut{(count == 1 ? "" : "s")}";

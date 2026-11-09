@@ -144,6 +144,13 @@ public sealed class ThemeView : Grid, IDisposable
     public void Update(ThemeDataContext data)
     {
         foreach (var part in _parts) part.Update(data);
+        // Elements shown only while a reading has a value (an unpaired clock, a source without a timeline).
+        foreach (var (element, visuals) in _visuals)
+        {
+            if (element.ShowIf is not { Length: > 0 } condition) continue;
+            var shown = Shows(condition, data) ? Visibility.Visible : Visibility.Hidden;
+            foreach (var visual in visuals) if (visual.Visibility != shown) visual.Visibility = shown;
+        }
         // A frozen or offline feed dims every sensor reading, so a stuck 88 °C never looks live.
         if (data.SensorFeed != _feed)
         {
@@ -329,6 +336,20 @@ public sealed class ThemeView : Grid, IDisposable
         return brush;
     }
 
+    /// <summary>
+    /// A wide picture (a video's 16:9 thumbnail) in a round frame is shown whole as a rounded rectangle across the
+    /// circle, not cropped to it (which cut off its own title); covers and square frames are unchanged.
+    /// </summary>
+    internal static bool ShowsWhole(bool round, BitmapSource? art) => round && art is { PixelHeight: > 0 } a && a.PixelWidth / (double)a.PixelHeight > 1.25;
+
+    /// <summary>Whether a reading has a value to show (a number, or text other than the missing mark).</summary>
+    internal static bool Shows(string name, ThemeDataContext data) =>
+        ThemeData.Read(name, null, false, data) is var v && (v.Number is { } n && double.IsFinite(n) || v.Text.Length > 0 && v.Text != ThemeData.Missing);
+
+    /// <summary>The value at the top of a chart: its Maximum, or 15% above its peak but never below MinimumScale.</summary>
+    internal static double ChartScale(ThemeElement element, double peak) =>
+        element.Maximum > 0 ? element.Maximum : Math.Max(Math.Max(1, element.MinimumScale), peak * 1.15);
+
     /// <summary>0 normal, 1 warning, 2 critical, from the element's thresholds and the reading that decides (°C for temperatures).</summary>
     internal static int AlertLevel(ThemeElement e, ThemeDataContext data)
     {
@@ -448,8 +469,11 @@ public sealed class ThemeView : Grid, IDisposable
     private sealed class AlbumArtPart : IPart
     {
         private readonly Image _cover;
-        private readonly bool _gray;
+        private readonly bool _gray, _round;
         private readonly TextBlock _placeholder;
+        private readonly Border _box;
+        private readonly Brush _fill;
+        private readonly double _w, _h, _r;
         private object? _shown = new();
 
         public AlbumArtPart(ThemeElement element, Canvas canvas)
@@ -463,7 +487,11 @@ public sealed class ThemeView : Grid, IDisposable
                 Foreground = Solid(element.LineColor, Colors.White), HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
                 VerticalAlignment = System.Windows.VerticalAlignment.Center
             };
-            var box = new Border { Width = w, Height = h, CornerRadius = new CornerRadius(r), Background = Solid(element.FillColor, Colors.Transparent) };
+            (_w, _h, _r) = (w, h, r);
+            _round = r >= Math.Min(w, h) / 2 - 1;
+            _fill = Solid(element.FillColor, Colors.Transparent);
+            var box = new Border { Width = w, Height = h, CornerRadius = new CornerRadius(r), Background = _fill };
+            _box = box;
             var layers = new Grid();
             layers.Children.Add(_placeholder);
             layers.Children.Add(_cover);
@@ -471,11 +499,29 @@ public sealed class ThemeView : Grid, IDisposable
             Place(canvas, box, element.X, element.Y);
         }
 
+        private void Fit(BitmapSource? art)
+        {
+            if (ShowsWhole(_round, art))
+            {
+                double ih = Math.Min(_h, _w * art!.PixelHeight / art.PixelWidth), corner = Math.Min(_w, _h) * 0.08;
+                _cover.Stretch = Stretch.Uniform;
+                _cover.Clip = new RectangleGeometry(new Rect(0, (_h - ih) / 2, _w, ih), corner, corner);
+                _box.Background = Brushes.Transparent;
+            }
+            else
+            {
+                _cover.Stretch = Stretch.UniformToFill;
+                _cover.Clip = new RectangleGeometry(new Rect(0, 0, _w, _h), _r, _r);
+                _box.Background = _fill;
+            }
+        }
+
         public void Update(ThemeDataContext data)
         {
             var art = data.Media?.Art;
             if (ReferenceEquals(art, _shown)) return;
             _shown = art;
+            Fit(art);
             _cover.Source = _gray ? Gray(art) : art;
             _placeholder.Visibility = art is null ? Visibility.Visible : Visibility.Collapsed;
         }
@@ -640,7 +686,8 @@ public sealed class ThemeView : Grid, IDisposable
                 }
                 return;
             }
-            Place(canvas, new Rectangle { Width = w, Height = h, Fill = _back, RadiusX = element.CornerRadius, RadiusY = element.CornerRadius },
+            Place(canvas, new Rectangle { Width = w, Height = h, Fill = _back, RadiusX = element.CornerRadius, RadiusY = element.CornerRadius,
+                Stroke = element.BorderWidth > 0 ? Solid(element.BorderColor, Colors.Transparent) : null, StrokeThickness = element.BorderWidth },
                 element.X, element.Y);
             _fill = new Rectangle { Width = 0, Height = h, Fill = _front, RadiusX = element.CornerRadius, RadiusY = element.CornerRadius };
             Place(canvas, _fill, element.X, element.Y);
@@ -730,6 +777,8 @@ public sealed class ThemeView : Grid, IDisposable
         private readonly Queue<double> _history = new();
         private readonly Polyline _line;
         private readonly Polygon _area;
+        private readonly Polyline? _warnLine;
+        private readonly Line? _guide;
 
         public ChartPart(ThemeElement element, Canvas canvas)
         {
@@ -740,7 +789,19 @@ public sealed class ThemeView : Grid, IDisposable
             _line = new Polyline { Stroke = Solid(element.LineColor, Colors.White), StrokeThickness = Math.Max(0.5, element.LineWidth),
                 StrokeLineJoin = PenLineJoin.Round };
             host.Children.Add(_area);
+            if (element.GuideAt is > 0)
+            {
+                _guide = new Line { X1 = 0, X2 = w, Stroke = Solid(element.LineColor, Colors.White), Opacity = 0.45, StrokeThickness = 1.5,
+                    StrokeDashArray = [4, 4] };
+                host.Children.Add(_guide);
+            }
             host.Children.Add(_line);
+            if (element.WarnAt is > 0 && !element.LowIsBad)
+            {
+                // The same line in the warning color, shown only above the warning level (by its clip).
+                _warnLine = new Polyline { Stroke = AlertBrushes(element).Warn, StrokeThickness = _line.StrokeThickness, StrokeLineJoin = PenLineJoin.Round };
+                host.Children.Add(_warnLine);
+            }
             if (element.BorderWidth > 0)
                 host.Children.Add(new Rectangle { Width = w, Height = h, Stroke = Solid(element.BorderColor, Colors.Transparent),
                     StrokeThickness = element.BorderWidth });
@@ -754,15 +815,26 @@ public sealed class ThemeView : Grid, IDisposable
             while (_history.Count > Math.Max(2, _element.Samples)) _history.Dequeue();
 
             double w = Math.Max(1, _element.Width), h = Math.Max(1, _element.Height);
-            double max = _element.Maximum > 0 ? _element.Maximum : Math.Max(1, _history.Max() * 1.15);
-            double step = w / (Math.Max(2, _element.Samples) - 1);
+            double max = ChartScale(_element, _history.Max());
             var points = new PointCollection();
-            // Newest sample at the right edge, older samples moving left.
-            int i = Math.Max(2, _element.Samples) - _history.Count;
+            // Newest sample at the right edge, older samples moving left. Until the chart is full, what there is spreads
+            // across the whole width (a single reading is a flat line) instead of a sliver at the right edge.
+            int slots = Math.Max(2, Math.Min(_history.Count, Math.Max(2, _element.Samples)));
+            double step = w / (slots - 1);
+            if (_history.Count == 1) points.Add(new Point(0, h - Math.Clamp(_history.Peek() / max, 0, 1) * h));
+            int i = Math.Max(0, slots - _history.Count);
             foreach (var sample in _history)
                 points.Add(new Point(i++ * step, h - Math.Clamp(sample / max, 0, 1) * h));
             points.Freeze();
             _line.Points = points;
+            double Y(double v) => h - Math.Clamp(v / max, 0, 1) * h;
+            if (_guide != null) _guide.Y1 = _guide.Y2 = Math.Round(Y(_element.GuideAt!.Value)) + 0.5;
+            if (_warnLine != null)
+            {
+                _warnLine.Points = points;
+                double top = Y(_element.WarnAt!.Value);
+                _warnLine.Clip = top <= 0 ? Geometry.Empty : new RectangleGeometry(new Rect(0, 0, w, top));
+            }
             var area = new PointCollection(points) { new Point(w, h), new Point(points[0].X, h) };
             area.Freeze();
             _area.Points = area;

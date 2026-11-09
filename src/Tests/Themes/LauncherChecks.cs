@@ -64,6 +64,34 @@ internal static class LauncherChecks
         Check(ThemeData.Read("APP_NAME", null, false, withGap, 2).Text == "" && ThemeData.Read("APP_NAME", null, false, withGap, 3).Text == "Three",
             "An empty slot between shortcuts shows nothing and later slots keep their numbers");
 
+        // Gaming and Productivity lists: older settings have none; picks are saved, cleaned and ordered.
+        Check(settings.ShortcutLists.Count == 0 && reloaded.ShortcutLists.Count == 0, "Settings from before shortcut lists load with none (every theme shows the main list)");
+        reloaded.ShortcutLists = new() { ["gaming"] = [5, 2, 5, 0, 99], ["Nonsense"] = [1], ["Productivity"] = [] };
+        SettingsStore.SaveFile(settingsFile, reloaded);
+        var listed = SettingsStore.LoadFile(settingsFile).ShortcutLists;
+        Check(listed.Keys.Order().SequenceEqual(["Gaming", "Productivity"]) && listed["GAMING"].SequenceEqual([5, 2]) && listed["Productivity"].Count == 0,
+            "Shortcut lists are saved per list (Gaming, Productivity) with picks in order, without repeats, slots out of range or unknown lists");
+        var all = new List<AppShortcut> { new() { Target = "1.exe" }, new(), new() { Target = "3.exe" }, new() { Target = "4.exe" }, new() { Target = "5.exe" } };
+        var lists = new Dictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase) { ["Gaming"] = [5, 2, 3], ["Productivity"] = [1, 4] };
+        var gamingPicks = ShortcutLists.PicksOf(lists, all, "gaming");
+        Check(gamingPicks.SequenceEqual([5, 3]) && ShortcutLists.TileSlots(all, gamingPicks).SequenceEqual([5, 3]) &&
+              ShortcutLists.DrawerSlots(all, gamingPicks).SequenceEqual([5, 3, 1, 4]) &&
+              ShortcutLists.PicksOf(lists, all, null).Count == 0 && ShortcutLists.TileSlots(all, []).SequenceEqual([1, 2, 3, 4, 5]) &&
+              ShortcutLists.DrawerSlots(all, []).SequenceEqual([1, 3, 4, 5]) && ShortcutLists.PicksOf(lists, all, "Lifestyle").Count == 0,
+            "A theme on the Gaming list shows its picks on its tiles in order (tile 1 = first pick) and first in the app drawer, then every other shortcut; " +
+            "the main list and a list with no picks show every slot in order");
+        ShortcutLists.Swapped(lists, 4, 5);
+        bool swapped = lists["Gaming"].SequenceEqual([4, 2, 3]) && lists["Productivity"].SequenceEqual([1, 5]);
+        ShortcutLists.Removed(lists, 2);
+        bool removed = lists["Gaming"].SequenceEqual([3, 2]) && lists["Productivity"].SequenceEqual([1, 4]);
+        ShortcutLists.Replaced(lists, 1);
+        Check(swapped && removed && lists["Productivity"].SequenceEqual([4]),
+            "Lists keep their picks on the same shortcuts when the main list is reordered or a shortcut removed, and drop a slot given a new shortcut");
+        var builtIn = new[] { "28-halo", "30-halo-gaming", "31-halo-gaming-column", "32-halo-productivity", "33-halo-productivity-column" }
+            .Select(id => ThemeStore.Load(BuiltInTemplates.Ensure(BuiltInTemplates.Prefix + id, Path.Combine(root, "templates"))!).ShortcutList).ToList();
+        Check(builtIn.SequenceEqual([null, "Gaming", "Gaming", "Productivity", "Productivity"]),
+            "Halo Gaming and Halo Productivity (bar and column) follow their own shortcut lists; Halo Lifestyle keeps the main list");
+
         // Dock mode: the reserved slice of a display; the live app bar is not registered in tests (it would move real windows).
         var display = new System.Drawing.Rectangle(0, 0, 2560, 1440);
         Check(AppBar.Slice(display, "Top", 22) == new System.Drawing.Rectangle(0, 0, 2560, 317) &&

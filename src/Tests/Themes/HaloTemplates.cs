@@ -5,7 +5,7 @@ namespace Pulsewave.Regression;
 // Source of the Halo built-in templates, Pulsewave's signature style, in three focused versions, each for the
 // 8.8" bar (1920x480) and the HYTE Y70 column (682x2560):
 //   Lifestyle (28-halo, 29-halo-column): clock, weather with the next hours, now playing with the album, the dock.
-//   Gaming (30-halo-gaming, 31-halo-gaming-column): live FPS first with its history, the session, CPU and GPU cards
+//   Gaming (30-halo-gaming, 31-halo-gaming-column): live FPS first with frame time, the session, CPU and GPU cards
 //     with what is holding them back (thermal / power limits).
 //   Productivity (32-halo-productivity, 33-halo-productivity-column): one timer card (timer or stopwatch, Pomodoro),
 //     Claude Code and Codex limits with when they reset, system and network, a now-playing strip.
@@ -60,7 +60,7 @@ internal static class HaloTemplates
         Hours(e, 1360, 78, 508, 26);
         e.Add(Value(1360, 182, "WEATHER_RAIN", Font(14, Secondary), unit: false, width: 508));
         Toggles(e, 1360, 214, 508, 56, LifestyleToggles);
-        Dock(e, 1360, 316, 508, 112, 4, 1, labels: true);
+        Dock(e, 1360, 316, 508, 112, 4, 1, labels: false);
         return t;
     }
 
@@ -84,7 +84,7 @@ internal static class HaloTemplates
         Day(e, ix + iw / 2, 824, 2);
 
         // Now playing.
-        Card(e, x, 1014, w, 670);
+        Card(e, x, 1014, w, 562);
         ArtRing(e, ix, 1046, 262);
         double tx = ix + 290, tw = iw - 290;
         e.Add(Header(tx, 1052, "NOW PLAYING"));
@@ -92,15 +92,15 @@ internal static class HaloTemplates
         e.Add(Value(tx, 1154, "MEDIA_ARTIST", Font(16, Secondary), unit: false, width: tw, action: ThemeAction.MediaPage));
         e.Add(Value(tx, 1184, "MEDIA_ALBUM", Font(14, Secondary), unit: false, width: tw, action: ThemeAction.MediaPage));
         e.Add(Value(tx, 1216, "MEDIA_TIME", Num(15, Sky), unit: false));
-        Transport(e, mid, 1364, 84, 112, 170);
-        Volume(e, ix, 1564, iw, 64);
+        Transport(e, mid, 1334, 84, 112, 170);
+        Volume(e, ix, 1478, iw, 64);
 
-        Card(e, x, 1708, w, 170);
-        Toggles(e, ix, 1708 + (170 - 104) / 2.0, iw, 72, LifestyleToggles);
+        Card(e, x, 1600, w, 170);
+        Toggles(e, ix, 1600 + (170 - 104) / 2.0, iw, 72, LifestyleToggles);
 
-        // One row of favourites.
-        Card(e, x, 1902, w, 204);
-        Dock(e, ix, 1928, iw, 152, 4, 1, labels: true);
+        // Two rows of favourites.
+        Card(e, x, 1794, w, 312);
+        Dock(e, ix, 1820, iw, 260, 4, 1, labels: false, rows: 2);
 
         // A light look at the PC, last: the least of what Lifestyle is for.
         Card(e, x, 2130, w, 406);
@@ -114,6 +114,7 @@ internal static class HaloTemplates
     public static ThemeDefinition GamingBar()
     {
         var t = New("Halo Gaming", 1920, 480);
+        t.ShortcutList = ShortcutLists.Gaming;
         var e = t.Elements;
 
         // The game: live FPS first, with its history, then the session.
@@ -124,7 +125,7 @@ internal static class HaloTemplates
         Fps(e, 256, 140, 300, 50, 24, 180, 254, 64);
         SessionRow(e, 52, 346, 504, 18);
 
-        Processor(e, 608, 24, 420, 432, "CPU", "CPUMODEL", "CPULOAD", "CPU_LIMIT", Sky, ("TEMP", "CPUTEMP"), ("POWER", "CPUPWR"), ("CLOCK", "CPUCLOCK_G"), ("FAN", "CPUFAN_STATE"), small: true);
+        Processor(e, 608, 24, 420, 432, "CPU", "CPUMODEL", "CPULOAD", "CPU_LIMIT", Sky, ("TEMP", "CPUTEMP"), ("POWER", "CPUPWR"), ("CLOCK", "CPUCLOCK_G"), ("FAN", "CPUFAN_ALERT"), small: true);
         Processor(e, 1052, 24, 420, 432, "GPU", "GPUMODEL", "GPULOAD", "GPU_LIMIT", Pink, ("TEMP", "GPUTEMP"), ("POWER", "GPUPWR"), ("CLOCK", "GPUCLOCK_G"), ("VRAM", "GPURAM_GB_OF"), small: true);
 
         // Time, memory and toggles.
@@ -138,6 +139,7 @@ internal static class HaloTemplates
     public static ThemeDefinition GamingColumn()
     {
         var t = New("Halo Gaming Column", 682, 2560);
+        t.ShortcutList = ShortcutLists.Gaming;
         var e = t.Elements;
         const double x = Margin, w = 682 - 2 * Margin, ix = x + Pad, iw = w - 2 * Pad, mid = 341;
 
@@ -151,7 +153,7 @@ internal static class HaloTemplates
         Fps(e, rx, 386, rw, 64, 24, 210, 520, 64);
         SessionRow(e, ix, 612, iw, 20);
 
-        Processor(e, x, 728, w, 476, "CPU", "CPUMODEL", "CPULOAD", "CPU_LIMIT", Sky, ("TEMP", "CPUTEMP"), ("POWER", "CPUPWR"), ("CLOCK", "CPUCLOCK_G"), ("FAN", "CPUFAN_STATE"));
+        Processor(e, x, 728, w, 476, "CPU", "CPUMODEL", "CPULOAD", "CPU_LIMIT", Sky, ("TEMP", "CPUTEMP"), ("POWER", "CPUPWR"), ("CLOCK", "CPUCLOCK_G"), ("FAN", "CPUFAN_ALERT"));
         Processor(e, x, 1228, w, 476, "GPU", "GPUMODEL", "GPULOAD", "GPU_LIMIT", Pink, ("TEMP", "GPUTEMP"), ("POWER", "GPUPWR"), ("CLOCK", "GPUCLOCK_G"), ("VRAM", "GPURAM_GB_OF"));
 
         Card(e, x, 1728, w, 236);
@@ -165,7 +167,7 @@ internal static class HaloTemplates
 
         // Two rows of games and apps.
         Card(e, x, 2182, w, 354);
-        Dock(e, ix, 2208, iw, 302, 4, 1, labels: true, rows: 2);
+        Dock(e, ix, 2208, iw, 302, 4, 1, labels: false, rows: 2);
         return t;
     }
 
@@ -174,6 +176,7 @@ internal static class HaloTemplates
     public static ThemeDefinition WorkBar()
     {
         var t = New("Halo Productivity", 1920, 480);
+        t.ShortcutList = ShortcutLists.Productivity;
         var e = t.Elements;
 
         // Clock, weather and what is playing.
@@ -197,7 +200,7 @@ internal static class HaloTemplates
         Load(e, 1504, 82, 364, "CPU", "CPULOAD", "CPUTEMP");
         Load(e, 1504, 130, 364, "GPU", "GPULOAD", "GPUTEMP");
         Load(e, 1504, 178, 364, "MEMORY", "RAMLOAD", "RAM_GB_OF");
-        Load(e, 1504, 226, 364, "DRIVE", "DRIVE_USED_PCT", "DRIVE_FREE");
+        Load(e, 1504, 226, 364, "DRIVE", "DRIVE_USED_PCT", "DRIVE_USED_OF");
         Stat(e, 1504, 276, "DOWNLOAD", "DOWNDSPEED", 17);
         Stat(e, 1686, 276, "UPLOAD", "UPSPEED", 17);
         Toggles(e, 1504, 338, 364, 48, WorkToggles);
@@ -207,6 +210,7 @@ internal static class HaloTemplates
     public static ThemeDefinition WorkColumn()
     {
         var t = New("Halo Productivity Column", 682, 2560);
+        t.ShortcutList = ShortcutLists.Productivity;
         var e = t.Elements;
         const double x = Margin, w = 682 - 2 * Margin, ix = x + Pad, iw = w - 2 * Pad, mid = 341;
 
@@ -232,7 +236,7 @@ internal static class HaloTemplates
         Load(e, ix, 1632, iw, "CPU", "CPULOAD", "CPUTEMP");
         Load(e, ix, 1692, iw, "GPU", "GPULOAD", "GPUTEMP");
         Load(e, ix, 1752, iw, "MEMORY", "RAMLOAD", "RAM_GB_OF");
-        Load(e, ix, 1812, iw, "DRIVE", "DRIVE_USED_PCT", "DRIVE_FREE");
+        Load(e, ix, 1812, iw, "DRIVE", "DRIVE_USED_PCT", "DRIVE_USED_OF");
         Stat(e, ix, 1874, "DOWNLOAD", "DOWNDSPEED", 20);
         Stat(e, ix + iw / 2, 1874, "UPLOAD", "UPSPEED", 20);
 
@@ -240,7 +244,7 @@ internal static class HaloTemplates
         Toggles(e, ix, 1996 + (170 - 104) / 2.0, iw, 72, WorkToggles);
 
         Card(e, x, 2190, w, 346);
-        Dock(e, ix, 2216, iw, 294, 4, 1, labels: true, rows: 2);
+        Dock(e, ix, 2216, iw, 294, 4, 1, labels: false, rows: 2);
         return t;
     }
 
@@ -295,11 +299,11 @@ internal static class HaloTemplates
         e.Add(Value(x + px * 1.5, row, "WEATHER_TEMP", Num(size, Text)));
         double textSize = Math.Max(15, size * 0.34);
         e.Add(Value(x + w, row + px * 0.18, "WEATHER_TEXT", Font(textSize, Text, bold: true, ThemeTextAlignment.Right), unit: false, width: w - px * 3.4));
-        e.Add(Value(x + w, row + px * 0.18 + textSize * 1.75, "WEATHER_FEELS_NOTE", Font(13, Secondary, align: ThemeTextAlignment.Right), unit: false));
+        e.Add(Value(x + w, row + px * 0.18 + textSize * 1.7, "WEATHER_FEELS_NOTE", Font(15, Secondary, align: ThemeTextAlignment.Right), unit: false));
         double labels = row + px * 1.42 + (compact ? 0 : 6);
         e.Add(Label(x, labels, "HIGH")); e.Add(Value(x, labels + 18, "WEATHER_HIGH", Num(18, Text)));
         e.Add(Label(x + 84, labels, "LOW")); e.Add(Value(x + 84, labels + 18, "WEATHER_LOW", Num(18, Text)));
-        e.Add(Value(x + w, labels, "WEATHER_SUN_NEXT_LABEL", Font(11, Secondary, bold: true, ThemeTextAlignment.Right), unit: false));
+        e.Add(Value(x + w, labels, "WEATHER_SUN_NEXT_LABEL", Font(12, Secondary, bold: true, ThemeTextAlignment.Right), unit: false));
         e.Add(Value(x + w, labels + 18, "WEATHER_SUN_NEXT", Num(18, Text, ThemeTextAlignment.Right), unit: false));
     }
 
@@ -341,7 +345,7 @@ internal static class HaloTemplates
     {
         e.Add(new ThemeElement { Kind = ThemeElementKind.Arc, DataName = "MEDIA_PROGRESS", X = x, Y = y, Width = ring, Height = ring, Diameter = ring, Thickness = 7,
             StartAngle = -90, SweepAngle = 360, RoundCaps = true, ForeColor = Sky, GradientColor = Violet, BackColor = Track, Action = ThemeAction.MediaPage,
-            GlowColor = "#557FD8FF", GlowSize = 8 });
+            GlowColor = "#557FD8FF", GlowSize = 8, ShowIf = "MEDIA_PROGRESS" }); // no ring for sources without a timeline
         double inset = 18, art = ring - inset * 2;
         e.Add(new ThemeElement { Kind = ThemeElementKind.AlbumArt, X = x + inset, Y = y + inset, Width = art, Height = art, CornerRadius = art / 2,
             FillColor = Button, LineColor = Secondary, Action = ThemeAction.MediaPage });
@@ -375,7 +379,7 @@ internal static class HaloTemplates
         e.Add(Label(bx, y + 2, "VOLUME"));
         e.Add(Value(bx + bw, y - 2, "VOLUME", Num(14, Secondary, ThemeTextAlignment.Right)));
         e.Add(new ThemeElement { Kind = ThemeElementKind.Bar, X = bx, Y = y + size - track - 4, Width = bw, Height = track, CornerRadius = track / 2, DataName = "VOLUME",
-            BackColor = Track, ForeColor = Sky, GradientColor = Violet, Action = ThemeAction.VolumeMixer });
+            BackColor = "#14FFFFFF", ForeColor = Sky, GradientColor = Violet, Action = ThemeAction.VolumeMixer, BorderColor = "#24FFFFFF", BorderWidth = 1 });
     }
 
     /// <summary>A load ring with its reading inside, a label and one detail below.</summary>
@@ -402,37 +406,45 @@ internal static class HaloTemplates
         e.Add(Header(ix, y + 26, title));
         e.Add(Value(ix + 44, y + 27, model, Font(11, Secondary), unit: false, width: iw - 44 - 130));
         e.Add(Value(ix + iw, y + 25, limit, Font(12, Warm, bold: true, ThemeTextAlignment.Right), unit: false));
-        double ring = small ? 150 : 200, ry = y + (small ? 58 : 64);
-        e.Add(new ThemeElement { Kind = ThemeElementKind.Arc, DataName = load, X = ix, Y = ry, Width = ring, Height = ring, Diameter = ring, Thickness = small ? 13 : 17,
+        double thick = small ? 13 : 17, ring = (small ? 150 : 200) - thick, ry = y + (small ? 58 : 64) + thick / 2, rx = ix + thick / 2;
+        e.Add(new ThemeElement { Kind = ThemeElementKind.Arc, DataName = load, X = rx, Y = ry, Width = ring, Height = ring, Diameter = ring, Thickness = thick,
             StartAngle = 135, SweepAngle = 270, RoundCaps = true, ForeColor = color, GradientColor = Violet, BackColor = Track, Action = ThemeAction.Details });
-        e.Add(Value(ix + ring / 2, ry + ring * 0.3, load, Num(small ? 28 : 38, Text, ThemeTextAlignment.Center), action: ThemeAction.Details));
-        e.Add(Txt(ix + ring / 2, ry + ring * 0.3 + (small ? 44 : 60), "LOAD", Font(12, Secondary, bold: true, ThemeTextAlignment.Center)));
+        e.Add(Value(rx + ring / 2, ry + ring * 0.3, load, Num(small ? 28 : 38, Text, ThemeTextAlignment.Center), action: ThemeAction.Details));
+        e.Add(Txt(rx + ring / 2, ry + ring * 0.3 + (small ? 44 : 60), "LOAD", Font(12, Secondary, bold: true, ThemeTextAlignment.Center)));
+        ring += thick; ry -= thick / 2;
         // Temperature and power large beside the ring; the label sits right above its value, not across the card.
-        double sx = ix + ring + (small ? 26 : 36), big = small ? 30 : 40, gap = small ? 74 : 98;
+        double sx = ix + ring + (small ? 26 : 36), big = small ? 30 : 40, gap = small ? 82 : 108;
         Stat(e, sx, ry + 4, a.Label, a.Data, big, labelSize: 13);
         Stat(e, sx, ry + 4 + gap, b.Label, b.Data, big, labelSize: 13);
         double below = ry + ring + (small ? 14 : 22), half = iw / 2;
-        Stat(e, ix, below, c.Label, c.Data, small ? 20 : 26, labelSize: 13);
-        Stat(e, ix + half, below, d.Label, d.Data, small ? 20 : 26, labelSize: 13);
+        // A clock HWiNFO doesn't export is left out rather than shown as "--"; the fan shows only when it stops.
+        string? Only(string data) => data.Contains("CLOCK", StringComparison.Ordinal) || data == "CPUFAN_ALERT" ? data : null;
+        Stat(e, ix, below, c.Label, c.Data, small ? 20 : 26, labelSize: 13, showIf: Only(c.Data));
+        Stat(e, ix + half, below, d.Label, d.Data, small ? 20 : 26, labelSize: 13, showIf: Only(d.Data));
         double chartTop = below + (small ? 58 : 74), chartBottom = y + h - Pad;
         e.Add(Label(ix, chartTop, "LOAD · LAST 60 S"));
         e.Add(new ThemeElement { Kind = ThemeElementKind.Chart, DataName = load, X = ix, Y = chartTop + 26, Width = iw, Height = chartBottom - chartTop - 26, Samples = 60, Maximum = 100,
             LineColor = color, LineWidth = 2, FillColor = "#22" + color[3..], Action = ThemeAction.Details });
     }
 
-    /// <summary>Live FPS as the hero number, average and 1% low (amber when it drops far below the average) beside it, and the FPS history.</summary>
+    /// <summary>
+    /// Live FPS as the hero number, average and 1% low (amber when it drops far below the average) beside it, and frame
+    /// time: one reading per poll, so "sampled" (it shows sustained stutter, not every hitch). Dashed at 16.7 ms (60 FPS),
+    /// scaled to at least 25 ms, amber above 33 ms (below 30 FPS).
+    /// </summary>
     private static void Fps(List<ThemeElement> e, double x, double y, double w, double hero, double small, double side, double chartY, double chartH)
     {
         e.Add(Label(x, y, "FPS"));
-        var live = Value(x, y + 16, "FPS", Num(hero, Text), unit: false);
+        // Live FPS only while the game runs: afterwards the sensor reads the desktop or a launcher, not the game.
+        var live = Value(x, y + 16, "GAME_FPS", Num(hero, Text), unit: false);
         e.Add(live);
         Stat(e, x + side, y, "AVG", "GAME_FPS_AVG", small).ShowUnit = false;
         var low = Stat(e, x + side, y + small * 4 / 3 + 30, "1% LOW", "GAME_FPS_LOW", small);
         low.ShowUnit = false;
         low.ColorBy = "GAME_FPS_LOW_PCT"; low.LowIsBad = true; low.WarnAt = 60; low.CriticalAt = 40;
-        e.Add(Label(x, chartY, "FPS · LAST 60 S"));
-        e.Add(new ThemeElement { Kind = ThemeElementKind.Chart, DataName = "FPS", X = x, Y = chartY + 18, Width = w, Height = chartH - 18, Samples = 60, Maximum = 0,
-            LineColor = Sky, LineWidth = 2, FillColor = "#227FD8FF", Action = ThemeAction.GamingPage });
+        e.Add(Label(x, chartY, "FRAME TIME · SAMPLED"));
+        e.Add(new ThemeElement { Kind = ThemeElementKind.Chart, DataName = "FRAMETIME", X = x, Y = chartY + 18, Width = w, Height = chartH - 18, Samples = 60, Maximum = 0,
+            MinimumScale = 25, GuideAt = 16.7, WarnAt = 33, LineColor = Sky, LineWidth = 2, FillColor = "#227FD8FF", Action = ThemeAction.GamingPage });
     }
 
     /// <summary>The session in one format: its length, today, this week, and the session's peak temperatures.</summary>
@@ -458,7 +470,7 @@ internal static class HaloTemplates
     private static void Load(List<ThemeElement> e, double x, double y, double w, string name, string load, string detail)
     {
         e.Add(Label(x, y + 3, name));
-        e.Add(Limited(Value(x + 84, y, detail, Num(14, Secondary), unit: detail != "RAM_GB_OF")));
+        e.Add(Limited(Value(x + 84, y, detail, Num(14, Secondary), unit: detail is not ("RAM_GB_OF" or "DRIVE_USED_OF"))));
         e.Add(Value(x + w, y, load, Num(14, Text, ThemeTextAlignment.Right)));
         var bar = new ThemeElement { Kind = ThemeElementKind.Bar, DataName = load, X = x, Y = y + 26, Width = w, Height = 10, CornerRadius = 5,
             ForeColor = Sky, GradientColor = Violet, BackColor = Track, Action = ThemeAction.Details };
@@ -474,7 +486,7 @@ internal static class HaloTemplates
             string window = i == 0 ? "_5H" : "_WEEK";
             double ry = y + 34 + i * 66;
             e.Add(Label(x, ry + 3, i == 0 ? "5 HOURS" : "THIS WEEK"));
-            e.Add(Value(x + 96, ry + 1, prefix + window + "_RESET", Font(13, Secondary), unit: false, width: w - 96 - 70, format: "resets"));
+            e.Add(Value(x + 96, ry, prefix + window + "_RESET", Font(14, Secondary), unit: false, width: w - 96 - 70, format: "resets"));
             e.Add(Value(x + w, ry, prefix + window, Num(15, Text, ThemeTextAlignment.Right)));
             e.Add(Warn(new ThemeElement { Kind = ThemeElementKind.Bar, DataName = prefix + window, X = x, Y = ry + 28, Width = w, Height = 12, CornerRadius = 6,
                 ForeColor = Sky, GradientColor = Violet, BackColor = Track }, 75, 90));
@@ -493,15 +505,15 @@ internal static class HaloTemplates
         double clockY = y + h * 0.1;
         e.Add(Value(cx, clockY, "FOCUS_CLOCK", Num(clock, Text, ThemeTextAlignment.Center), unit: false, action: ThemeAction.FocusToggle));
         double buttons = clockY + clock * 4 / 3 * 1.36 + 8, bh = Math.Round(clock * 0.72);
-        double main = 168, reset = 120;
-        double bx = cx - (main + 12 + reset) / 2;
+        double main = 150, reset = 110, add = 110;
+        double bx = cx - (main + reset + add + 24) / 2;
         e.AddRange(PillValue(bx, buttons, main, bh, "FOCUS_ACTION", ThemeAction.FocusToggle, Math.Round(bh * 0.32)));
-        e.AddRange(Pills(bx + main + 12, buttons, bh, [("Reset", reset, ThemeAction.FocusReset)]));
+        e.AddRange(Pills(bx + main + 12, buttons, bh, [("Reset", reset, ThemeAction.FocusReset), ("+1 min", add, ThemeAction.TimerAddMinute)]));
         double presets = buttons + bh + 32;
         e.Add(Txt(cx, presets, "POMODORO", Font(11, Secondary, bold: true, ThemeTextAlignment.Center)));
         double ph = Math.Round(bh * 0.86), pw = 110;
-        double px0 = cx - (pw * 3 + 24) / 2;
-        e.AddRange(Pills(px0, presets + 22, ph, [("25 / 5", pw, ThemeAction.Pomodoro25), ("50 / 10", pw, ThemeAction.Pomodoro50), ("+1 min", pw, ThemeAction.TimerAddMinute)]));
+        double px0 = cx - (pw * 2 + 12) / 2;
+        e.AddRange(Pills(px0, presets + 22, ph, [("25 / 5", pw, ThemeAction.Pomodoro25), ("50 / 10", pw, ThemeAction.Pomodoro50)]));
     }
 
     /// <summary>Round quick toggles spread evenly across a width, each with a label under it.</summary>
@@ -571,13 +583,17 @@ internal static class HaloTemplates
     private static double IconTop(double y, double size, double pt) => y + (size - pt * 4 / 3 * 1.33) / 2 + pt * 4 / 3 * 0.18;
 
     /// <summary>A labelled reading: small-caps label with the number right under it. Returns the number for extra settings.</summary>
-    private static ThemeElement Stat(List<ThemeElement> e, double x, double y, string label, string data, double size, double labelSize = 11)
+    private static ThemeElement Stat(List<ThemeElement> e, double x, double y, string label, string data, double size, double labelSize = 11, string? showIf = null)
     {
-        e.Add(Txt(x, y, label, Font(labelSize, Secondary, bold: true)));
-        var value = Limited(Value(x, y + labelSize * 1.6, data, Num(size, Text)));
+        // The label sits close above its own value, clearly nearer it than the reading above.
+        e.Add(Txt(x, y, label, Font(labelSize, Secondary, bold: true)) is var caption && showIf != null ? With(caption, showIf) : caption);
+        var value = Limited(Value(x, y + labelSize * 1.3, data, Num(size, Text)));
+        if (showIf != null) value.ShowIf = showIf;
         e.Add(value);
         return value;
     }
+
+    private static ThemeElement With(ThemeElement element, string showIf) { element.ShowIf = showIf; return element; }
 
     /// <summary>Warning levels where a reading can really be too high: CPU, GPU and drive temperatures (and session peaks).</summary>
     private static ThemeElement Limited(ThemeElement value)
@@ -587,7 +603,7 @@ internal static class HaloTemplates
             "CPUTEMP" or "GAME_PEAK_CPU" => (90, 98),
             "GPUTEMP" or "GAME_PEAK_GPU" => (83, 90),
             "HDDTEMP" => (70, 80),
-            "CPUFAN_STATE" => (50, 100), // red only when the fan stops
+            "CPUFAN_STATE" or "CPUFAN_ALERT" => (50, 100), // red only when the fan stops
             _ => null
         };
         return limits is { } l ? Warn(value, l.Item1, l.Item2) : value;
@@ -609,7 +625,7 @@ internal static class HaloTemplates
     private static ThemeElement Header(double x, double y, string text) => Txt(x, y, text, Font(13, Secondary, bold: true));
 
     /// <summary>The one value label style, above its number.</summary>
-    private static ThemeElement Label(double x, double y, string text) => Txt(x, y, text, Font(11, Secondary, bold: true));
+    private static ThemeElement Label(double x, double y, string text) => Txt(x, y, text, Font(12, Secondary, bold: true));
 
     /// <summary>The one number style.</summary>
     private static ThemeFont Num(double size, string color, ThemeTextAlignment align = ThemeTextAlignment.Left) => Font(size, color, align: align, family: Semi);

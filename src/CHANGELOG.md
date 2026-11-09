@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+## 0.11.0 (2026-11-09)
+Frame time on Halo Gaming, RTSS's own 1% low, and separate shortcut lists for Halo Gaming and Halo Productivity. Settings from 0.10.0 carry over; until you pair the RTSS readings or tick shortcuts for a list, everything reads and opens as before.
+- Halo Gaming (bar and column): the FPS chart becomes frame time in ms, labelled "FRAME TIME · SAMPLED". Live FPS stays the big number. It is one reading per poll, so it shows sustained stutter rather than every single slow frame. It has a dashed guide at 16.7 ms (60 FPS), an automatic scale that never drops below 25 ms (so a steady game stays a calm low line), and the line turns amber above 33 ms (below 30 FPS).
+- Frame time is RTSS's "Frame Time" reading when paired, else worked out from FPS. The 1% low is RTSS's "Framerate 1% Low" when paired: its latest reading while playing, and the median of its readings for the saved session. Otherwise it is the slowest 1% of the session's seconds, as before.
+- Sensor Manager: two new optional readings, Frame time (RTSS, ms) and FPS 1% low (RTSS). Auto-pair matches both by name and unit; it never picks the 0.1% low or averaged frame times, and FPS still prefers the displayed frame rate.
+- Shortcut lists (tray → Shortcuts → List): Gaming and Productivity each tick some of your shortcuts and order them with Move up / down. Halo Gaming shows the Gaming list on its tiles (tile 1 is the first pick) and Halo Productivity the Productivity list, bar and column alike. Their app drawer shows the list's picks first, then every other shortcut. Halo Lifestyle and the other themes keep the main list in slot order. A list with nothing ticked shows the main list. Picks stay on the same shortcuts when you reorder or remove them in All shortcuts. A drop on an empty tile of a list theme adds the shortcut to that list.
+- New theme options for your own themes: a theme can follow the Gaming or Productivity list (ShortcutList), and charts gain an automatic-scale minimum, a dashed guide line and an amber line above a level (editor: Chart). New data FRAMETIME (Frame rate section).
+- From the design audit with real data (release candidate 2):
+  - Fixed: the weather showed a sun after dark. The report's day flag can be half an hour old; the symbol now follows today's sunrise and sunset. Clear nights use a solid crescent that matches the solid sun and clouds.
+  - Fixed: Halo Gaming's SESSION was empty after a game. It now shows the last session's length, as the Gaming page does.
+  - Fixed: after a game, Halo Gaming's big FPS kept showing the sensor's reading (the desktop or a launcher) beside LAST PLAYED. It now reads "--" until a game runs (new data GAME_FPS).
+  - Fixed: history charts drew a sliver at the right edge until a minute had passed (after starting or switching theme). What there is now spreads across the chart.
+  - The CPU and GPU clocks are left out instead of showing "--" when HWiNFO doesn't export them, and the now-playing ring is left out for sources without a timeline (YouTube in a browser). New element option ShowIf: show only while a reading has a value.
+  - The GPU's name drops the board partner's text that HWiNFO adds after a second colon, and themes show it without the brand words ("RTX 5070 Ti").
+  - Halo: labels sit closer to their own value than to the reading above (TEMP / POWER on the CPU and GPU cards). The dock tiles no longer show names, which were cut off at this size and repeated the store's capitals; the app drawer still names them.
+- Design items from the same audit (release candidate 3):
+  - Halo Gaming: the CPU fan row shows only when the fan stops (red STOPPED; new data CPUFAN_ALERT) instead of a big "FAN OK". The load rings' outer edges line up with the text.
+  - A video's wide thumbnail (YouTube in a browser) in the round now-playing frame is shown whole as a rounded rectangle instead of cropped to a circle; album covers stay round.
+  - Halo Lifestyle Column: the now-playing card is about 110 px shorter (controls and volume closer to the track), and the room goes to a second row of four favourites.
+  - Halo Productivity: +1 min sits with Start and Reset; the POMODORO row holds only its presets. The drive reads used of total like memory ("1.5 / 1.9 TB"; new data DRIVE_USED_OF).
+  - The volume track is darker with a faint outline, so the fill's end is clear (bars can now have an outline).
+  - Larger small text for 3–4 ft: labels 12 pt (were 11), "Feels" 15 pt, "resets in" 14 pt, the sunrise / sunset label 12 pt.
+
 ## 0.10.0 (2026-11-09)
 The HUD picks the theme for the moment: a theme while gaming, and themes in the schedule. Your own theme is never replaced; it returns when the game or the period ends. Settings from 0.9.2 carry over and behave exactly as before until you set a gaming or schedule theme.
 - Theme while gaming (tray → Gaming): one theme shown while any recognised game runs, and optionally a game's own theme or "Don't switch" for it (pick a game in the list, then "This game"; the list's Theme column shows each game's). The theme switches when the game session starts and your own returns when it ends (after the session's 30 s grace).

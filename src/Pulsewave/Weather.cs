@@ -146,7 +146,7 @@ internal static class WeatherClient
     /// <summary>A weather symbol from Segoe UI Symbol (drawn in the text's color).</summary>
     public static string Symbol(int code, bool isDay = true) => code switch
     {
-        0 or 1 => isDay ? "☀" : "☾",
+        0 or 1 => isDay ? "☀" : "🌙", // a solid crescent, like the solid sun and clouds
         2 => isDay ? "⛅" : "☁",
         3 => "☁",
         45 or 48 => "\U0001F32B",

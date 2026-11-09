@@ -889,6 +889,9 @@ public sealed class ThemeEditorWindow : Window
                 Number("Height", e.Height, v => Edit(x => x.Height = Math.Max(2, v)));
                 Number("Maximum (0 = auto)", e.Maximum, v => Edit(x => x.Maximum = Math.Max(0, v)));
                 Number("Samples", e.Samples, v => Edit(x => x.Samples = (int)Math.Clamp(v, 2, 600)));
+                Number("Auto scale at least (Maximum 0)", e.MinimumScale, v => Edit(x => x.MinimumScale = Math.Max(0, v)));
+                OptionalNumber("Dashed guide at (blank = none)", e.GuideAt, v => Edit(x => x.GuideAt = v is > 0 ? v : null));
+                OptionalNumber("Line amber above (blank = never)", e.WarnAt, v => Edit(x => { x.WarnAt = v is > 0 ? v : null; x.LowIsBad = false; }));
                 ColorField("Line", e.LineColor, v => Edit(x => x.LineColor = v));
                 ColorField("Fill", e.FillColor, v => Edit(x => x.FillColor = v));
                 ColorField("Border", e.BorderColor, v => Edit(x => x.BorderColor = v));

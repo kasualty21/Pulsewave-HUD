@@ -56,6 +56,8 @@ public sealed class MonitorSettings
     public double MemoryAlertPercent { get; set; } = 95;
     // Programs, games and links the HUD can open; theme shortcut slots are 1-based positions in this list.
     public List<AppShortcut> Shortcuts { get; set; } = new();
+    // The Gaming and Productivity lists (tray → Shortcuts → List): ordered slot numbers for themes that follow them.
+    public Dictionary<string, List<int>> ShortcutLists { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     // Dock mode: "" covers the whole selected display; Top, Bottom, Left or Right reserves that edge of it
     // (like the taskbar), DockPercent of the display's short side deep, or 0 to fit the theme's shape.
     public string DockEdge { get; set; } = "";
@@ -219,6 +221,7 @@ public static class SettingsStore
         config.Schedule = (config.Schedule ?? new()).Where(r => r != null).Take(16).ToList();
         foreach (var rule in config.Schedule) rule.Normalize();
         config.Shortcuts = (config.Shortcuts ?? new()).Where(s => s != null).Take(AppShortcut.MaxCount).ToList();
+        config.ShortcutLists = Pulsewave.ShortcutLists.Normalize(config.ShortcutLists);
         foreach (var shortcut in config.Shortcuts)
         {
             shortcut.Name ??= ""; shortcut.Target ??= ""; shortcut.Arguments ??= "";

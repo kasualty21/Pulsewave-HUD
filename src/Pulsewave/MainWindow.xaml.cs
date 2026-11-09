@@ -66,6 +66,12 @@ public partial class MainWindow : Window
     private string _scheduleStatus = "";
     private string? _poweredDown; // the display put in standby by the schedule
     private IReadOnlyList<ShortcutView?> _shortcutViews = [];
+    // The shown theme's shortcut list ("Gaming", "Productivity" or null for the main list), the slot each of its
+    // tiles opens (tile 1 first) with their views, and the app drawer's order.
+    private string? _shortcutList;
+    private List<int> _tileSlots = [];
+    private IReadOnlyList<ShortcutView?> _tileViews = [];
+    private List<int> _drawerSlots = [];
     private ShortcutsForm? _shortcutsForm;
     private readonly AiUsageReader _usage = new();
     private static readonly System.Net.Http.HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(15) };
@@ -120,6 +126,7 @@ public partial class MainWindow : Window
         catch (Exception ex) { _settings = new MonitorSettings(); _settingsLoadError = ex.Message; } // Save guard preserves original.
         _reader = new SensorReader(_settings);
         _shortcutViews = _settings.Shortcuts.Select(ShortcutView.From).ToList();
+        ArrangeShortcuts();
         _media.PlexToken = PlexTokenStore.Load();
         // The smart builder (and its encrypted xAI key) was removed before release; delete a leftover key.
         try { System.IO.File.Delete(System.IO.Path.Combine(SettingsStore.DirectoryPath, "xai-key.dat")); }
@@ -431,7 +438,7 @@ public partial class MainWindow : Window
             Media = _media.Current,
             MediaPosition = _media.Plexamp is { DurationMs: > 0 } timeline
                 ? (TimeSpan.FromMilliseconds(Math.Min(timeline.TimeMs, timeline.DurationMs)), TimeSpan.FromMilliseconds(timeline.DurationMs)) : null,
-            Shortcuts = _shortcutViews,
+            Shortcuts = _tileViews,
             Usage = _usage.Read(now), // local files, read at most every 15 s
             Volume = _showsVolume ? AudioVolume.Read() : null,
             Timer = _timers.TimerLeft(now),
@@ -494,6 +501,7 @@ public partial class MainWindow : Window
         _themeView?.Dispose();
         _themeView = null;
         _showsClaude = _showsVolume = false;
+        _shortcutList = null;
         ThemeHost.Child = null;
         string shown = ShownTheme;
         if (!string.IsNullOrEmpty(shown))
@@ -505,6 +513,7 @@ public partial class MainWindow : Window
                     : System.IO.Path.Combine(ThemeStore.RootPath, shown);
                 var theme = ThemeStore.Load(dir);
                 if (ThemePalettes.Find(_settings.ThemePalettes.GetValueOrDefault(shown)) is { } palette) ThemePalettes.Apply(theme, palette);
+                _shortcutList = ShortcutLists.Canonical(theme.ShortcutList);
                 _themeView = new ThemeView(theme, dir);
                 if (_dim is { Mode: "Theme" or "Both" }) _themeView.SetGlows(false);
                 ThemeHost.Child = _themeView;
@@ -525,6 +534,7 @@ public partial class MainWindow : Window
                 _tray?.ShowBalloonTip(6000, "Theme not loaded · showing Classic", ex.Message, Forms.ToolTipIcon.Warning);
             }
         }
+        ArrangeShortcuts();
         bool themed = _themeView != null;
         ThemeHost.Visibility = themed ? Visibility.Visible : Visibility.Collapsed;
         ClassicView.Visibility = themed ? Visibility.Collapsed : Visibility.Visible;
@@ -792,7 +802,7 @@ public partial class MainWindow : Window
             case ThemeAction.FocusToggle: _timers.ToggleShown(now); break;
             case ThemeAction.FocusReset: _timers.ResetShown(); break;
             case ThemeAction.FocusSwitch: _timers.SwitchShown(); break;
-            case ThemeAction.Launch: Launch(slot); break;
+            case ThemeAction.Launch: Launch(TileSlot(slot)); break;
             case ThemeAction.AppDrawer: ShowDrawer(); break;
             case ThemeAction.LightsPage: ShowLights(); break;
             case ThemeAction.LightsToggle: RunLights(new LightsCommand(_settings.Lights.Off ? LightsKind.On : LightsKind.Off)); break;
@@ -870,7 +880,7 @@ public partial class MainWindow : Window
         _gamingView?.Close();
         DetailHost.Child = _drawer;
         DetailHost.Visibility = Visibility.Visible;
-        _drawer.Open(_shortcutViews);
+        _drawer.Open(_shortcutViews, _drawerSlots);
     }
 
     /// <summary>The Lights page: OpenRGB profiles, effects, colors and brightness as touch tiles.</summary>
@@ -1239,6 +1249,21 @@ public partial class MainWindow : Window
         _ = ReadLights();
     }
 
+    /// <summary>
+    /// Orders the shortcuts for the shown theme: its list's picks on the tiles (or every slot in order) and the
+    /// picks first in the app drawer.
+    /// </summary>
+    private void ArrangeShortcuts()
+    {
+        var picks = ShortcutLists.PicksOf(_settings.ShortcutLists, _settings.Shortcuts, _shortcutList);
+        _tileSlots = ShortcutLists.TileSlots(_settings.Shortcuts, picks);
+        _tileViews = _tileSlots.Select(slot => _shortcutViews[slot - 1]).ToList();
+        _drawerSlots = ShortcutLists.DrawerSlots(_settings.Shortcuts, picks);
+    }
+
+    /// <summary>The shortcut slot a theme's tile opens (1 = its first tile), or 0 when the tile has none.</summary>
+    private int TileSlot(int tile) => tile >= 1 && tile <= _tileSlots.Count ? _tileSlots[tile - 1] : 0;
+
     /// <summary>Opens the user's shortcut in a 1-based slot; an empty slot does nothing.</summary>
     private void Launch(int slot)
     {
@@ -1263,33 +1288,45 @@ public partial class MainWindow : Window
         var dropped = Dropped(e.Data);
         if (dropped.Count == 0) return;
         int slot = 0;
+        // On a theme that follows the Gaming or Productivity list, a drop on a tile past its picks adds to that list.
+        bool toList = false;
         if (DetailHost.Visibility != Visibility.Visible && _themeView?.ElementAt(e.GetPosition(_themeView)) is { Slot: > 0 } target &&
             ThemeActions.Effective(target) == ThemeAction.Launch)
-            slot = target.Slot;
+        {
+            slot = TileSlot(target.Slot);
+            toList = slot == 0 && ShortcutLists.PicksOf(_settings.ShortcutLists, _settings.Shortcuts, _shortcutList).Count > 0;
+            if (slot == 0 && !toList) slot = target.Slot;
+        }
         var list = _settings.Shortcuts.Select(s => s.Copy()).ToList();
+        var lists = _settings.ShortcutLists.ToDictionary(p => p.Key, p => p.Value.ToList(), StringComparer.OrdinalIgnoreCase);
         var placed = new List<string>();
         foreach (var shortcut in dropped)
         {
             int used = AppShortcut.Assign(list, shortcut, slot);
             if (used == 0) break;
+            ShortcutLists.Replaced(lists, used);
+            if (toList) lists[_shortcutList!].Add(used);
             placed.Add($"{shortcut.DisplayName} → slot {used}");
             slot = 0;
         }
         if (placed.Count == 0) { _tray?.ShowBalloonTip(4000, "Shortcuts full", $"Up to {AppShortcut.MaxCount} shortcuts.", Forms.ToolTipIcon.Warning); return; }
-        if (SaveShortcuts(list) is { } error) { _tray?.ShowBalloonTip(5000, "Shortcut not added", error, Forms.ToolTipIcon.Error); return; }
-        if (_shortcutsForm is { IsDisposed: false }) _shortcutsForm.ShowSaved(_settings.Shortcuts);
-        if (DetailHost.Visibility == Visibility.Visible && DetailHost.Child == _drawer) _drawer?.Open(_shortcutViews);
+        if (SaveShortcuts(list, lists) is { } error) { _tray?.ShowBalloonTip(5000, "Shortcut not added", error, Forms.ToolTipIcon.Error); return; }
+        if (_shortcutsForm is { IsDisposed: false }) _shortcutsForm.ShowSaved(_settings.Shortcuts, _settings.ShortcutLists);
+        if (DetailHost.Visibility == Visibility.Visible && DetailHost.Child == _drawer) _drawer?.Open(_shortcutViews, _drawerSlots);
         _tray?.ShowBalloonTip(3000, "Shortcut added", string.Join("\n", placed), Forms.ToolTipIcon.Info);
     }
 
-    /// <summary>Saves the shortcut list and refreshes icons; returns why it was not saved, or null.</summary>
-    private string? SaveShortcuts(List<AppShortcut> list)
+    /// <summary>Saves the shortcuts and the Gaming and Productivity lists and refreshes icons; returns why they were not saved, or null.</summary>
+    private string? SaveShortcuts(List<AppShortcut> list, Dictionary<string, List<int>> lists)
     {
-        var prior = _settings.Shortcuts;
+        var prior = (_settings.Shortcuts, _settings.ShortcutLists);
         AppShortcut.TrimEnd(list);
-        try { _settings.Shortcuts = list; SettingsStore.Save(_settings); }
-        catch (Exception ex) { _settings.Shortcuts = prior; return "Not saved: " + ex.Message; }
+        // Picks of shortcuts that are gone are dropped.
+        var kept = ShortcutLists.Normalize(lists.ToDictionary(p => p.Key, p => ShortcutLists.Valid(list, p.Value)));
+        try { _settings.Shortcuts = list; _settings.ShortcutLists = kept; SettingsStore.Save(_settings); }
+        catch (Exception ex) { (_settings.Shortcuts, _settings.ShortcutLists) = prior; return "Not saved: " + ex.Message; }
         _shortcutViews = _settings.Shortcuts.Select(ShortcutView.From).ToList();
+        ArrangeShortcuts();
         _catalogDue = default; // shortcuts can add games
         if (IsLoaded) RefreshReadings();
         return null;
@@ -1298,7 +1335,7 @@ public partial class MainWindow : Window
     private void OpenShortcuts()
     {
         if (_shortcutsForm is { IsDisposed: false }) { _shortcutsForm.Activate(); return; }
-        _shortcutsForm = new ShortcutsForm(_settings.Shortcuts, SaveShortcuts);
+        _shortcutsForm = new ShortcutsForm(_settings.Shortcuts, _settings.ShortcutLists, SaveShortcuts);
         _shortcutsForm.Show(); _shortcutsForm.Activate();
     }
 
@@ -1947,7 +1984,7 @@ public partial class MainWindow : Window
                          path => GameCatalog.Match(_gameCatalog, path) != null || GameCatalog.IsIgnored(_settings.Gaming, path)) is { } candidate)
                 SuggestGame(candidate);
         }
-        _games.Update(now, _running?.Game.Key, _running?.Game.Name, values.Get("GpuFps"), values.Get("CpuTemp"), values.Get("GpuTemp"));
+        _games.Update(now, _running?.Game.Key, _running?.Game.Name, values.Get("GpuFps"), values.Get("CpuTemp"), values.Get("GpuTemp"), values.Get("GpuFpsLow"));
     }
 
     /// <summary>Asks on the HUD (and in the tray) whether a program that looks like a game should be tracked.</summary>

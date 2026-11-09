@@ -60,5 +60,14 @@ internal static class PairingChecks
               SensorPairing.Rank("GpuFan", catalog.First(e => e.Index == 15), "CurrentUser") < 0 && !SensorPairing.Suggest(["CpuPower"], tie, "CurrentUser", _ => false).Any() &&
               SensorPairing.Unit(catalog[4]) == "rpm",
             "Auto-pair leaves live pairings alone, scales GB to MB, refuses readings in the wrong unit (°F, a fan's %), and leaves ties to the user");
+
+        var rtss = SensorPairing.Suggest(["GpuFrameTime", "GpuFpsLow"], catalog, "CurrentUser", _ => false);
+        var seconds = new SensorCatalogEntry { Hive = "CurrentUser", Group = "RTSS", Label = "Frame Time", Raw = "0.0065", Formatted = "0.0065 s" };
+        var fpsAsTime = new SensorCatalogEntry { Hive = "CurrentUser", Group = "RTSS", Label = "Frame Time", Raw = "6.5", Formatted = "6.5 FPS" };
+        Check(rtss.TryGetValue("GpuFrameTime", out var time) && time.Entry.Label == "Frame Time" && time.Scale == 1 &&
+              rtss.TryGetValue("GpuFpsLow", out var low) && low.Entry.Label == "Framerate 1% Low" && low.Scale == 1 &&
+              SensorPairing.ScaleFor("GpuFrameTime", seconds) == 1000 && SensorPairing.Rank("GpuFrameTime", fpsAsTime, "CurrentUser") < 0 &&
+              SensorPairing.Rank("GpuFpsLow", catalog.First(e => e.Index == 21), "CurrentUser") < 0 && Of("GpuFps") == "CurrentUser/Framerate Displayed (avg)/1",
+            "Auto-pair matches RTSS's \"Frame Time\" (ms; seconds scaled) and \"Framerate 1% Low\" (FPS) on this PC, never the 0.1% low, and FPS still prefers what is displayed");
     }
 }

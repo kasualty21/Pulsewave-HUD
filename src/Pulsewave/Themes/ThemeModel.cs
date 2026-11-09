@@ -43,6 +43,11 @@ public sealed class ThemeDefinition
     public double BackgroundOffsetX { get; set; }
     public double BackgroundOffsetY { get; set; }
     public string? Preview { get; set; }
+    /// <summary>
+    /// Which of the user's shortcut lists this theme's tiles and app drawer follow: "Gaming" or "Productivity"
+    /// (tray → Shortcuts → List); null or anything else is the main list, in slot order.
+    /// </summary>
+    public string? ShortcutList { get; set; }
     public List<ThemeElement> Elements { get; set; } = new();
 }
 
@@ -149,6 +154,12 @@ public sealed class ThemeElement
     public string? WarnColor { get; set; }
     public string? CriticalColor { get; set; }
 
+    /// <summary>
+    /// A reading that must have a value for this element to show (an unpaired clock sensor, a media source without a
+    /// timeline); null always shows. Labels name the reading of the value they belong to.
+    /// </summary>
+    public string? ShowIf { get; set; }
+
     // Glow for text, values, panels, lines, bars and gauges; none when GlowColor is null.
     public string? GlowColor { get; set; }
     public double GlowSize { get; set; } = 12;
@@ -160,4 +171,10 @@ public sealed class ThemeElement
     public double LineWidth { get; set; } = 1;
     public double BorderWidth { get; set; }
     public int Samples { get; set; } = 30;
+    /// <summary>Chart with an automatic scale (Maximum 0): the scale never goes below this, so a calm line stays low.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double MinimumScale { get; set; }
+    /// <summary>Chart: a dashed guide line at this value (16.7 ms is 60 FPS); null draws none.</summary>
+    public double? GuideAt { get; set; }
+    // A chart with WarnAt draws the stretches of its line above that value in WarnColor (CriticalAt is not used).
 }

@@ -54,8 +54,15 @@ internal static class WeatherChecks
               ThemeData.Display(ThemeData.Read("WEATHER_TEMP", null, false, new ThemeDataContext()), true) == ThemeData.Missing &&
               !ThemeData.Unsupported.Contains("Weather") && ThemeData.IsAvailable("WEATHER_TEMP", new MonitorSettings()),
             "°F comes from the city's setting or the element's own; with no weather yet the values show --");
-        Check(WeatherClient.Symbol(0, isDay: false) == "☾" && WeatherClient.Describe(96) == "Thunderstorm, hail" && WeatherClient.Symbol(73) == "❄",
+        Check(WeatherClient.Symbol(0, isDay: false) == "🌙" && WeatherClient.Describe(96) == "Thunderstorm, hail" && WeatherClient.Symbol(73) == "❄",
             "Night-time clear skies show a moon; every weather code has words and a symbol");
+        // A report fetched by day (is_day 1) still shows the moon once the sun has set, and the sun after sunrise.
+        var clearDay = report with { Code = 0, IsDay = true };
+        string Icon(DateTime at) => ThemeData.Display(ThemeData.Read("WEATHER_ICON", null, false, new ThemeDataContext { Now = at, Weather = clearDay }), true);
+        Check(Icon(new DateTime(2026, 11, 9, 19, 30, 0)) == "🌙" && Icon(new DateTime(2026, 11, 9, 12, 0, 0)) == "☀" &&
+              Icon(new DateTime(2026, 11, 9, 6, 0, 0)) == "🌙" && ThemeData.Display(ThemeData.Read("WEATHER_ICON", null, false,
+                  new ThemeDataContext { Now = new DateTime(2026, 11, 10, 12, 0, 0), Weather = clearDay with { IsDay = false } }), true) == "🌙",
+            "The weather symbol follows today's sunrise and sunset, not the fetch's day flag (no sun after dark); an old report keeps its own flag");
 
         string root = Path.Combine(outputRoot, "weather-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
