@@ -142,7 +142,8 @@ public partial class MainWindow : Window
         Loaded += OnLoaded;
         Closing += OnClosing;
         _timer.Tick += (_, _) => RefreshReadings();
-        _playlistTimer.Tick += (_, _) => StepTheme(+1);
+        // The playlist waits while a game or a schedule period with a theme is in control (0.10).
+        _playlistTimer.Tick += (_, _) => { if (!ThemeDirector.PausesPlaylist(CurrentMoment(DateTime.Now))) StepTheme(+1, byHand: false); };
         Root.PreviewMouseLeftButtonDown += (_, e) => { _pressAt = e.GetPosition(Root); _pressTime = DateTime.Now; };
         Root.MouseLeftButtonUp += OnTap;
         _guard.Tick += (_, _) => GuardDisplay();
@@ -354,6 +355,7 @@ public partial class MainWindow : Window
         UpdateMediaPage();
         if (_gamingView != null && DetailHost.Child == _gamingView && DetailHost.Visibility == Visibility.Visible) _gamingView.Show(_games.Snapshot(now, GameTile));
         RunSchedule(now);
+        DirectTheme(now);
         ApplyAesthetic(now);
         if (_timers.Finished(now))
         {
@@ -442,21 +444,67 @@ public partial class MainWindow : Window
     }
 
     /// <summary>Shows the selected custom theme, or the Classic layout when none is set or it fails to load.</summary>
+    // --- Which theme shows (0.10) ---------------------------------------------------------------
+    // _settings.ActiveTheme is the user's own theme (their picks and the playlist). A game or a schedule period can
+    // show another over it (_autoTheme) without changing it, so when they end the user's theme simply returns.
+    private readonly ThemeDirector _director = new();
+    private string? _autoTheme;
+
+    /// <summary>The theme on the HUD now: a game's or the schedule's while one is in control, else the user's own.</summary>
+    private string ShownTheme => _autoTheme ?? _settings.ActiveTheme;
+
+    /// <summary>What is running now, for the director: the game session (with its theme) and the schedule period showing a theme.</summary>
+    private ThemeDirector.Moment CurrentMoment(DateTime now)
+    {
+        string? game = _games.CurrentKey;
+        string? gameTheme = ThemeDirector.GameTheme(_settings.Gaming, game);
+        var period = ThemeDirector.SchedulePeriod(_settings.Schedule, now);
+        return new(game, Installed(gameTheme) ? gameTheme : null, period?.Key, Installed(period?.Theme) ? period?.Theme : null);
+    }
+
+    /// <summary>A theme that can be shown (a template of this version or a theme folder); a deleted one is ignored, never a blank HUD.</summary>
+    private static bool Installed(string? id) => !string.IsNullOrEmpty(id) &&
+        (BuiltInTemplates.IsBuiltIn(id) ? BuiltInTemplates.Names.Contains(id[BuiltInTemplates.Prefix.Length..])
+                                        : System.IO.Directory.Exists(System.IO.Path.Combine(ThemeStore.RootPath, id)));
+
+    /// <summary>Each second: switches to the game's or the schedule's theme, or back to the user's, when that changes. Never shows a hidden HUD.</summary>
+    private void DirectTheme(DateTime now)
+    {
+        string? want = _director.Decide(CurrentMoment(now));
+        if (want == _autoTheme) return;
+        _autoTheme = want;
+        ApplyTheme();
+    }
+
+    /// <summary>
+    /// A theme the user chose (gallery, tray, swipe, hotkey, a theme's buttons): it becomes their own theme and outranks
+    /// the game and schedule period running now until those end.
+    /// </summary>
+    private void PickTheme(string id)
+    {
+        _director.HandPicked(CurrentMoment(DateTime.Now));
+        bool shownChanges = id != ShownTheme;
+        _autoTheme = null;
+        if (id != _settings.ActiveTheme) SavePreference(() => _settings.ActiveTheme = id, ApplyTheme);
+        else if (shownChanges) ApplyTheme();
+    }
+
     private void ApplyTheme()
     {
         _themeView?.Dispose();
         _themeView = null;
         _showsClaude = _showsVolume = false;
         ThemeHost.Child = null;
-        if (!string.IsNullOrEmpty(_settings.ActiveTheme))
+        string shown = ShownTheme;
+        if (!string.IsNullOrEmpty(shown))
         {
             try
             {
-                string dir = BuiltInTemplates.IsBuiltIn(_settings.ActiveTheme)
-                    ? BuiltInTemplates.Ensure(_settings.ActiveTheme) ?? throw new System.IO.InvalidDataException("This template is not part of this version.")
-                    : System.IO.Path.Combine(ThemeStore.RootPath, _settings.ActiveTheme);
+                string dir = BuiltInTemplates.IsBuiltIn(shown)
+                    ? BuiltInTemplates.Ensure(shown) ?? throw new System.IO.InvalidDataException("This template is not part of this version.")
+                    : System.IO.Path.Combine(ThemeStore.RootPath, shown);
                 var theme = ThemeStore.Load(dir);
-                if (ThemePalettes.Find(_settings.ThemePalettes.GetValueOrDefault(_settings.ActiveTheme)) is { } palette) ThemePalettes.Apply(theme, palette);
+                if (ThemePalettes.Find(_settings.ThemePalettes.GetValueOrDefault(shown)) is { } palette) ThemePalettes.Apply(theme, palette);
                 _themeView = new ThemeView(theme, dir);
                 if (_dim is { Mode: "Theme" or "Both" }) _themeView.SetGlows(false);
                 ThemeHost.Child = _themeView;
@@ -753,7 +801,7 @@ public partial class MainWindow : Window
             case ThemeAction.MediaPage: ShowMediaPage(); break;
             case ThemeAction.PalettePage: ShowPalettes(); break;
             case ThemeAction.GamingPage: ShowGaming(); break;
-            case ThemeAction.NextPalette: SetPalette(ThemePalettes.Next(_settings.ThemePalettes.GetValueOrDefault(_settings.ActiveTheme))); break;
+            case ThemeAction.NextPalette: SetPalette(ThemePalettes.Next(_settings.ThemePalettes.GetValueOrDefault(ShownTheme))); break;
             case ThemeAction.PlayPause: _ = _media.SendAsync(MediaCommand.PlayPause); break;
             case ThemeAction.NextTrack: _ = _media.SendAsync(MediaCommand.Next); break;
             case ThemeAction.PreviousTrack: _ = _media.SendAsync(MediaCommand.Previous); break;
@@ -930,7 +978,7 @@ public partial class MainWindow : Window
         _mediaView?.Close();
         DetailHost.Child = _paletteView;
         DetailHost.Visibility = Visibility.Visible;
-        _paletteView.Open(_settings.ThemePalettes.GetValueOrDefault(_settings.ActiveTheme) ?? "", _themeView?.Theme.Name);
+        _paletteView.Open(_settings.ThemePalettes.GetValueOrDefault(ShownTheme) ?? "", _themeView?.Theme.Name);
     }
     /// <summary>The media page: what's playing, seek, controls, and with Plexamp shuffle, repeat, volume and the queue.</summary>
     private void ShowMediaPage()
@@ -1175,7 +1223,7 @@ public partial class MainWindow : Window
             _settings.ScreenPowerOff = on;
             try { SettingsStore.Save(_settings); return null; }
             catch (Exception ex) { _settings.ScreenPowerOff = !on; return "Not saved: " + ex.Message; }
-        });
+        }, ThemeCycle.Available(ThemeStore.RootPath).Select(t => (t.Id, t.Name)).ToList());
         _scheduleForm.Show(); _scheduleForm.Activate();
     }
 
@@ -1410,10 +1458,10 @@ public partial class MainWindow : Window
     {
         if (_themesForm is { IsDisposed: false }) { _themesForm.Activate(); return; }
         _themesForm = new ThemesForm(_settings, ThemeStore.RootPath,
-            id => SavePreference(() => _settings.ActiveTheme = id, () => { ApplyTheme(); RestartPlaylist(); }),
+            id => { PickTheme(id); RestartPlaylist(); },
             live: () => ThemeContext(DateTime.Now, _lastValues),
             displaySize: () => (Shown.Width, Shown.Height),
-            themeSaved: id => { if (_settings.ActiveTheme == id) ApplyTheme(); }, // show edits to the running theme
+            themeSaved: id => { if (ShownTheme == id) ApplyTheme(); }, // show edits to the running theme
             openPlaylist: OpenPlaylist,
             filterChanged: SaveThemeFilter);
         _themesForm.Show(); _themesForm.Activate();
@@ -1438,13 +1486,17 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>Shows the next or previous theme of the playlist (or of all themes); stepping restarts the rotation interval.</summary>
-    private void StepTheme(int step)
+    /// <summary>
+    /// Shows the next or previous theme of the playlist (or of all themes), from the one showing; stepping restarts the
+    /// rotation interval. By hand (swipe, hotkey, tray, a theme's button) it is a pick; the playlist's own steps are not.
+    /// </summary>
+    private void StepTheme(int step, bool byHand = true)
     {
         var themes = ThemeCycle.Available(ThemeStore.RootPath);
         var order = ThemeCycle.Order(_settings.ThemePlaylist, themes.Select(t => t.Id).ToList(), ThemeCycle.Fitting(themes, Shown.Width, Shown.Height));
-        string next = ThemeCycle.Step(order, _settings.ActiveTheme, step);
-        if (next != _settings.ActiveTheme) SavePreference(() => _settings.ActiveTheme = next, ApplyTheme);
+        string next = ThemeCycle.Step(order, ShownTheme, step);
+        if (byHand) PickTheme(next);
+        else if (next != _settings.ActiveTheme) SavePreference(() => _settings.ActiveTheme = next, ApplyTheme);
         RestartPlaylist();
         if (_themesForm is { IsDisposed: false }) _themesForm.ShowActive();
     }
@@ -1587,7 +1639,7 @@ public partial class MainWindow : Window
             string theme = id[6..];
             if (ThemeCycle.Available(ThemeStore.RootPath).Any(t => t.Id == theme))
             {
-                if (theme != _settings.ActiveTheme) SavePreference(() => _settings.ActiveTheme = theme, ApplyTheme);
+                PickTheme(theme);
                 RestartPlaylist();
                 RestoreOverlay();
             }
@@ -1603,7 +1655,7 @@ public partial class MainWindow : Window
             case "previousTheme": StepTheme(-1); break;
             case "rotate": TogglePlaylist(announce: true); break;
             case "playlist": OpenPlaylist(); break;
-            case "nextPalette": SetPalette(ThemePalettes.Next(_settings.ThemePalettes.GetValueOrDefault(_settings.ActiveTheme))); break;
+            case "nextPalette": SetPalette(ThemePalettes.Next(_settings.ThemePalettes.GetValueOrDefault(ShownTheme))); break;
             case "shortcuts": OpenShortcuts(); break;
             case "drawer": RestoreOverlay(); ShowDrawer(); break;
             case "media": RestoreOverlay(); ShowMediaPage(); break;
@@ -1820,8 +1872,8 @@ public partial class MainWindow : Window
     /// <summary>Tray → Colors: show the current theme in one of the palettes, or its own colors. Custom themes only.</summary>
     private Forms.ToolStripMenuItem PaletteMenu()
     {
-        string current = _settings.ThemePalettes.GetValueOrDefault(_settings.ActiveTheme) ?? "";
-        bool themed = _settings.ActiveTheme.Length > 0;
+        string current = _settings.ThemePalettes.GetValueOrDefault(ShownTheme) ?? "";
+        bool themed = ShownTheme.Length > 0;
         var root = new Forms.ToolStripMenuItem("Colors · " + (themed ? ThemePalettes.Find(current)?.Name ?? "theme's own" : "themes only")) { Enabled = themed };
         var own = new Forms.ToolStripMenuItem("Theme's own colors") { Checked = ThemePalettes.Find(current) == null };
         own.Click += (_, _) => Dispatcher.Invoke(() => SetPalette(""));
@@ -1856,8 +1908,8 @@ public partial class MainWindow : Window
     /// <summary>Shows the current theme in a palette ("" = its own colors) and remembers it for that theme.</summary>
     private void SetPalette(string name)
     {
-        if (_settings.ActiveTheme.Length == 0) return;
-        string theme = _settings.ActiveTheme;
+        string theme = ShownTheme; // the theme showing, also a game's or the schedule's
+        if (theme.Length == 0) return;
         SavePreference(() =>
         {
             if (ThemePalettes.Find(name) is { } p) _settings.ThemePalettes[theme] = p.Name;
@@ -1965,7 +2017,8 @@ public partial class MainWindow : Window
     private void OpenGaming()
     {
         if (_gamingForm is { IsDisposed: false }) { _gamingForm.Refill(); _gamingForm.Activate(); return; }
-        _gamingForm = new GamingForm(_settings.Gaming, () => _gameCatalog, () => _suggestions, SaveGaming, TrackGame, IgnoreGame);
+        _gamingForm = new GamingForm(_settings.Gaming, () => _gameCatalog, () => _suggestions, SaveGaming, TrackGame, IgnoreGame,
+            ThemeCycle.Available(ThemeStore.RootPath).Select(t => (t.Id, t.Name)).ToList());
         _gamingForm.Show(); _gamingForm.Activate();
     }
 

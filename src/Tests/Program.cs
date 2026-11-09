@@ -105,7 +105,7 @@ if(args.Contains("--form-shots"))
     var formThread=new Thread(() => { try {
         var settings=new MonitorSettings{ThemePlaylist=["builtin:28-halo"]};
         settings.Shortcuts=[new AppShortcut{Name="Notepad",Target=@"C:\Windows\notepad.exe"},new AppShortcut{Name="Pulsewave site",Target="https://example.com"}];
-        settings.Gaming.Games.Add(new UserGame{Name="RetroArch",Exe=@"C:\RetroArch-Win64\retroarch.exe"});
+        settings.Gaming.Games.Add(new UserGame{Name="RetroArch",Exe=@"C:\RetroArch-Win64\retroarch.exe"});settings.Gaming.Theme="builtin:30-halo-gaming";settings.Gaming.Themes["gog:2"]="builtin:38-noir";
         var telemetry=new TelemetryEngine();
         string themes=System.IO.Path.Combine(System.IO.Path.GetTempPath(),"pw-form-shots-themes");
         var games=new List<Pulsewave.GameEntry>{new("steam:1","Stellar Blade",@"C:\Games\StellarBlade","1"),new("gog:2","SILENT HILL f",@"E:\GOG Games\SILENT HILL f",null,null,null,"GOG")};
@@ -115,9 +115,9 @@ if(args.Contains("--form-shots"))
             ("playlist", new PlaylistForm(settings, Pulsewave.Themes.ThemeCycle.Available(themes), _ => [], displaySize: () => (682, 2560))),
             ("shortcuts", new ShortcutsForm(settings.Shortcuts, _ => null)),
             ("lights", new LightsForm(new LightsSettings(), _ => { }, () => { }, () => null)),
-            ("schedule", new ScheduleForm([new ScheduleRule{Screen=true}], _ => null, "")),
+            ("schedule", new ScheduleForm([new ScheduleRule{Screen=true,Theme="builtin:36-paper"},new ScheduleRule{Off="09:00",On="17:00",Lights=false,Days=62,Theme="builtin:32-halo-productivity"}], _ => null, "", themes: Pulsewave.Themes.ThemeCycle.Available(System.IO.Path.Combine(System.IO.Path.GetTempPath(),"pw-form-shots-themes")).Select(x => (x.Id, x.Name)).ToList())),
             ("weather", new WeatherForm(new WeatherSettings{City="San Francisco",Latitude=37.8,Longitude=-122.4}, () => null)),
-            ("gaming", new GamingForm(settings.Gaming, () => games, () => [@"D:\Emu\emu.exe"], () => null, (_, _) => { }, _ => { })),
+            ("gaming", new GamingForm(settings.Gaming, () => games, () => [@"D:\Emu\emu.exe"], () => null, (_, _) => { }, _ => { }, Pulsewave.Themes.ThemeCycle.Available(System.IO.Path.Combine(System.IO.Path.GetTempPath(),"pw-form-shots-themes")).Select(x => (x.Id, x.Name)).ToList())),
             ("plex-token", new PlexTokenForm(_ => { })),
             ("sensor-manager", new SensorManagerForm(settings)),
             ("telemetry", new TelemetryForm(telemetry, settings, () => { })),
@@ -613,6 +613,7 @@ Pulsewave.Regression.GroupChecks.Run(testOutput);
 Pulsewave.Regression.LightsChecks.Run(testOutput);
 Pulsewave.Regression.ScheduleChecks.Run(testOutput);
 Pulsewave.Regression.PairingChecks.Run();
+Pulsewave.Regression.ThemeDirectorChecks.Run(testOutput);
 Pulsewave.Regression.AestheticChecks.Run(testOutput);
 Pulsewave.Regression.MixerChecks.Run(testOutput);
 Pulsewave.Regression.WeatherChecks.Run(testOutput);

@@ -75,7 +75,7 @@ Decided in a design review with the user. Released in small steps, each checked 
 
 **0.9.2 release gate:** the seven items under "Fixed after 0.9.1" in `validation/V0.9.1-ACCEPTANCE.md` confirmed on hardware (LEDs back on in the saved color, Open OpenRGB, kill-and-restart restoring backlight and display, Steam picker / 48 shortcuts, Auto-pair, FAN OK, outline and centred icons). The rest of that checklist stays open and does not block it.
 
-### V0.10 — The HUD picks the theme for the moment
+### V0.10 — The HUD picks the theme for the moment (released 2026-11-09)
 - **Game-aware themes.** One default "theme while gaming" plus optional per-game overrides, both in tray → Gaming (a choice at the top; a theme column per game, blank = default). When the session ends (after the existing 30 s grace) the theme from before the game returns, unless the schedule now wants another.
 - **Schedule themes.** "Show theme ___" as a fourth action on the existing rules (beside LEDs, screen, dim). Rules already overlap (up to 16, combined); when two want different themes, the **topmost** rule wins, as it already does for dimming. The Schedule window gains ▲ / ▼ to arrange rules.
 - **Precedence**, highest first: a theme the user picks (tray, gallery, swipe, hotkey; held until the current game or schedule period ends) → a running game → the schedule → the playlist (paused while any of those is in control, resumed after).

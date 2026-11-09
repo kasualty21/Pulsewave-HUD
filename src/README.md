@@ -1,4 +1,12 @@
-# Pulsewave System Monitor V0.9.2
+# Pulsewave System Monitor V0.10.0
+
+## V0.10.0 - The HUD picks the theme for the moment
+
+**Theme while gaming.** Tray → Gaming → "Theme while gaming" shows a theme (e.g. Halo Gaming) while any recognised game runs; a game can have its own theme or "Don't switch" (pick it in the list, then "This game"). Your own theme returns when the game ends.
+
+**Schedule themes.** A schedule rule can show a theme for its period (tray → Schedule → Show theme), e.g. Productivity on weekday daytime. When rules overlap the topmost wins; ▲ ▼ arrange them.
+
+**Who wins.** A theme you pick by hand holds until the game or schedule period running then ends; a game comes before the schedule; theme rotation waits while either is in control. Game and schedule themes never replace your own saved theme, and never show a hidden HUD.
 
 ## V0.9.2 - Fixes: LEDs, Open OpenRGB, centred icons, crash-safe dimming
 

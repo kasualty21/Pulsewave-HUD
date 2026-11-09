@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.10.0 (2026-11-09)
+The HUD picks the theme for the moment: a theme while gaming, and themes in the schedule. Your own theme is never replaced; it returns when the game or the period ends. Settings from 0.9.2 carry over and behave exactly as before until you set a gaming or schedule theme.
+- Theme while gaming (tray → Gaming): one theme shown while any recognised game runs, and optionally a game's own theme or "Don't switch" for it (pick a game in the list, then "This game"; the list's Theme column shows each game's). The theme switches when the game session starts and your own returns when it ends (after the session's 30 s grace).
+- Schedule themes (tray → Schedule): a rule can show a theme for its period ("Show theme"), alongside or instead of turning the LEDs or screen off and dimming. When rules overlap, the topmost wins; ▲ ▼ arrange the rules. A period past midnight counts as the evening it started.
+- Precedence: a theme you pick by hand (gallery, tray, swipe, hotkey, a theme's buttons) outranks the game and the schedule period running when you pick it, until they end; a game outranks the schedule; the schedule outranks theme rotation, which waits while a game or schedule theme is in control and resumes after. After a game, the HUD shows what the schedule wants then, else your own theme.
+- Game and schedule themes show over your own without changing it (it stays your saved theme), switch silently while the HUD is hidden and never unhide it, and are ignored if the theme was deleted. Theme colors (the Colors page, tray → Colors, next palette) apply to the theme showing.
+
 ## 0.9.2 (2026-11-09)
 Fixes from the first hardware checks of 0.9.1: the schedule's LEDs coming back on, Lights → Open OpenRGB, icons centred in the HUD pages' buttons, and night dimming / screen-off undone after a crash. Also 48 shortcuts with a paged app drawer and a better Steam picker, Sensor Manager Auto-pair, and FAN OK / STOPPED on Halo Gaming. Settings from 0.9.1 carry over.
 - Fixed: the schedule's LEDs stayed off at the end of an off period when the lights had last been set from an OpenRGB profile that OpenRGB no longer lists. Lights on now uses the saved color in that case (and says so) instead of failing and retrying every minute. The schedule's status line no longer blames OpenRGB for every failure.

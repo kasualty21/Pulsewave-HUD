@@ -25,6 +25,8 @@ public sealed class ScheduleRule
     public string DimMode { get; set; } = "Theme";
     /// <summary>Brightness kept while dimmed, 10–90 %.</summary>
     public int DimLevel { get; set; } = 40;
+    /// <summary>A theme to show for the period ("" = none). When several covering rules have one, the topmost wins.</summary>
+    public string Theme { get; set; } = "";
 
     public static readonly string[] DimModes = ["Theme", "Backlight", "Both"];
 
@@ -40,6 +42,16 @@ public sealed class ScheduleRule
         Days &= 127;
         DimMode = DimModes.FirstOrDefault(m => m.Equals(DimMode?.Trim(), StringComparison.OrdinalIgnoreCase)) ?? "Theme";
         DimLevel = Math.Clamp(DimLevel, 10, 90);
+        Theme = (Theme ?? "").Trim();
+    }
+
+    /// <summary>When the period covering <paramref name="now"/> started (today's or, past midnight, yesterday's Off time), or null when none covers it.</summary>
+    public DateTime? StartOf(DateTime now)
+    {
+        if (!Covers(now) || !TryTime(Off, out var off) || !TryTime(On, out var on)) return null;
+        var day = now.Date;
+        if (off > on && TimeOnly.FromDateTime(now) < on) day = day.AddDays(-1); // past midnight: began yesterday
+        return day + off.ToTimeSpan();
     }
 
     /// <summary>Whether this rule's off period covers <paramref name="now"/>.</summary>

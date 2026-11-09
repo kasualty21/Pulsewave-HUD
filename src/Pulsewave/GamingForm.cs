@@ -20,15 +20,24 @@ internal sealed class GamingForm : Forms.Form
     private readonly Func<string?> _save;
     private readonly Action<string, string> _track;
     private readonly Action<string> _ignore;
-    private readonly Forms.ListView _games = List(("Game", 330), ("Found in", 110), ("Matched by", 300));
+    private readonly Forms.ListView _games = List(("Game", 300), ("Found in", 100), ("Theme", 170), ("Matched by", 230));
+    private readonly IReadOnlyList<(string Id, string Name)> _themes;
+    private readonly Forms.ComboBox _defaultTheme = Choice(), _gameTheme = Choice();
+    private readonly Forms.Label _gameLabel = new() { AutoSize = true, ForeColor = Muted, Padding = new Forms.Padding(14, 7, 6, 0) };
+    private bool _filling;
+
+    /// <summary>A theme choice: an id, or "" for the default / don't switch, and <see cref="GamingSettings.NoTheme"/>.</summary>
+    private sealed record ThemeChoice(string Id, string Label) { public override string ToString() => Label; }
     private readonly Forms.ListBox _added = Box(), _ignored = Box(), _pending = Box();
     private readonly Forms.CheckBox _suggest = new() { Text = "Suggest programs that look like games (full-screen with the GPU busy for 2 minutes)", AutoSize = true, ForeColor = Color.White };
     private readonly Forms.Label _status = new() { Dock = Forms.DockStyle.Bottom, Height = 34, Padding = new Forms.Padding(16, 6, 16, 0), ForeColor = Muted };
 
     /// <param name="track">Adds a program as a game (path, name); <paramref name="ignore"/> marks one as never a game. Both save.</param>
+    /// <param name="themes">The installed themes (id, name) for "Theme while gaming" and each game's own pick.</param>
     public GamingForm(GamingSettings settings, Func<IReadOnlyList<GameEntry>> catalog, Func<IReadOnlyList<string>> suggested,
-        Func<string?> save, Action<string, string> track, Action<string> ignore)
+        Func<string?> save, Action<string, string> track, Action<string> ignore, IReadOnlyList<(string Id, string Name)>? themes = null)
     {
+        _themes = (themes ?? []).Where(t => t.Id.Length > 0).ToList(); // Classic isn't offered: "don't switch" leaves the user's theme
         _settings = settings;
         _catalog = catalog;
         _suggested = suggested;
@@ -86,7 +95,32 @@ internal sealed class GamingForm : Forms.Form
         _suggest.Checked = settings.Suggest;
         _suggest.CheckedChanged += (_, _) => { _settings.Suggest = _suggest.Checked; Saved(_suggest.Checked ? "Suggestions on." : "Suggestions off."); };
         bottom.Controls.AddRange([ignoreGame, _suggest]);
+
+        // Theme while gaming (0.10): one default for every game, and the selected game's own pick.
+        var themeRow = new Forms.FlowLayoutPanel { Dock = Forms.DockStyle.Top, Height = 40, WrapContents = false, Padding = new Forms.Padding(0, 4, 0, 0) };
+        themeRow.Controls.Add(new Forms.Label { Text = "Theme while gaming", AutoSize = true, ForeColor = Muted, Padding = new Forms.Padding(0, 7, 6, 0) });
+        themeRow.Controls.Add(_defaultTheme);
+        themeRow.Controls.Add(_gameLabel);
+        themeRow.Controls.Add(_gameTheme);
+        _defaultTheme.Items.Add(new ThemeChoice("", "Don't switch"));
+        foreach (var t in _themes) _defaultTheme.Items.Add(new ThemeChoice(t.Id, t.Name));
+        _defaultTheme.SelectedItem = _defaultTheme.Items.Cast<ThemeChoice>().FirstOrDefault(c => c.Id == _settings.Theme) ?? _defaultTheme.Items[0];
+        _defaultTheme.SelectedIndexChanged += (_, _) =>
+        {
+            if (_filling || _defaultTheme.SelectedItem is not ThemeChoice c) return;
+            _settings.Theme = c.Id;
+            Saved(c.Id.Length == 0 ? "Games no longer switch the theme." : $"Games show {c.Label} (the theme returns when the game ends).");
+        };
+        _gameTheme.SelectedIndexChanged += (_, _) =>
+        {
+            if (_filling || _gameTheme.SelectedItem is not ThemeChoice c || SelectedGame() is not { } g) return;
+            if (c.Id.Length == 0) _settings.Themes.Remove(g.Key); else _settings.Themes[g.Key] = c.Id;
+            Saved($"{g.Name}: {c.Label}.");
+        };
+        _games.SelectedIndexChanged += (_, _) => ShowGameTheme();
+
         left.Controls.Add(_games);
+        left.Controls.Add(themeRow);
         left.Controls.Add(bottom);
 
         Controls.Add(left);
@@ -100,11 +134,19 @@ internal sealed class GamingForm : Forms.Form
     public void Refill(string? status = null)
     {
         var games = _catalog().OrderBy(g => g.Source == "Steam").ThenBy(g => g.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
+        string? selected = SelectedGame()?.Key;
+        _filling = true;
         _games.BeginUpdate();
         _games.Items.Clear();
         foreach (var g in games)
-            _games.Items.Add(new Forms.ListViewItem([g.Name, g.Source, g.Exe != null ? Path.GetFileName(g.Exe) + (g.Folder.Length > 0 ? " · folder" : "") : g.Folder]) { Tag = g });
+        {
+            var item = new Forms.ListViewItem([g.Name, g.Source, ThemeLabel(g.Key), g.Exe != null ? Path.GetFileName(g.Exe) + (g.Folder.Length > 0 ? " · folder" : "") : g.Folder]) { Tag = g };
+            _games.Items.Add(item);
+            if (g.Key == selected) item.Selected = true;
+        }
         _games.EndUpdate();
+        _filling = false;
+        ShowGameTheme();
         _added.Items.Clear();
         foreach (var g in _settings.Games) _added.Items.Add($"{g.Name}  ·  {Path.GetFileName(g.Exe)}");
         _ignored.Items.Clear();
@@ -115,6 +157,43 @@ internal sealed class GamingForm : Forms.Form
     }
 
     public void ShowStatus(string text) => _status.Text = text;
+
+    private GameEntry? SelectedGame() => _games.SelectedItems.Count > 0 ? _games.SelectedItems[0].Tag as GameEntry : null;
+
+    /// <summary>What a game shows while played, for its Theme column: its own pick, "default (…)" or "don't switch".</summary>
+    internal string ThemeLabel(string key) => _settings.Themes.GetValueOrDefault(key) switch
+    {
+        GamingSettings.NoTheme => "Don't switch",
+        { Length: > 0 } own => NameOf(own),
+        _ => _settings.Theme.Length > 0 ? "Default · " + NameOf(_settings.Theme) : "—"
+    };
+
+    private string NameOf(string id) => _themes.FirstOrDefault(t => t.Id == id).Name ?? "(theme removed)";
+
+    /// <summary>The "This game" choice follows the selected game.</summary>
+    private void ShowGameTheme()
+    {
+        _filling = true;
+        _gameTheme.Items.Clear();
+        if (SelectedGame() is { } g)
+        {
+            _gameTheme.Items.Add(new ThemeChoice("", _settings.Theme.Length > 0 ? "Default (" + NameOf(_settings.Theme) + ")" : "Default (don't switch)"));
+            _gameTheme.Items.Add(new ThemeChoice(GamingSettings.NoTheme, "Don't switch"));
+            foreach (var t in _themes) _gameTheme.Items.Add(new ThemeChoice(t.Id, t.Name));
+            string own = _settings.Themes.GetValueOrDefault(g.Key) ?? "";
+            _gameTheme.SelectedItem = _gameTheme.Items.Cast<ThemeChoice>().FirstOrDefault(c => c.Id == own) ?? _gameTheme.Items[0];
+        }
+        // No empty box while nothing is selected: a hint instead.
+        _gameTheme.Visible = SelectedGame() != null;
+        _gameLabel.Text = SelectedGame() != null ? "This game" : "Pick a game for its own theme";
+        _filling = false;
+    }
+
+    private static Forms.ComboBox Choice() => new()
+    {
+        DropDownStyle = Forms.ComboBoxStyle.DropDownList, Width = 190, FlatStyle = Forms.FlatStyle.Flat,
+        BackColor = Color.FromArgb(40, 53, 68), ForeColor = Color.White, Margin = new Forms.Padding(0, 3, 0, 0)
+    };
 
     private void AddGame()
     {

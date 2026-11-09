@@ -21,9 +21,17 @@ public sealed class GamingSettings
     public List<string> Ignored { get; set; } = new();
     /// <summary>Ask "Track this as a game?" when an unknown program runs full-screen with the GPU busy.</summary>
     public bool Suggest { get; set; } = true;
+    /// <summary>The theme shown while any game runs ("" = don't switch).</summary>
+    public string Theme { get; set; } = "";
+    /// <summary>Per-game themes by game key, overriding <see cref="Theme"/>; <see cref="NoTheme"/> = don't switch for this game.</summary>
+    public Dictionary<string, string> Themes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    public const string NoTheme = "none";
 
     public void Normalize()
     {
+        Theme = (Theme ?? "").Trim();
+        Themes = new Dictionary<string, string>((Themes ?? new()).Where(t => !string.IsNullOrWhiteSpace(t.Key) && !string.IsNullOrWhiteSpace(t.Value))
+            .Take(500).ToDictionary(t => t.Key, t => t.Value.Trim()), StringComparer.OrdinalIgnoreCase);
         Games = (Games ?? new()).Where(g => g != null && !string.IsNullOrWhiteSpace(g.Exe)).GroupBy(g => g.Exe.ToLowerInvariant()).Select(g => g.First()).Take(200).ToList();
         foreach (var g in Games) g.Name = string.IsNullOrWhiteSpace(g.Name) ? Path.GetFileNameWithoutExtension(g.Exe) : g.Name.Trim();
         Ignored = (Ignored ?? new()).Where(i => !string.IsNullOrWhiteSpace(i)).Select(i => i.ToLowerInvariant()).Distinct().Take(500).ToList();
@@ -375,6 +383,8 @@ public sealed class GameTracker
 
     public IReadOnlyList<GameSession> History => _history;
     public string? CurrentGame => _name;
+    /// <summary>The running session's game key (it stays through the 30 s grace after the game was last seen), or null.</summary>
+    public string? CurrentKey => _key;
 
     /// <summary>
     /// One look at what is running (null: no known game), with this second's FPS and temperatures.

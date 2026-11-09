@@ -27,22 +27,26 @@ internal sealed class ScheduleForm : Forms.Form
     private readonly Forms.NumericUpDown _dimLevel = new() { Minimum = 10, Maximum = 90, Increment = 5, Width = 60, Value = 40 };
     private static readonly string[] DimLabels = ["Darken the theme, no glows", "Lower the display's backlight", "Both"];
     private readonly Forms.DateTimePicker _off = Picker(), _on = Picker();
+    private readonly Forms.ComboBox _theme = new() { DropDownStyle = Forms.ComboBoxStyle.DropDownList, Width = 260 };
+    private readonly IReadOnlyList<(string Id, string Name)> _themes;
     private readonly Forms.CheckBox[] _days = Week.Select(d => Box(CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName(d))).ToArray();
-    private readonly Forms.Panel _editor = new() { Dock = Forms.DockStyle.Right, Width = 400, BackColor = Panel, Padding = new Forms.Padding(14, 10, 14, 10) };
+    private readonly Forms.Panel _editor = new() { Dock = Forms.DockStyle.Right, Width = 440, BackColor = Panel, Padding = new Forms.Padding(14, 10, 14, 10) };
     private readonly Forms.Label _status = new() { Dock = Forms.DockStyle.Bottom, Height = 40, Padding = new Forms.Padding(16, 6, 16, 0), ForeColor = Muted };
     private bool _loading;
 
     /// <param name="save">Saves the rules; returns why it could not, or null.</param>
     /// <param name="setPowerOff">Saves the display power-down option; returns why it could not, or null.</param>
+    /// <param name="themes">Installed themes (id, name) a rule can show for its period.</param>
     public ScheduleForm(IEnumerable<ScheduleRule> rules, Func<List<ScheduleRule>, string?> save, string status,
-        bool powerOff = false, Func<bool, string?>? setPowerOff = null)
+        bool powerOff = false, Func<bool, string?>? setPowerOff = null, IReadOnlyList<(string Id, string Name)>? themes = null)
     {
+        _themes = (themes ?? []).Where(t => t.Id.Length > 0).ToList();
         _rules = rules.Select(r => r.Copy()).ToList();
         _save = save;
         Text = "Pulsewave · Schedule";
         StartPosition = Forms.FormStartPosition.CenterScreen;
-        Size = new Size(860, 480);
-        MinimumSize = new Size(760, 420);
+        Size = new Size(920, 640);
+        MinimumSize = new Size(800, 560);
         BackColor = Color.FromArgb(19, 27, 37);
         ForeColor = Color.FromArgb(232, 242, 249);
         Font = new Font("Segoe UI", 9.5f);
@@ -72,15 +76,21 @@ internal sealed class ScheduleForm : Forms.Form
         foreach (var label in DimLabels) _dimMode.Items.Add(label);
         var dimRow = new Forms.FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = new Forms.Padding(18, 0, 0, 0) };
         dimRow.Controls.AddRange([_dimMode, Caption("brightness %"), _dimLevel]);
-        fields.Controls.AddRange([_enabled, times, Caption("Starting on"), days, presets, _lights, _screen, _dim, dimRow,
-            new Forms.Label { AutoSize = false, Width = 360, Height = 96, ForeColor = Muted, Margin = new Forms.Padding(0, 10, 0, 0),
+        _theme.Items.Add("No theme change");
+        foreach (var t in _themes) _theme.Items.Add(t.Name);
+        var themeRow = new Forms.FlowLayoutPanel { AutoSize = true, WrapContents = false };
+        themeRow.Controls.AddRange([Caption("Show theme"), _theme]);
+        fields.Controls.AddRange([_enabled, times, Caption("Starting on"), days, presets, _lights, _screen, _dim, dimRow, themeRow,
+            new Forms.Label { AutoSize = false, Width = 380, Height = 112, ForeColor = Muted, Margin = new Forms.Padding(0, 10, 0, 0),
                 Text = "Waking the screen by tap needs click-through off. While it is black the HUD stops drawing; telemetry and session stats keep running. " +
-                       "The backlight works on displays that take brightness over DDC/CI (not the main display) and is put back afterwards." }]);
+                       "The backlight works on displays that take brightness over DDC/CI (not the main display) and is put back afterwards. " +
+                       "A theme shows for the period, then yours returns. Overlapping rules: the topmost wins (▲ ▼)." }]);
         _editor.Controls.Add(fields);
 
         foreach (var box in new[] { _enabled, _lights, _screen, _dim }.Concat(_days)) box.CheckedChanged += (_, _) => Changed();
         _dimMode.SelectedIndexChanged += (_, _) => Changed();
         _dimLevel.ValueChanged += (_, _) => Changed();
+        _theme.SelectedIndexChanged += (_, _) => Changed();
         _off.ValueChanged += (_, _) => Changed();
         _on.ValueChanged += (_, _) => Changed();
 
@@ -99,6 +109,9 @@ internal sealed class ScheduleForm : Forms.Form
             Save();
             Fill(Math.Min(index, _rules.Count - 1));
         }));
+        // Order matters: when rules overlap, the topmost one's theme and dimming apply.
+        buttons.Controls.Add(Button("▲", () => MoveRule(-1)));
+        buttons.Controls.Add(Button("▼", () => MoveRule(+1)));
         var power = new Forms.CheckBox { Text = "Screen off also puts the HUD's display in standby (if it supports DDC/CI)",
             Checked = powerOff, Dock = Forms.DockStyle.Bottom, Height = 30, Padding = new Forms.Padding(4, 0, 0, 0) };
         power.CheckedChanged += (_, _) => { if (setPowerOff?.Invoke(power.Checked) is { } error) ShowStatus(error); };
@@ -117,20 +130,40 @@ internal sealed class ScheduleForm : Forms.Form
 
     public void ShowStatus(string text) => _status.Text = text;
 
+    /// <summary>Moves the selected rule up or down the list (the topmost covering rule wins).</summary>
+    internal void MoveRule(int step)
+    {
+        int index = _list.SelectedIndex, to = index + step;
+        if (index < 0 || to < 0 || to >= _rules.Count) return;
+        (_rules[index], _rules[to]) = (_rules[to], _rules[index]);
+        Save();
+        Fill(to);
+    }
+
+    internal IReadOnlyList<ScheduleRule> Rules => _rules;
+    internal void SelectRule(int index) => _list.SelectedIndex = index;
+
+    private string ThemeName(string id) => _themes.FirstOrDefault(t => t.Id == id).Name ?? "a removed theme";
+
     private void Fill(int select)
     {
         _loading = true;
         _list.Items.Clear();
-        foreach (var r in _rules) _list.Items.Add(Summary(r));
+        foreach (var r in _rules) _list.Items.Add(Summary(r, ThemeName));
         _loading = false;
         if (select >= 0 && select < _list.Items.Count) _list.SelectedIndex = select;
         ShowSelected();
     }
 
-    internal static string Summary(ScheduleRule r)
+    internal static string Summary(ScheduleRule r, Func<string, string>? themeName = null)
     {
-        string what = r.Lights && r.Screen ? "LEDs and screen" : r.Lights ? "LEDs" : r.Screen ? "Screen" : r.Dim ? "" : "Nothing";
-        string dim = r.Dim ? (what.Length > 0 ? $", dim {r.DimLevel}%" : $"Dim {r.DimLevel}%") : "";
+        bool theme = r.Theme.Length > 0;
+        string what = r.Lights && r.Screen ? "LEDs and screen" : r.Lights ? "LEDs" : r.Screen ? "Screen" : r.Dim || theme ? "" : "Nothing";
+        // Dimming and a theme follow what turns off ("LEDs off … , dim 40%, theme Paper"), or lead the line on their own ("Theme Paper 09:00 → 17:00").
+        var extras = new List<string>();
+        if (r.Dim) extras.Add($"dim {r.DimLevel}%");
+        if (theme) extras.Add("theme " + (themeName?.Invoke(r.Theme) ?? r.Theme));
+        string dim = extras.Count == 0 ? "" : what.Length > 0 ? ", " + string.Join(", ", extras) : char.ToUpperInvariant(extras[0][0]) + string.Join(", ", extras)[1..];
         string days = r.Days switch
         {
             127 => "every day", 0b0111110 => "weekdays", 0b1000001 => "weekends", 0 => "no days",
@@ -154,6 +187,12 @@ internal sealed class ScheduleForm : Forms.Form
         _dimMode.SelectedIndex = Math.Max(0, Array.IndexOf(ScheduleRule.DimModes, r.DimMode));
         _dimLevel.Value = Math.Clamp(r.DimLevel, 10, 90);
         _dimMode.Enabled = _dimLevel.Enabled = r.Dim;
+        _theme.Items.Clear();
+        _theme.Items.Add("No theme change");
+        foreach (var t in _themes) _theme.Items.Add(t.Name);
+        int themeAt = r.Theme.Length == 0 ? 0 : _themes.Select(t => t.Id).ToList().IndexOf(r.Theme) + 1;
+        if (themeAt == 0 && r.Theme.Length > 0) { _theme.Items.Add("(removed) " + r.Theme); themeAt = _theme.Items.Count - 1; } // kept, not dropped
+        _theme.SelectedIndex = themeAt;
         _off.Value = DateTime.Today + (ScheduleRule.TryTime(r.Off, out var off) ? off.ToTimeSpan() : TimeSpan.FromHours(23));
         _on.Value = DateTime.Today + (ScheduleRule.TryTime(r.On, out var on) ? on.ToTimeSpan() : TimeSpan.FromHours(7));
         for (int i = 0; i < Week.Length; i++) _days[i].Checked = (r.Days & (1 << (int)Week[i])) != 0;
@@ -178,13 +217,16 @@ internal sealed class ScheduleForm : Forms.Form
         r.DimMode = ScheduleRule.DimModes[Math.Max(0, _dimMode.SelectedIndex)];
         r.DimLevel = (int)_dimLevel.Value;
         _dimMode.Enabled = _dimLevel.Enabled = r.Dim;
+        int pick = _theme.SelectedIndex;
+        if (pick == 0) r.Theme = "";
+        else if (pick > 0 && pick <= _themes.Count) r.Theme = _themes[pick - 1].Id; // a "(removed)" entry keeps the old id
         r.Off = _off.Value.ToString("HH:mm", CultureInfo.InvariantCulture);
         r.On = _on.Value.ToString("HH:mm", CultureInfo.InvariantCulture);
         r.Days = 0;
         for (int i = 0; i < Week.Length; i++) if (_days[i].Checked) r.Days |= 1 << (int)Week[i];
         Save();
         _loading = true;
-        _list.Items[_list.SelectedIndex] = Summary(r);
+        _list.Items[_list.SelectedIndex] = Summary(r, ThemeName);
         _loading = false;
     }
 
