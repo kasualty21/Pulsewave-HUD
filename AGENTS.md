@@ -20,3 +20,17 @@ Read-only planning is not a source audit. Distinguish directly reproduced automa
 Avoid launching the real overlay, editing live user settings, changing startup entries or display topology during automated tests. Use isolated fixtures and app-owned off-screen renders.
 Keep releases/ immutable. Put scratch files in work/. Do not remove another agent's work. No destructive cleanup without resolving and verifying intended workspace paths.
 Before handing back: report changed files, rationale, validation results, unresolved issues and integration needs. Do not bump versions independently.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs live in GitHub Issues on kasualty21/Pulsewave-HUD, used through the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five default labels: needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root, created when first needed. See `docs/agents/domain.md`.
