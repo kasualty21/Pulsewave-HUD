@@ -1,4 +1,10 @@
-# Pulsewave System Monitor V0.9.1
+# Pulsewave System Monitor V0.9.2
+
+## V0.9.2 - Fixes: LEDs, Open OpenRGB, centred icons, crash-safe dimming
+
+**Fixed.** At the end of a schedule's off period the LEDs now come back on even when the OpenRGB profile they were last set from is gone (the saved color is used instead). Lights → Open OpenRGB brings the OpenRGB window forward (it used to stop at OpenRGB's background service, or pick one of its hidden menus). Icons sit centred in the round buttons of the HUD's own pages (Now playing, Lights, Volume, Colors, the app drawer); they were 3–6 px low. If Pulsewave is closed unexpectedly while it has lowered the display's backlight or put it in standby, the next start puts both back.
+
+**Improved.** Up to 48 shortcuts (was 24); the app drawer shows 24 to a page. The Steam games picker starts with nothing ticked, has a search box and counts free slots. Sensor Manager → Auto-pair pairs every missing reading with the right scale in one click. Halo Gaming's CPU card shows FAN OK, turning red STOPPED only if the fan stops. Previous / next buttons use outline icons that match the quick actions.
 
 ## V0.9.1 - Halo versions, monochrome themes, gaming sessions and night dimming
 

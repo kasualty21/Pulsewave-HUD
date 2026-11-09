@@ -93,14 +93,14 @@ internal sealed class MixerView : Grid
             }
             if (rows.Count == 0) _cards.Children.Add(OneUi.Label("No playback device.", 24, OneUi.Secondary));
         }
-        foreach (var row in rows) Set(row.Key, row.Level, row.Muted);
+        foreach (var row in rows) Set(row.Key, row.Level, row.Muted, refresh: true);
     }
 
-    /// <summary>After a tap: show the new level or mute straight away.</summary>
-    public void Set(string key, double level, bool muted)
+    /// <summary>After a tap: show the new level or mute straight away. A refresh leaves a slider the user is moving alone.</summary>
+    public void Set(string key, double level, bool muted, bool refresh = false)
     {
         if (!_parts.TryGetValue(key, out var parts)) return;
-        parts.Slider.Set(level, muted);
+        if (refresh) parts.Slider.Show(level, muted); else parts.Slider.Set(level, muted);
         OneUi.SetOn(parts.Mute, muted);
         OneUi.SetGlyph(parts.Mute, muted ? MuteGlyph : SpeakerGlyph);
         parts.Mute.Tag = muted ? "muted" : "mute";

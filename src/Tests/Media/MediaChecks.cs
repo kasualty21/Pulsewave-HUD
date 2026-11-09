@@ -120,6 +120,18 @@ internal static class MediaChecks
                     Check(fits && queueRows == 2 && sent.Count == 2 && sent[0] == (PlexampControl.Seek, (long)(197546 * 0.75)) && sent[1] == (PlexampControl.SkipTo, 28735L),
                         $"The {w}x{h} media page fits, seeks where the bar is tapped and plays a tapped queue track ({tiles.Count} tiles)");
                 }
+                // A player's late volume report doesn't pull the knob back while a finger moves it (it jittered), but does once it has settled.
+                var slider = new PillSlider(vertical: false, 84, "slider:test");
+                slider.Measure(new Size(400, 84)); slider.Arrange(new Rect(0, 0, 400, 84));
+                slider.Set(20);
+                slider.DragTo(new Point(42 + (400 - 84) * 0.7, 40), final: false);
+                double dragged = slider.Level;
+                slider.Show(25); // Plexamp still reporting the old level
+                bool held = slider.Level == dragged;
+                bool later = !slider.InHand(Environment.TickCount64 + PillSlider.HoldMs + 1);
+                slider.Set(55);
+                Check(dragged == 70 && held && later && slider.Level == 55,
+                    "A slider being dragged ignores the device's own (late) readings until 2 s after the finger lifts, so it no longer jitters");
             }
             catch (Exception ex) { failure = ex; }
         });

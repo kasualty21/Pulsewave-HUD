@@ -3,7 +3,7 @@
 This workspace is coordinated in this chat. Specialist work is assigned to bounded tasks; the coordinator integrates changes and owns versioned releases.
 
 ## Current position
-V0.9.1 brings Halo in three versions (Lifestyle, Gaming, Productivity), the monochrome Graphite, Paper and Noir templates (thirty-nine built-in in all), warning colors, gaming sessions, stale-sensor dimming, night dimming, performance-limit tags, a reworked theme editor and an assignable tray double-click. V0.9.0 brought themes, the theme editor and L-Connect import, One UI-style touch pages, LED control through OpenRGB with a schedule, weather, aesthetic mode and color palettes. Classic keeps its default Midnight look.
+V0.9.2 fixes the schedule's LEDs, Open OpenRGB, icon centring on the HUD pages and the volume slider, restores the backlight and display after a crash, and adds 48 shortcuts with a paged app drawer and Sensor Manager Auto-pair. V0.9.1 brought Halo in three versions (Lifestyle, Gaming, Productivity), the monochrome Graphite, Paper and Noir templates (thirty-nine built-in in all), warning colors, gaming sessions, stale-sensor dimming, night dimming, performance-limit tags, a reworked theme editor and an assignable tray double-click. V0.9.0 brought themes, the theme editor and L-Connect import, One UI-style touch pages, LED control through OpenRGB with a schedule, weather, aesthetic mode and color palettes. Classic keeps its default Midnight look.
 
 - `src/`: editable application and build instructions.
 - `releases/`: immutable versioned source and Windows packages.
@@ -12,7 +12,7 @@ V0.9.1 brings Halo in three versions (Lifestyle, Gaming, Productivity), the mono
 - `docs/TEAM.md` and `docs/BOARD.md`: coordination rules and task state.
 - `work/`: imports and temporary artifacts, not release deliverables.
 
-V0.9.1 source and self-contained Windows x64 packages are in `releases/`. See `docs/validation/V0.9.1-release-evidence.md` for build and package hashes, and `docs/validation/V0.9.1-ACCEPTANCE.md` for the device checklist. `docs/ROADMAP.md` lists planned fixes and features.
+Releases are on GitHub (the latest is V0.9.2) and, locally, in `releases/` (not tracked in git). See `docs/validation/V0.9.2-release-evidence.md` for build and package hashes, and `docs/validation/V0.9.1-ACCEPTANCE.md` for the device checklist. `docs/ROADMAP.md` lists planned fixes and features.
 
 ## Themes
 Pulsewave was built for a 1920×480 8.8" bar and also runs on other screens: the HYTE Y70 Touch Infinite (either way up), vertical bars and tablets. Turn click-through off in the tray for touch and click controls: tap now playing to play/pause and a readout for its details page.

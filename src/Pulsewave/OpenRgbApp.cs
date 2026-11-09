@@ -38,7 +38,8 @@ internal static class OpenRgbApp
                 if (WindowOf(process.Id) is { } window)
                 {
                     if (IsIconic(window)) ShowWindow(window, SwRestore);
-                    else if (!IsWindowVisible(window)) ShowWindow(window, SwShow);
+                    else if (!IsWindowVisible(window) && !ReopenFromTray(process.Id, window))
+                        return (false, "OpenRGB is in the tray: double-click its icon to open it.");
                     // The HUD never takes focus, so Windows may refuse to hand it over; raising the window
                     // above the others (topmost, then back) still brings it into view.
                     if (!SetForegroundWindow(window))
@@ -87,6 +88,46 @@ internal static class OpenRgbApp
         }, IntPtr.Zero);
         return found != IntPtr.Zero ? found : fallback != IntPtr.Zero ? fallback : null;
     }
+
+    /// <summary>
+    /// OpenRGB minimized to the tray has its window hidden by Qt. Showing that window from outside leaves it blank (Qt
+    /// still thinks it hidden and never draws it), so instead Pulsewave sends OpenRGB's tray icon the message a
+    /// double-click on it sends (Qt 5's tray callback, WM_APP + 101, to its tray message window), and OpenRGB opens its
+    /// own window. This follows Qt's way of handling tray icons rather than a documented OpenRGB interface, so it
+    /// is checked: true only when the window really became visible within a second.
+    /// </summary>
+    private static bool ReopenFromTray(int processId, IntPtr window)
+    {
+        if (TrayWindowOf(processId) is not { } tray) return false;
+        PostMessage(tray, TrayCallback, IntPtr.Zero, (IntPtr)WmLButtonDblClk);
+        for (int i = 0; i < 20 && !IsWindowVisible(window); i++) Thread.Sleep(50);
+        return IsWindowVisible(window);
+    }
+
+    /// <summary>Qt's hidden window that receives the process's tray icon clicks.</summary>
+    private static IntPtr? TrayWindowOf(int processId)
+    {
+        IntPtr found = IntPtr.Zero;
+        EnumWindows((candidate, _) =>
+        {
+            GetWindowThreadProcessId(candidate, out uint owner);
+            if (owner != processId) return true;
+            var name = new StringBuilder(256);
+            GetClassName(candidate, name, name.Capacity);
+            if (!IsQtTrayWindowClass(name.ToString())) return true;
+            found = candidate;
+            return false;
+        }, IntPtr.Zero);
+        return found != IntPtr.Zero ? found : null;
+    }
+
+    /// <summary>Qt names its tray message window's class like "Qt5150TrayIconMessageWindowClass" (Qt version in the middle).</summary>
+    internal static bool IsQtTrayWindowClass(string name) =>
+        name.StartsWith("Qt", StringComparison.Ordinal) && name.EndsWith("TrayIconMessageWindowClass", StringComparison.Ordinal);
+
+    private const uint TrayCallback = 0x8000 + 101, WmLButtonDblClk = 0x0203;
+    [DllImport("user32.dll")] private static extern bool PostMessage(IntPtr window, uint message, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern int GetClassName(IntPtr window, StringBuilder name, int size);
 
     /// <summary>A window with a title bar (caption) that isn't a tool window: an app's main window, not a popup menu.</summary>
     internal static bool IsMainWindowStyle(int style, int exStyle) => (style & WsCaption) == WsCaption && (exStyle & WsExToolWindow) == 0;

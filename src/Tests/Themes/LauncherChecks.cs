@@ -270,6 +270,25 @@ internal static class LauncherChecks
         paged.Open(many.Take(24).ToList());
         Check(firstPage == (0, 2) && onSecond == 6 && clamped == (1, 2) && paged.Paging == (0, 1) && AppDrawerView.Pages(48) == 2,
             $"The app drawer shows 24 shortcuts to a page with page buttons beyond that ({onSecond} tiles on page 2 of 30 shortcuts)");
+
+        // Pages keep one shape: 44 shortcuts (24 + 20) put the first tile in the same place at the same size on both pages.
+        var shapes = new List<string>();
+        foreach (var (w, h) in new[] { (1920, 480), (682, 2560) })
+        {
+            var size = SensorDetails.LogicalSize(w, h);
+            var drawer = new AppDrawerView(size);
+            drawer.Open(Enumerable.Range(0, 44).Select(i => ThemeSampleData.SampleShortcuts[i % ThemeSampleData.SampleShortcuts.Count]).ToList());
+            Rect FirstTile(int page)
+            {
+                drawer.ShowPage(page);
+                drawer.Measure(size); drawer.Arrange(new Rect(size)); drawer.UpdateLayout();
+                var tile = Descendants(drawer).OfType<System.Windows.Controls.Border>().First(b => b.Child is System.Windows.Controls.StackPanel { Children.Count: 2 } && b.ActualWidth > 60);
+                return tile.TransformToAncestor(drawer).TransformBounds(new Rect(0, 0, tile.ActualWidth, tile.ActualHeight));
+            }
+            Rect one = FirstTile(0), two = FirstTile(1);
+            if (Math.Abs(one.X - two.X) > 0.5 || Math.Abs(one.Y - two.Y) > 0.5 || Math.Abs(one.Width - two.Width) > 0.5) shapes.Add($"{w}x{h}: {one} vs {two}");
+        }
+        Check(shapes.Count == 0, "Every app drawer page has the same grid: tiles keep their size and place from page to page " + string.Join("; ", shapes));
     }
 
     private sealed class FakeServer(string body, System.Net.HttpStatusCode status = System.Net.HttpStatusCode.OK) : System.Net.Http.HttpMessageHandler

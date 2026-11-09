@@ -224,6 +224,7 @@ internal sealed class PillSlider : Grid, ITouchDrag
         SizeChanged += (_, _) => Layout();
         MouseLeftButtonUp += (_, e) =>
         {
+            _touchedAt = Environment.TickCount64;
             if (IsMouseCaptured) ReleaseMouseCapture();
             if (LevelAt(PositionOf(e, this)) is { } level) LevelChosen?.Invoke(level);
         };
@@ -249,6 +250,7 @@ internal sealed class PillSlider : Grid, ITouchDrag
         if (LevelAt(at) is not { } level) return;
         Set(level, false, _value.Text.EndsWith('%') ? $"{level:0}%" : null);
         long now = Environment.TickCount64;
+        _touchedAt = now;
         if (!final && now - _lastSent < 60) return;
         _lastSent = now;
         LevelChosen?.Invoke(level);
@@ -257,7 +259,23 @@ internal sealed class PillSlider : Grid, ITouchDrag
     /// <summary>The icon inside the round end of the fill: a glyph, or an app's picture.</summary>
     public void SetIcon(object icon) => _icon.Content = icon;
 
-    /// <summary>Shows a level 0–100; a muted slider shows its level faintly and says so.</summary>
+    /// <summary>
+    /// How long after the last touch readings from the device are ignored. A player such as Plexamp reports its
+    /// volume a beat behind the finger; drawing those readings mid-drag made the knob jump back and forth.
+    /// </summary>
+    public const int HoldMs = 2000;
+    private long _touchedAt = long.MinValue / 2;
+
+    /// <summary>Whether the user is moving the slider or just let go of it.</summary>
+    public bool InHand(long now) => now - _touchedAt < HoldMs;
+
+    /// <summary>A level reported by the device (a refresh): shown unless the user is moving the slider or just let go.</summary>
+    public void Show(double level, bool muted = false, string? text = null)
+    {
+        if (!InHand(Environment.TickCount64)) Set(level, muted, text);
+    }
+
+    /// <summary>Shows a level 0–100 at once; a muted slider shows its level faintly and says so.</summary>
     public void Set(double level, bool muted = false, string? text = null)
     {
         _level = Math.Clamp(level, 0, 100);

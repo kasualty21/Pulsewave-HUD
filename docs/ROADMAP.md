@@ -51,7 +51,7 @@ The other PC's GPU label issue was resolved by correcting its HWiNFO setup; it i
 - Halo Lifestyle / Gaming / Productivity, Graphite / Paper / Noir, warning colors, tinted dock, editor rework, refreshed templates 01–25, gaming sessions, stale-sensor dimming, night dimming, limit tags, assignable tray double-click. 39 templates pass the quality gate with realistic and worst-case values.
 - Automated evidence only so far; see `validation/V0.9.1-ACCEPTANCE.md` for what still needs a device check.
 
-## V0.9.2 — Fixes and hardware acceptance (next)
+## V0.9.2 — Fixes and hardware acceptance (released 2026-11-09)
 Fixes and verification, no new features. Items marked *verify* are implemented but unconfirmed on real hardware; the rest need code.
 
 Status 2026-11-08 (user's results and the fixes since, unreleased): 1 done (48 shortcuts, drawer pages, picker unticked with search and slot count); 2 done (crash record, display-restore.json); 3 screen wake confirmed by the user, LEDs failed — fixed (missing OpenRGB profile now falls back to the saved color); 4 confirmed by the user; 5 and 6 still to check; 7 confirmed by the user; 8 failed — fixed (service process and hidden popup windows); 9 done (outline previous / next, FAN OK / STOPPED; model names were already 11–14 px, unchanged); 10 done (`scripts/Run-Tests.ps1`); 11 done (one checklist, `validation/V0.9.1-ACCEPTANCE.md`). Not yet seen on hardware: the fixes for 1, 2, 3, 8 and 9.

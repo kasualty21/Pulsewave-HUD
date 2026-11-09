@@ -337,6 +337,9 @@ internal static class LightsChecks
         // Window styles read from OpenRGB on this PC: the main window and one of its hidden popup menus.
         Check(OpenRgbApp.IsMainWindowStyle(unchecked((int)0x86CF0000), 0x100) && !OpenRgbApp.IsMainWindowStyle(unchecked((int)0x86000000), 0x88),
             "Open OpenRGB picks OpenRGB's main window (title bar, not a tool window), not one of its hidden popup menus also titled OpenRGB");
+        Check(OpenRgbApp.IsQtTrayWindowClass("Qt5150TrayIconMessageWindowClass") && OpenRgbApp.IsQtTrayWindowClass("Qt6TrayIconMessageWindowClass") &&
+              !OpenRgbApp.IsQtTrayWindowClass("Qt5150QWindowIcon") && !OpenRgbApp.IsQtTrayWindowClass("Shell_TrayWnd"),
+            "Open OpenRGB finds Qt's tray message window (any Qt version) to reopen an OpenRGB hidden in the tray");
 
         // The Lights page at both screen shapes.
         Exception? failure = null;

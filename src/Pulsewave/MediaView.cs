@@ -214,7 +214,7 @@ internal sealed class MediaView : Grid
         OneUi.SetOn(_shuffle, timeline?.Shuffle == true);
         OneUi.SetOn(_repeat, timeline?.Repeat is 1 or 2);
         OneUi.SetGlyph(_repeat, timeline?.Repeat == 1 ? RepeatOneGlyph : RepeatGlyph);
-        if (timeline?.Volume is { } v) _volume.Set(v);
+        if (timeline?.Volume is { } v) _volume.Show(v); // not while the finger is on it: Plexamp reports a beat behind
         _seek.Visibility = plex && timeline!.DurationMs > 0 ? Visibility.Visible : Visibility.Hidden;
         _elapsed.Text = plex ? Clock(_seeking is { } held ? (long)(timeline!.DurationMs * held) : timeline!.TimeMs) : "";
         _remaining.Text = plex && timeline!.DurationMs > 0 ? "−" + Clock(Math.Max(0, timeline.DurationMs - timeline.TimeMs)) : "";

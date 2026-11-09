@@ -116,7 +116,9 @@ public sealed class AppDrawerView : Grid
         }
         else
         {
-            var (columns, rows, tile) = Layout(shortcuts.Count, _area);
+            // With several pages every page uses the full page's grid, so tiles keep their size and place from page to
+            // page; a shorter last page leaves its remaining cells empty instead of reshaping.
+            var (columns, rows, tile) = Layout(pages > 1 ? PerPage : shortcuts.Count, _area);
             _tiles.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
             _tiles.VerticalAlignment = System.Windows.VerticalAlignment.Center;
             for (int c = 0; c < columns; c++) _tiles.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(tile) });
