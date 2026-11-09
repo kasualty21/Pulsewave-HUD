@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>Pulsewave</AssemblyName>
+    <Version>0.9.1</Version>
+    <RootNamespace>Pulsewave</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\Pulsewave-logo.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- WPF's own touch layer is off: the HUD handles touch itself so it never moves the mouse cursor and is not counted twice (TouchInput.cs). Other windows get touch as ordinary clicks. -->
+    <RuntimeHostConfigurationOption Include="Switch.System.Windows.Input.Stylus.DisableStylusAndTouchSupport" Value="true" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Pulsewave-logo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Built-in theme templates, read-only in the app (see Themes/BuiltInTemplates.cs). -->
+    <EmbeddedResource Include="Templates\*.json" LogicalName="Pulsewave.Templates.%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>
+
+
+
+
+

@@ -1,0 +1,801 @@
+{
+  "Format": 1,
+  "Name": "Tiles",
+  "Source": "Pulsewave template",
+  "Width": 1920,
+  "Height": 480,
+  "BackgroundColor": "#FF2E3440",
+  "Elements": [
+    {
+      "Kind": "Panel",
+      "X": 0,
+      "Y": 0,
+      "Width": 1920,
+      "Height": 480,
+      "FillColor": "#FF2E3440",
+      "GradientColor": "#FF262B35",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#00000000",
+      "BorderWidth": 0,
+      "CornerRadius": 0,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Panel",
+      "X": 20,
+      "Y": 20,
+      "Width": 300,
+      "Height": 212,
+      "FillColor": "#FF3B4252",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#14FFFFFF",
+      "BorderWidth": 1,
+      "CornerRadius": 18,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Text",
+      "X": 44,
+      "Y": 44,
+      "Text": "",
+      "Font": {
+        "Family": "Segoe Fluent Icons",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FF88C0D0",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 74,
+      "Y": 42,
+      "Text": "CPU LOAD",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 12,
+        "Bold": true,
+        "Color": "#FFD8DEE9",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 44,
+      "Y": 82,
+      "DataName": "CPULOAD",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFECEFF4",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Bar",
+      "X": 44,
+      "Y": 192,
+      "Width": 252,
+      "Height": 10,
+      "DataName": "CPULOAD",
+      "ForeColor": "#FF88C0D0",
+      "BackColor": "#FF2E3440",
+      "CornerRadius": 5,
+      "SegmentWidth": 0,
+      "SegmentGap": 0,
+      "Maximum": 100
+    },
+    {
+      "Kind": "Panel",
+      "X": 336,
+      "Y": 20,
+      "Width": 300,
+      "Height": 212,
+      "FillColor": "#FF3B4252",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#14FFFFFF",
+      "BorderWidth": 1,
+      "CornerRadius": 18,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Text",
+      "X": 360,
+      "Y": 44,
+      "Text": "",
+      "Font": {
+        "Family": "Segoe Fluent Icons",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FFD08770",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 390,
+      "Y": 42,
+      "Text": "CPU TEMP",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 12,
+        "Bold": true,
+        "Color": "#FFD8DEE9",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 360,
+      "Y": 82,
+      "DataName": "CPUTEMP",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFECEFF4",
+        "Alignment": "Left"
+      },
+      "WarnAt": 90,
+      "CriticalAt": 98
+    },
+    {
+      "Kind": "Bar",
+      "X": 360,
+      "Y": 192,
+      "Width": 252,
+      "Height": 10,
+      "DataName": "CPUTEMP",
+      "ForeColor": "#FFD08770",
+      "BackColor": "#FF2E3440",
+      "CornerRadius": 5,
+      "SegmentWidth": 0,
+      "SegmentGap": 0,
+      "Maximum": 100,
+      "WarnAt": 90,
+      "CriticalAt": 98
+    },
+    {
+      "Kind": "Panel",
+      "X": 652,
+      "Y": 20,
+      "Width": 300,
+      "Height": 212,
+      "FillColor": "#FF3B4252",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#14FFFFFF",
+      "BorderWidth": 1,
+      "CornerRadius": 18,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Text",
+      "X": 676,
+      "Y": 44,
+      "Text": "",
+      "Font": {
+        "Family": "Segoe Fluent Icons",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FFEBCB8B",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 706,
+      "Y": 42,
+      "Text": "CPU POWER",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 12,
+        "Bold": true,
+        "Color": "#FFD8DEE9",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 676,
+      "Y": 82,
+      "DataName": "CPUPWR",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFECEFF4",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Bar",
+      "X": 676,
+      "Y": 192,
+      "Width": 252,
+      "Height": 10,
+      "DataName": "CPUPWR",
+      "ForeColor": "#FFEBCB8B",
+      "BackColor": "#FF2E3440",
+      "CornerRadius": 5,
+      "SegmentWidth": 0,
+      "SegmentGap": 0,
+      "Maximum": 300
+    },
+    {
+      "Kind": "Panel",
+      "X": 968,
+      "Y": 20,
+      "Width": 300,
+      "Height": 212,
+      "FillColor": "#FF3B4252",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#14FFFFFF",
+      "BorderWidth": 1,
+      "CornerRadius": 18,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Text",
+      "X": 992,
+      "Y": 44,
+      "Text": "",
+      "Font": {
+        "Family": "Segoe Fluent Icons",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FF81A1C1",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1022,
+      "Y": 42,
+      "Text": "CPU CLOCK",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 12,
+        "Bold": true,
+        "Color": "#FFD8DEE9",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 992,
+      "Y": 82,
+      "DataName": "CPUCLOCK_G",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFECEFF4",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Bar",
+      "X": 992,
+      "Y": 192,
+      "Width": 252,
+      "Height": 10,
+      "DataName": "CPUCLOCK_G",
+      "ForeColor": "#FF81A1C1",
+      "BackColor": "#FF2E3440",
+      "CornerRadius": 5,
+      "SegmentWidth": 0,
+      "SegmentGap": 0,
+      "Maximum": 6
+    },
+    {
+      "Kind": "Panel",
+      "X": 20,
+      "Y": 248,
+      "Width": 300,
+      "Height": 212,
+      "FillColor": "#FF3B4252",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#14FFFFFF",
+      "BorderWidth": 1,
+      "CornerRadius": 18,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Text",
+      "X": 44,
+      "Y": 272,
+      "Text": "",
+      "Font": {
+        "Family": "Segoe Fluent Icons",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FFA3BE8C",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 74,
+      "Y": 270,
+      "Text": "GPU LOAD",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 12,
+        "Bold": true,
+        "Color": "#FFD8DEE9",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 44,
+      "Y": 310,
+      "DataName": "GPULOAD",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFECEFF4",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Bar",
+      "X": 44,
+      "Y": 420,
+      "Width": 252,
+      "Height": 10,
+      "DataName": "GPULOAD",
+      "ForeColor": "#FFA3BE8C",
+      "BackColor": "#FF2E3440",
+      "CornerRadius": 5,
+      "SegmentWidth": 0,
+      "SegmentGap": 0,
+      "Maximum": 100
+    },
+    {
+      "Kind": "Panel",
+      "X": 336,
+      "Y": 248,
+      "Width": 300,
+      "Height": 212,
+      "FillColor": "#FF3B4252",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#14FFFFFF",
+      "BorderWidth": 1,
+      "CornerRadius": 18,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Text",
+      "X": 360,
+      "Y": 272,
+      "Text": "",
+      "Font": {
+        "Family": "Segoe Fluent Icons",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FFE88A93",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 390,
+      "Y": 270,
+      "Text": "GPU TEMP",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 12,
+        "Bold": true,
+        "Color": "#FFD8DEE9",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 360,
+      "Y": 310,
+      "DataName": "GPUTEMP",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFECEFF4",
+        "Alignment": "Left"
+      },
+      "WarnAt": 83,
+      "CriticalAt": 90
+    },
+    {
+      "Kind": "Bar",
+      "X": 360,
+      "Y": 420,
+      "Width": 252,
+      "Height": 10,
+      "DataName": "GPUTEMP",
+      "ForeColor": "#FFE88A93",
+      "BackColor": "#FF2E3440",
+      "CornerRadius": 5,
+      "SegmentWidth": 0,
+      "SegmentGap": 0,
+      "Maximum": 100,
+      "WarnAt": 83,
+      "CriticalAt": 90
+    },
+    {
+      "Kind": "Panel",
+      "X": 652,
+      "Y": 248,
+      "Width": 300,
+      "Height": 212,
+      "FillColor": "#FF3B4252",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#14FFFFFF",
+      "BorderWidth": 1,
+      "CornerRadius": 18,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Text",
+      "X": 676,
+      "Y": 272,
+      "Text": "",
+      "Font": {
+        "Family": "Segoe Fluent Icons",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FFEBCB8B",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 706,
+      "Y": 270,
+      "Text": "GPU POWER",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 12,
+        "Bold": true,
+        "Color": "#FFD8DEE9",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 676,
+      "Y": 310,
+      "DataName": "GPUPWR",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFECEFF4",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Bar",
+      "X": 676,
+      "Y": 420,
+      "Width": 252,
+      "Height": 10,
+      "DataName": "GPUPWR",
+      "ForeColor": "#FFEBCB8B",
+      "BackColor": "#FF2E3440",
+      "CornerRadius": 5,
+      "SegmentWidth": 0,
+      "SegmentGap": 0,
+      "Maximum": 450
+    },
+    {
+      "Kind": "Panel",
+      "X": 968,
+      "Y": 248,
+      "Width": 300,
+      "Height": 212,
+      "FillColor": "#FF3B4252",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#14FFFFFF",
+      "BorderWidth": 1,
+      "CornerRadius": 18,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Text",
+      "X": 992,
+      "Y": 272,
+      "Text": "",
+      "Font": {
+        "Family": "Segoe Fluent Icons",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FFB48EAD",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1022,
+      "Y": 270,
+      "Text": "FPS",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 12,
+        "Bold": true,
+        "Color": "#FFD8DEE9",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 992,
+      "Y": 310,
+      "DataName": "FPS",
+      "ShowUnit": false,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFECEFF4",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Bar",
+      "X": 992,
+      "Y": 420,
+      "Width": 252,
+      "Height": 10,
+      "DataName": "FPS",
+      "ForeColor": "#FFB48EAD",
+      "BackColor": "#FF2E3440",
+      "CornerRadius": 5,
+      "SegmentWidth": 0,
+      "SegmentGap": 0,
+      "Maximum": 240
+    },
+    {
+      "Kind": "Panel",
+      "X": 1284,
+      "Y": 248,
+      "Width": 300,
+      "Height": 212,
+      "FillColor": "#FF3B4252",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#14FFFFFF",
+      "BorderWidth": 1,
+      "CornerRadius": 18,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Text",
+      "X": 1308,
+      "Y": 272,
+      "Text": "",
+      "Font": {
+        "Family": "Segoe Fluent Icons",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FF88C0D0",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1338,
+      "Y": 270,
+      "Text": "MEMORY",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 12,
+        "Bold": true,
+        "Color": "#FFD8DEE9",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1308,
+      "Y": 310,
+      "DataName": "RAMLOAD",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFECEFF4",
+        "Alignment": "Left"
+      },
+      "WarnAt": 85,
+      "CriticalAt": 95
+    },
+    {
+      "Kind": "Bar",
+      "X": 1308,
+      "Y": 420,
+      "Width": 252,
+      "Height": 10,
+      "DataName": "RAMLOAD",
+      "ForeColor": "#FF88C0D0",
+      "BackColor": "#FF2E3440",
+      "CornerRadius": 5,
+      "SegmentWidth": 0,
+      "SegmentGap": 0,
+      "Maximum": 100,
+      "WarnAt": 85,
+      "CriticalAt": 95
+    },
+    {
+      "Kind": "Panel",
+      "X": 1600,
+      "Y": 248,
+      "Width": 300,
+      "Height": 212,
+      "FillColor": "#FF3B4252",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#14FFFFFF",
+      "BorderWidth": 1,
+      "CornerRadius": 18,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Text",
+      "X": 1624,
+      "Y": 272,
+      "Text": "",
+      "Font": {
+        "Family": "Segoe Fluent Icons",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FF81A1C1",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1654,
+      "Y": 270,
+      "Text": "DOWNLOAD",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 12,
+        "Bold": true,
+        "Color": "#FFD8DEE9",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1624,
+      "Y": 310,
+      "DataName": "DOWNDSPEED",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFECEFF4",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1624,
+      "Y": 414,
+      "Text": "",
+      "Font": {
+        "Family": "Segoe Fluent Icons",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FF81A1C1",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1654,
+      "Y": 412,
+      "Text": "UP",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 12,
+        "Bold": true,
+        "Color": "#FFD8DEE9",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1876,
+      "Y": 406,
+      "DataName": "UPSPEED",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 18,
+        "Bold": false,
+        "Color": "#FFECEFF4",
+        "Alignment": "Right"
+      }
+    },
+    {
+      "Kind": "Panel",
+      "X": 1284,
+      "Y": 20,
+      "Width": 616,
+      "Height": 212,
+      "FillColor": "#FF3B4252",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#14FFFFFF",
+      "BorderWidth": 1,
+      "CornerRadius": 18,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Data",
+      "X": 1592.0,
+      "Y": 56,
+      "DataName": "TIME",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Light",
+        "Size": 72,
+        "Bold": false,
+        "Color": "#FFECEFF4",
+        "Alignment": "Center"
+      },
+      "DataFormat": "h:m"
+    },
+    {
+      "Kind": "Data",
+      "X": 1584.0,
+      "Y": 188,
+      "DataName": "DAY",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 16,
+        "Bold": true,
+        "Color": "#FF88C0D0",
+        "Alignment": "Right"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1600.0,
+      "Y": 188,
+      "DataName": "DATE",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 16,
+        "Bold": false,
+        "Color": "#FFD8DEE9",
+        "Alignment": "Left"
+      },
+      "DataFormat": "month"
+    }
+  ]
+}

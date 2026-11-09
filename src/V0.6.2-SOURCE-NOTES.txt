@@ -1,0 +1,14 @@
+V0.6.2 based on user-confirmed V0.6.1.
+V0.6.1 source ZIP SHA256: EFCCB94B405DAE22D98D3C49D25300BA8FCB21ACE5A21D1C5DF87214BE8BD67F
+
+Source changes relative to V0.6.1:
+MODIFIED: GraphiteMonitor/AdaptiveVisualEngine.cs
+ADDED: GraphiteMonitor/AssemblyInfo.cs
+MODIFIED: GraphiteMonitor/GraphiteMonitor.csproj
+MODIFIED: GraphiteMonitor/MainWindow.xaml.cs
+MODIFIED: GraphiteMonitor/SettingsStore.cs
+ADDED: GraphiteMonitor/VisualProfile.cs
+MODIFIED: GraphiteMonitor/VisualSettingsForm.cs
+
+MainWindow.xaml, SensorReader, SensorCatalog, SensorManagerForm, TelemetryEngine, TelemetryForm, DesktopIntegration and App sources remain unchanged from V0.6.1.
+The original V0.5 baseline ZIP is unchanged; see BASELINE-MANIFEST.txt.

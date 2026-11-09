@@ -1,0 +1,437 @@
+{
+  "Format": 1,
+  "Name": "Cockpit",
+  "Source": "Pulsewave template",
+  "Width": 1920,
+  "Height": 480,
+  "BackgroundColor": "#FF07090D",
+  "Elements": [
+    {
+      "Kind": "Panel",
+      "X": 0,
+      "Y": 0,
+      "Width": 1920,
+      "Height": 480,
+      "FillColor": "#FF11161E",
+      "GradientColor": "#FF07090D",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#00000000",
+      "BorderWidth": 0,
+      "CornerRadius": 0,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Panel",
+      "X": 20,
+      "Y": 20,
+      "Width": 1180,
+      "Height": 440,
+      "FillColor": "#E60D1219",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#22FFFFFF",
+      "BorderWidth": 1.5,
+      "CornerRadius": 26,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Arc",
+      "X": 55.0,
+      "Y": 99.0,
+      "Width": 230,
+      "Height": 230,
+      "Diameter": 230,
+      "Thickness": 20,
+      "DataName": "CPULOAD",
+      "ForeColor": "#FF35E0B0",
+      "BackColor": "#FF1C2430",
+      "StartAngle": 135,
+      "SweepAngle": 270,
+      "RoundCaps": false,
+      "SegmentWidth": 7,
+      "SegmentGap": 3,
+      "Maximum": 100
+    },
+    {
+      "Kind": "Data",
+      "X": 170,
+      "Y": 176,
+      "DataName": "CPULOAD",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFF4F7FA",
+        "Alignment": "Center"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 170,
+      "Y": 336,
+      "Text": "CPU LOAD",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 14,
+        "Bold": true,
+        "Color": "#FF9DAAB9",
+        "Alignment": "Center"
+      }
+    },
+    {
+      "Kind": "Arc",
+      "X": 345.0,
+      "Y": 99.0,
+      "Width": 230,
+      "Height": 230,
+      "Diameter": 230,
+      "Thickness": 20,
+      "DataName": "CPUTEMP",
+      "ForeColor": "#FFFFB547",
+      "BackColor": "#FF1C2430",
+      "StartAngle": 135,
+      "SweepAngle": 270,
+      "RoundCaps": false,
+      "SegmentWidth": 7,
+      "SegmentGap": 3,
+      "Maximum": 100,
+      "WarnAt": 90,
+      "CriticalAt": 98
+    },
+    {
+      "Kind": "Data",
+      "X": 460,
+      "Y": 176,
+      "DataName": "CPUTEMP",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFF4F7FA",
+        "Alignment": "Center"
+      },
+      "WarnAt": 90,
+      "CriticalAt": 98
+    },
+    {
+      "Kind": "Text",
+      "X": 460,
+      "Y": 336,
+      "Text": "CPU TEMP",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 14,
+        "Bold": true,
+        "Color": "#FF9DAAB9",
+        "Alignment": "Center"
+      }
+    },
+    {
+      "Kind": "Arc",
+      "X": 635.0,
+      "Y": 99.0,
+      "Width": 230,
+      "Height": 230,
+      "Diameter": 230,
+      "Thickness": 20,
+      "DataName": "GPULOAD",
+      "ForeColor": "#FF5AB0FF",
+      "BackColor": "#FF1C2430",
+      "StartAngle": 135,
+      "SweepAngle": 270,
+      "RoundCaps": false,
+      "SegmentWidth": 7,
+      "SegmentGap": 3,
+      "Maximum": 100
+    },
+    {
+      "Kind": "Data",
+      "X": 750,
+      "Y": 176,
+      "DataName": "GPULOAD",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFF4F7FA",
+        "Alignment": "Center"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 750,
+      "Y": 336,
+      "Text": "GPU LOAD",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 14,
+        "Bold": true,
+        "Color": "#FF9DAAB9",
+        "Alignment": "Center"
+      }
+    },
+    {
+      "Kind": "Arc",
+      "X": 925.0,
+      "Y": 99.0,
+      "Width": 230,
+      "Height": 230,
+      "Diameter": 230,
+      "Thickness": 20,
+      "DataName": "GPUTEMP",
+      "ForeColor": "#FFFFB547",
+      "BackColor": "#FF1C2430",
+      "StartAngle": 135,
+      "SweepAngle": 270,
+      "RoundCaps": false,
+      "SegmentWidth": 7,
+      "SegmentGap": 3,
+      "Maximum": 100,
+      "WarnAt": 83,
+      "CriticalAt": 90
+    },
+    {
+      "Kind": "Data",
+      "X": 1040,
+      "Y": 176,
+      "DataName": "GPUTEMP",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFF4F7FA",
+        "Alignment": "Center"
+      },
+      "WarnAt": 83,
+      "CriticalAt": 90
+    },
+    {
+      "Kind": "Text",
+      "X": 1040,
+      "Y": 336,
+      "Text": "GPU TEMP",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 14,
+        "Bold": true,
+        "Color": "#FF9DAAB9",
+        "Alignment": "Center"
+      }
+    },
+    {
+      "Kind": "Line",
+      "X": 60,
+      "Y": 400,
+      "Width": 1100,
+      "Height": 0,
+      "LineColor": "#1FFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Data",
+      "X": 60,
+      "Y": 414,
+      "DataName": "CPUMODEL",
+      "ShowUnit": false,
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 12,
+        "Bold": false,
+        "Color": "#FF9DAAB9",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1160,
+      "Y": 414,
+      "DataName": "GPUMODEL",
+      "ShowUnit": false,
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 12,
+        "Bold": false,
+        "Color": "#FF9DAAB9",
+        "Alignment": "Right"
+      }
+    },
+    {
+      "Kind": "Panel",
+      "X": 1216,
+      "Y": 20,
+      "Width": 684,
+      "Height": 440,
+      "FillColor": "#E60D1219",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#22FFFFFF",
+      "BorderWidth": 1.5,
+      "CornerRadius": 26,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Data",
+      "X": 1252,
+      "Y": 34,
+      "DataName": "TIME",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Light",
+        "Size": 72,
+        "Bold": false,
+        "Color": "#FFF4F7FA",
+        "Alignment": "Left"
+      },
+      "DataFormat": "h:m"
+    },
+    {
+      "Kind": "Data",
+      "X": 1864,
+      "Y": 54,
+      "DataName": "DAY",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 18,
+        "Bold": true,
+        "Color": "#FF9DAAB9",
+        "Alignment": "Right"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1864,
+      "Y": 88,
+      "DataName": "DATE",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 16,
+        "Bold": false,
+        "Color": "#FF9DAAB9",
+        "Alignment": "Right"
+      },
+      "DataFormat": "month"
+    },
+    {
+      "Kind": "Text",
+      "X": 1252,
+      "Y": 168,
+      "Text": "",
+      "Font": {
+        "Family": "Segoe Fluent Icons",
+        "Size": 16,
+        "Bold": false,
+        "Color": "#FFFFB547",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1286,
+      "Y": 166,
+      "Text": "FPS",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 14,
+        "Bold": true,
+        "Color": "#FF9DAAB9",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1864,
+      "Y": 150,
+      "DataName": "FPS",
+      "ShowUnit": false,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFF4F7FA",
+        "Alignment": "Right"
+      }
+    },
+    {
+      "Kind": "Chart",
+      "X": 1252,
+      "Y": 232,
+      "Width": 612,
+      "Height": 110,
+      "DataName": "GPULOAD",
+      "LineColor": "#FF5AB0FF",
+      "FillColor": "#335AB0FF",
+      "LineWidth": 2.5,
+      "Samples": 60,
+      "Maximum": 100,
+      "BorderColor": "#00000000",
+      "BorderWidth": 0
+    },
+    {
+      "Kind": "Text",
+      "X": 1252,
+      "Y": 352,
+      "Text": "GPU LOAD · 60 s",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 12,
+        "Bold": true,
+        "Color": "#FF9DAAB9",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1252,
+      "Y": 396,
+      "Text": "MEMORY",
+      "Font": {
+        "Family": "Segoe UI",
+        "Size": 13,
+        "Bold": true,
+        "Color": "#FF9DAAB9",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Bar",
+      "X": 1376,
+      "Y": 401,
+      "Width": 360,
+      "Height": 12,
+      "DataName": "RAMLOAD",
+      "ForeColor": "#FF35E0B0",
+      "BackColor": "#26FFFFFF",
+      "CornerRadius": 6,
+      "SegmentWidth": 0,
+      "SegmentGap": 0,
+      "Maximum": 100,
+      "WarnAt": 85,
+      "CriticalAt": 95
+    },
+    {
+      "Kind": "Data",
+      "X": 1864,
+      "Y": 388,
+      "DataName": "RAMLOAD",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Segoe UI Semibold",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FFF4F7FA",
+        "Alignment": "Right"
+      },
+      "WarnAt": 85,
+      "CriticalAt": 95
+    }
+  ]
+}

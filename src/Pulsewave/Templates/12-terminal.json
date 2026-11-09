@@ -1,0 +1,1625 @@
+{
+  "Format": 1,
+  "Name": "Terminal",
+  "Source": "Pulsewave template",
+  "Width": 1920,
+  "Height": 480,
+  "BackgroundColor": "#FF020503",
+  "Elements": [
+    {
+      "Kind": "Panel",
+      "X": 0,
+      "Y": 0,
+      "Width": 1920,
+      "Height": 480,
+      "FillColor": "#FF07110A",
+      "GradientColor": "#FF020503",
+      "GradientAngle": 90,
+      "GradientStyle": "Radial",
+      "BorderColor": "#00000000",
+      "BorderWidth": 0,
+      "CornerRadius": 0,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 3,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 9,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 15,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 21,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 27,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 33,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 39,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 45,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 51,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 57,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 63,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 69,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 75,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 81,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 87,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 93,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 99,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 105,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 111,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 117,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 123,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 129,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 135,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 141,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 147,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 153,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 159,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 165,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 171,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 177,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 183,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 189,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 195,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 201,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 207,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 213,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 219,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 225,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 231,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 237,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 243,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 249,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 255,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 261,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 267,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 273,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 279,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 285,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 291,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 297,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 303,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 309,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 315,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 321,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 327,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 333,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 339,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 345,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 351,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 357,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 363,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 369,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 375,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 381,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 387,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 393,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 399,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 405,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 411,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 417,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 423,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 429,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 435,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 441,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 447,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 453,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 459,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 465,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 471,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 477,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#0CFFFFFF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Text",
+      "X": 40,
+      "Y": 18,
+      "Text": "pulsewave@rig:~$ watch -n1 sensors",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 15,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1880,
+      "Y": 16,
+      "DataName": "TIME",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 16,
+        "Bold": false,
+        "Color": "#FF39FF72",
+        "Alignment": "Right"
+      },
+      "DataFormat": "h:m:s"
+    },
+    {
+      "Kind": "Line",
+      "X": 40,
+      "Y": 52,
+      "Width": 1840,
+      "Height": 0,
+      "LineColor": "#FF1A7A36",
+      "LineWidth": 1,
+      "SegmentWidth": 6,
+      "SegmentGap": 4
+    },
+    {
+      "Kind": "Text",
+      "X": 40,
+      "Y": 84,
+      "Text": "cpu.load",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 16,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 470,
+      "Y": 74,
+      "DataName": "CPULOAD",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 28,
+        "Bold": true,
+        "Color": "#FFB8FFCB",
+        "Alignment": "Right"
+      },
+      "GlowColor": "#6639FF72",
+      "GlowSize": 12
+    },
+    {
+      "Kind": "Text",
+      "X": 500,
+      "Y": 80,
+      "Text": "[",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1084,
+      "Y": 80,
+      "Text": "]",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Bar",
+      "X": 522,
+      "Y": 86,
+      "Width": 556,
+      "Height": 22,
+      "DataName": "CPULOAD",
+      "ForeColor": "#FF39FF72",
+      "BackColor": "#1439FF72",
+      "CornerRadius": 0,
+      "SegmentWidth": 10,
+      "SegmentGap": 4,
+      "Maximum": 100,
+      "GlowColor": "#6639FF72",
+      "GlowSize": 10
+    },
+    {
+      "Kind": "Text",
+      "X": 1112,
+      "Y": 84,
+      "Text": "cpu.temp",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1420,
+      "Y": 78,
+      "DataName": "CPUTEMP",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FF39FF72",
+        "Alignment": "Right"
+      },
+      "WarnAt": 90,
+      "CriticalAt": 98
+    },
+    {
+      "Kind": "Text",
+      "X": 40,
+      "Y": 160,
+      "Text": "gpu.load",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 16,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 470,
+      "Y": 150,
+      "DataName": "GPULOAD",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 28,
+        "Bold": true,
+        "Color": "#FFB8FFCB",
+        "Alignment": "Right"
+      },
+      "GlowColor": "#6639FF72",
+      "GlowSize": 12
+    },
+    {
+      "Kind": "Text",
+      "X": 500,
+      "Y": 156,
+      "Text": "[",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1084,
+      "Y": 156,
+      "Text": "]",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Bar",
+      "X": 522,
+      "Y": 162,
+      "Width": 556,
+      "Height": 22,
+      "DataName": "GPULOAD",
+      "ForeColor": "#FF39FF72",
+      "BackColor": "#1439FF72",
+      "CornerRadius": 0,
+      "SegmentWidth": 10,
+      "SegmentGap": 4,
+      "Maximum": 100,
+      "GlowColor": "#6639FF72",
+      "GlowSize": 10
+    },
+    {
+      "Kind": "Text",
+      "X": 1112,
+      "Y": 160,
+      "Text": "gpu.temp",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1420,
+      "Y": 154,
+      "DataName": "GPUTEMP",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FF39FF72",
+        "Alignment": "Right"
+      },
+      "WarnAt": 83,
+      "CriticalAt": 90
+    },
+    {
+      "Kind": "Text",
+      "X": 40,
+      "Y": 236,
+      "Text": "mem.load",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 16,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 470,
+      "Y": 226,
+      "DataName": "RAMLOAD",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 28,
+        "Bold": true,
+        "Color": "#FFB8FFCB",
+        "Alignment": "Right"
+      },
+      "GlowColor": "#6639FF72",
+      "GlowSize": 12,
+      "WarnAt": 85,
+      "CriticalAt": 95
+    },
+    {
+      "Kind": "Text",
+      "X": 500,
+      "Y": 232,
+      "Text": "[",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1084,
+      "Y": 232,
+      "Text": "]",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Bar",
+      "X": 522,
+      "Y": 238,
+      "Width": 556,
+      "Height": 22,
+      "DataName": "RAMLOAD",
+      "ForeColor": "#FF39FF72",
+      "BackColor": "#1439FF72",
+      "CornerRadius": 0,
+      "SegmentWidth": 10,
+      "SegmentGap": 4,
+      "Maximum": 100,
+      "GlowColor": "#6639FF72",
+      "GlowSize": 10,
+      "WarnAt": 85,
+      "CriticalAt": 95
+    },
+    {
+      "Kind": "Text",
+      "X": 1112,
+      "Y": 236,
+      "Text": "mem.used",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1420,
+      "Y": 230,
+      "DataName": "RAM_GB",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FF39FF72",
+        "Alignment": "Right"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 40,
+      "Y": 312,
+      "Text": "vram.load",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 16,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 470,
+      "Y": 302,
+      "DataName": "GPURAMLOAD",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 28,
+        "Bold": true,
+        "Color": "#FFB8FFCB",
+        "Alignment": "Right"
+      },
+      "GlowColor": "#6639FF72",
+      "GlowSize": 12,
+      "WarnAt": 85,
+      "CriticalAt": 95
+    },
+    {
+      "Kind": "Text",
+      "X": 500,
+      "Y": 308,
+      "Text": "[",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1084,
+      "Y": 308,
+      "Text": "]",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Bar",
+      "X": 522,
+      "Y": 314,
+      "Width": 556,
+      "Height": 22,
+      "DataName": "GPURAMLOAD",
+      "ForeColor": "#FF39FF72",
+      "BackColor": "#1439FF72",
+      "CornerRadius": 0,
+      "SegmentWidth": 10,
+      "SegmentGap": 4,
+      "Maximum": 100,
+      "GlowColor": "#6639FF72",
+      "GlowSize": 10,
+      "WarnAt": 85,
+      "CriticalAt": 95
+    },
+    {
+      "Kind": "Text",
+      "X": 1112,
+      "Y": 312,
+      "Text": "gpu.pwr",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1420,
+      "Y": 306,
+      "DataName": "GPUPWR",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FF39FF72",
+        "Alignment": "Right"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 40,
+      "Y": 388,
+      "Text": "fps",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 16,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 470,
+      "Y": 378,
+      "DataName": "FPS",
+      "ShowUnit": false,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 28,
+        "Bold": true,
+        "Color": "#FFB8FFCB",
+        "Alignment": "Right"
+      },
+      "GlowColor": "#6639FF72",
+      "GlowSize": 12
+    },
+    {
+      "Kind": "Text",
+      "X": 500,
+      "Y": 384,
+      "Text": "[",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1084,
+      "Y": 384,
+      "Text": "]",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Bar",
+      "X": 522,
+      "Y": 390,
+      "Width": 556,
+      "Height": 22,
+      "DataName": "FPS",
+      "ForeColor": "#FF39FF72",
+      "BackColor": "#1439FF72",
+      "CornerRadius": 0,
+      "SegmentWidth": 10,
+      "SegmentGap": 4,
+      "Maximum": 240,
+      "GlowColor": "#6639FF72",
+      "GlowSize": 10
+    },
+    {
+      "Kind": "Text",
+      "X": 1112,
+      "Y": 388,
+      "Text": "fps.avg",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1420,
+      "Y": 382,
+      "DataName": "FPS_AVG",
+      "ShowUnit": false,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 22,
+        "Bold": false,
+        "Color": "#FF39FF72",
+        "Alignment": "Right"
+      }
+    },
+    {
+      "Kind": "Panel",
+      "X": 1460,
+      "Y": 70,
+      "Width": 420,
+      "Height": 386,
+      "FillColor": "#00000000",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#FF1A7A36",
+      "BorderWidth": 1.5,
+      "CornerRadius": 0,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Text",
+      "X": 1480,
+      "Y": 82,
+      "Text": "[ host ]",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 14,
+        "Bold": true,
+        "Color": "#FF39FF72",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1480,
+      "Y": 118,
+      "DataName": "CPUMODEL",
+      "ShowUnit": false,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 13,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      },
+      "Width": 380
+    },
+    {
+      "Kind": "Data",
+      "X": 1480,
+      "Y": 146,
+      "DataName": "GPUMODEL",
+      "ShowUnit": false,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 13,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      },
+      "Width": 380
+    },
+    {
+      "Kind": "Line",
+      "X": 1480,
+      "Y": 186,
+      "Width": 380,
+      "Height": 0,
+      "LineColor": "#FF1A7A36",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 4
+    },
+    {
+      "Kind": "Data",
+      "X": 1480,
+      "Y": 196,
+      "DataName": "TIME",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 48,
+        "Bold": true,
+        "Color": "#FFB8FFCB",
+        "Alignment": "Left"
+      },
+      "DataFormat": "h:m",
+      "GlowColor": "#6639FF72",
+      "GlowSize": 16
+    },
+    {
+      "Kind": "Data",
+      "X": 1480,
+      "Y": 290,
+      "DataName": "DAY",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 14,
+        "Bold": true,
+        "Color": "#FF39FF72",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1536,
+      "Y": 290,
+      "DataName": "DATE",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      },
+      "DataFormat": "month"
+    },
+    {
+      "Kind": "Line",
+      "X": 1480,
+      "Y": 330,
+      "Width": 380,
+      "Height": 0,
+      "LineColor": "#FF1A7A36",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 4
+    },
+    {
+      "Kind": "Text",
+      "X": 1480,
+      "Y": 350,
+      "Text": "net.down",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1860,
+      "Y": 346,
+      "DataName": "DOWNDSPEED",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 18,
+        "Bold": false,
+        "Color": "#FF39FF72",
+        "Alignment": "Right"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1480,
+      "Y": 396,
+      "Text": "net.up",
+      "Font": {
+        "Family": "Consolas",
+        "Size": 14,
+        "Bold": false,
+        "Color": "#FF27B850",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1860,
+      "Y": 392,
+      "DataName": "UPSPEED",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Consolas",
+        "Size": 18,
+        "Bold": false,
+        "Color": "#FF39FF72",
+        "Alignment": "Right"
+      }
+    }
+  ]
+}

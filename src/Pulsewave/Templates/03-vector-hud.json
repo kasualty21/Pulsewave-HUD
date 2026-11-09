@@ -1,0 +1,734 @@
+{
+  "Format": 1,
+  "Name": "Vector HUD",
+  "Source": "Pulsewave template",
+  "Width": 1920,
+  "Height": 480,
+  "BackgroundColor": "#FF010407",
+  "Elements": [
+    {
+      "Kind": "Panel",
+      "X": 0,
+      "Y": 0,
+      "Width": 1920,
+      "Height": 480,
+      "FillColor": "#FF041019",
+      "GradientColor": "#FF010407",
+      "GradientAngle": 90,
+      "GradientStyle": "Radial",
+      "BorderColor": "#00000000",
+      "BorderWidth": 0,
+      "CornerRadius": 0,
+      "CornerStyle": "Round"
+    },
+    {
+      "Kind": "Line",
+      "X": 120,
+      "Y": 0,
+      "Width": 0,
+      "Height": 480,
+      "LineColor": "#2635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 240,
+      "Y": 0,
+      "Width": 0,
+      "Height": 480,
+      "LineColor": "#2635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 360,
+      "Y": 0,
+      "Width": 0,
+      "Height": 480,
+      "LineColor": "#2635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 480,
+      "Y": 0,
+      "Width": 0,
+      "Height": 480,
+      "LineColor": "#2635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 600,
+      "Y": 0,
+      "Width": 0,
+      "Height": 480,
+      "LineColor": "#2635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 720,
+      "Y": 0,
+      "Width": 0,
+      "Height": 480,
+      "LineColor": "#2635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 840,
+      "Y": 0,
+      "Width": 0,
+      "Height": 480,
+      "LineColor": "#2635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 960,
+      "Y": 0,
+      "Width": 0,
+      "Height": 480,
+      "LineColor": "#2635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 1080,
+      "Y": 0,
+      "Width": 0,
+      "Height": 480,
+      "LineColor": "#2635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 1200,
+      "Y": 0,
+      "Width": 0,
+      "Height": 480,
+      "LineColor": "#2635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 1320,
+      "Y": 0,
+      "Width": 0,
+      "Height": 480,
+      "LineColor": "#2635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 1440,
+      "Y": 0,
+      "Width": 0,
+      "Height": 480,
+      "LineColor": "#2635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 1560,
+      "Y": 0,
+      "Width": 0,
+      "Height": 480,
+      "LineColor": "#2635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 1680,
+      "Y": 0,
+      "Width": 0,
+      "Height": 480,
+      "LineColor": "#2635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 1800,
+      "Y": 0,
+      "Width": 0,
+      "Height": 480,
+      "LineColor": "#2635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 120,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#2035D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 240,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#2035D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Line",
+      "X": 0,
+      "Y": 360,
+      "Width": 1920,
+      "Height": 0,
+      "LineColor": "#2035D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 4,
+      "SegmentGap": 8
+    },
+    {
+      "Kind": "Panel",
+      "X": 24,
+      "Y": 24,
+      "Width": 560,
+      "Height": 432,
+      "FillColor": "#E6031018",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#FF35D9FF",
+      "BorderWidth": 2,
+      "CornerRadius": 22,
+      "CornerStyle": "Cut",
+      "GlowColor": "#9935D9FF",
+      "GlowSize": 16
+    },
+    {
+      "Kind": "Text",
+      "X": 58,
+      "Y": 44,
+      "Text": "CPU // CORE",
+      "Font": {
+        "Family": "Bahnschrift SemiBold",
+        "Size": 15,
+        "Bold": false,
+        "Color": "#FF35D9FF",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Line",
+      "X": 58,
+      "Y": 78,
+      "Width": 492,
+      "Height": 0,
+      "LineColor": "#6635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Text",
+      "X": 58,
+      "Y": 100,
+      "Text": "UTILIZATION",
+      "Font": {
+        "Family": "Bahnschrift",
+        "Size": 12,
+        "Bold": false,
+        "Color": "#FF8FD9EE",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 58,
+      "Y": 118,
+      "DataName": "CPULOAD",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Bahnschrift SemiBold",
+        "Size": 72,
+        "Bold": false,
+        "Color": "#FFEAFBFF",
+        "Alignment": "Left"
+      },
+      "GlowColor": "#6635D9FF",
+      "GlowSize": 18
+    },
+    {
+      "Kind": "Bar",
+      "X": 58,
+      "Y": 238,
+      "Width": 492,
+      "Height": 18,
+      "DataName": "CPULOAD",
+      "ForeColor": "#FF35D9FF",
+      "BackColor": "#2235D9FF",
+      "CornerRadius": 0,
+      "SegmentWidth": 10,
+      "SegmentGap": 5,
+      "Maximum": 100,
+      "GlowColor": "#9935D9FF",
+      "GlowSize": 10
+    },
+    {
+      "Kind": "Text",
+      "X": 58,
+      "Y": 290,
+      "Text": "TEMP",
+      "Font": {
+        "Family": "Bahnschrift",
+        "Size": 12,
+        "Bold": false,
+        "Color": "#FF8FD9EE",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 58,
+      "Y": 310,
+      "DataName": "CPUTEMP",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Bahnschrift SemiBold",
+        "Size": 34,
+        "Bold": false,
+        "Color": "#FFEAFBFF",
+        "Alignment": "Left"
+      },
+      "WarnAt": 90,
+      "CriticalAt": 98
+    },
+    {
+      "Kind": "Text",
+      "X": 324,
+      "Y": 290,
+      "Text": "POWER",
+      "Font": {
+        "Family": "Bahnschrift",
+        "Size": 12,
+        "Bold": false,
+        "Color": "#FF8FD9EE",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 324,
+      "Y": 310,
+      "DataName": "CPUPWR",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Bahnschrift SemiBold",
+        "Size": 34,
+        "Bold": false,
+        "Color": "#FFEAFBFF",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 58,
+      "Y": 392,
+      "Text": "STATUS",
+      "Font": {
+        "Family": "Bahnschrift",
+        "Size": 11,
+        "Bold": false,
+        "Color": "#FF8FD9EE",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 144,
+      "Y": 392,
+      "Text": "NOMINAL",
+      "Font": {
+        "Family": "Bahnschrift SemiBold",
+        "Size": 11,
+        "Bold": false,
+        "Color": "#FF35D9FF",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Panel",
+      "X": 1336,
+      "Y": 24,
+      "Width": 560,
+      "Height": 432,
+      "FillColor": "#E6031018",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#FF35D9FF",
+      "BorderWidth": 2,
+      "CornerRadius": 22,
+      "CornerStyle": "Cut",
+      "GlowColor": "#9935D9FF",
+      "GlowSize": 16
+    },
+    {
+      "Kind": "Text",
+      "X": 1370,
+      "Y": 44,
+      "Text": "GPU // RENDER",
+      "Font": {
+        "Family": "Bahnschrift SemiBold",
+        "Size": 15,
+        "Bold": false,
+        "Color": "#FF35D9FF",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Line",
+      "X": 1370,
+      "Y": 78,
+      "Width": 492,
+      "Height": 0,
+      "LineColor": "#6635D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Text",
+      "X": 1370,
+      "Y": 100,
+      "Text": "UTILIZATION",
+      "Font": {
+        "Family": "Bahnschrift",
+        "Size": 12,
+        "Bold": false,
+        "Color": "#FF8FD9EE",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1370,
+      "Y": 118,
+      "DataName": "GPULOAD",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Bahnschrift SemiBold",
+        "Size": 72,
+        "Bold": false,
+        "Color": "#FFEAFBFF",
+        "Alignment": "Left"
+      },
+      "GlowColor": "#6635D9FF",
+      "GlowSize": 18
+    },
+    {
+      "Kind": "Bar",
+      "X": 1370,
+      "Y": 238,
+      "Width": 492,
+      "Height": 18,
+      "DataName": "GPULOAD",
+      "ForeColor": "#FF35D9FF",
+      "BackColor": "#2235D9FF",
+      "CornerRadius": 0,
+      "SegmentWidth": 10,
+      "SegmentGap": 5,
+      "Maximum": 100,
+      "GlowColor": "#9935D9FF",
+      "GlowSize": 10
+    },
+    {
+      "Kind": "Text",
+      "X": 1370,
+      "Y": 290,
+      "Text": "TEMP",
+      "Font": {
+        "Family": "Bahnschrift",
+        "Size": 12,
+        "Bold": false,
+        "Color": "#FF8FD9EE",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1370,
+      "Y": 310,
+      "DataName": "GPUTEMP",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Bahnschrift SemiBold",
+        "Size": 34,
+        "Bold": false,
+        "Color": "#FFEAFBFF",
+        "Alignment": "Left"
+      },
+      "WarnAt": 83,
+      "CriticalAt": 90
+    },
+    {
+      "Kind": "Text",
+      "X": 1636,
+      "Y": 290,
+      "Text": "POWER",
+      "Font": {
+        "Family": "Bahnschrift",
+        "Size": 12,
+        "Bold": false,
+        "Color": "#FF8FD9EE",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1636,
+      "Y": 310,
+      "DataName": "GPUPWR",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Bahnschrift SemiBold",
+        "Size": 34,
+        "Bold": false,
+        "Color": "#FFEAFBFF",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1370,
+      "Y": 392,
+      "Text": "STATUS",
+      "Font": {
+        "Family": "Bahnschrift",
+        "Size": 11,
+        "Bold": false,
+        "Color": "#FF8FD9EE",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 1456,
+      "Y": 392,
+      "Text": "NOMINAL",
+      "Font": {
+        "Family": "Bahnschrift SemiBold",
+        "Size": 11,
+        "Bold": false,
+        "Color": "#FF35D9FF",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Panel",
+      "X": 600,
+      "Y": 24,
+      "Width": 720,
+      "Height": 432,
+      "FillColor": "#E6031018",
+      "GradientAngle": 90,
+      "GradientStyle": "Linear",
+      "BorderColor": "#FF35D9FF",
+      "BorderWidth": 2,
+      "CornerRadius": 22,
+      "CornerStyle": "Cut",
+      "GlowColor": "#9935D9FF",
+      "GlowSize": 16
+    },
+    {
+      "Kind": "Line",
+      "X": 630,
+      "Y": 60,
+      "Width": 60,
+      "Height": 0,
+      "LineColor": "#FF35D9FF",
+      "LineWidth": 2,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Line",
+      "X": 1230,
+      "Y": 60,
+      "Width": 60,
+      "Height": 0,
+      "LineColor": "#FF35D9FF",
+      "LineWidth": 2,
+      "SegmentWidth": 0,
+      "SegmentGap": 0
+    },
+    {
+      "Kind": "Text",
+      "X": 960,
+      "Y": 44,
+      "Text": "SYSTEM CLOCK",
+      "Font": {
+        "Family": "Bahnschrift SemiBold",
+        "Size": 15,
+        "Bold": false,
+        "Color": "#FF35D9FF",
+        "Alignment": "Center"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 960,
+      "Y": 82,
+      "DataName": "TIME",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Bahnschrift Light",
+        "Size": 104,
+        "Bold": false,
+        "Color": "#FF35D9FF",
+        "Alignment": "Center"
+      },
+      "DataFormat": "h:m:s",
+      "GlowColor": "#9935D9FF",
+      "GlowSize": 22
+    },
+    {
+      "Kind": "Data",
+      "X": 960,
+      "Y": 236,
+      "DataName": "DATE",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Bahnschrift",
+        "Size": 20,
+        "Bold": false,
+        "Color": "#FF8FD9EE",
+        "Alignment": "Center"
+      },
+      "DataFormat": "long"
+    },
+    {
+      "Kind": "Line",
+      "X": 640,
+      "Y": 290,
+      "Width": 640,
+      "Height": 0,
+      "LineColor": "#4435D9FF",
+      "LineWidth": 1,
+      "SegmentWidth": 6,
+      "SegmentGap": 6
+    },
+    {
+      "Kind": "Text",
+      "X": 660,
+      "Y": 312,
+      "Text": "FRAMERATE",
+      "Font": {
+        "Family": "Bahnschrift",
+        "Size": 12,
+        "Bold": false,
+        "Color": "#FF8FD9EE",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 660,
+      "Y": 332,
+      "DataName": "FPS",
+      "ShowUnit": false,
+      "Font": {
+        "Family": "Bahnschrift SemiBold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFEAFBFF",
+        "Alignment": "Left"
+      }
+    },
+    {
+      "Kind": "Text",
+      "X": 960,
+      "Y": 312,
+      "Text": "MEMORY",
+      "Font": {
+        "Family": "Bahnschrift",
+        "Size": 12,
+        "Bold": false,
+        "Color": "#FF8FD9EE",
+        "Alignment": "Center"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 960,
+      "Y": 332,
+      "DataName": "RAMLOAD",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Bahnschrift SemiBold",
+        "Size": 40,
+        "Bold": false,
+        "Color": "#FFEAFBFF",
+        "Alignment": "Center"
+      },
+      "WarnAt": 85,
+      "CriticalAt": 95
+    },
+    {
+      "Kind": "Text",
+      "X": 1260,
+      "Y": 312,
+      "Text": "NETWORK",
+      "Font": {
+        "Family": "Bahnschrift",
+        "Size": 12,
+        "Bold": false,
+        "Color": "#FF8FD9EE",
+        "Alignment": "Right"
+      }
+    },
+    {
+      "Kind": "Data",
+      "X": 1260,
+      "Y": 340,
+      "DataName": "DOWNDSPEED",
+      "ShowUnit": true,
+      "Font": {
+        "Family": "Bahnschrift SemiBold",
+        "Size": 28,
+        "Bold": false,
+        "Color": "#FFEAFBFF",
+        "Alignment": "Right"
+      }
+    }
+  ]
+}

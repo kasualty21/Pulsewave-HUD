@@ -1,0 +1,58 @@
+{
+  "Kind": "Accelerated synthetic palette/telemetry/WPF exercise; not a gaming or monitor-recovery test",
+  "DurationSeconds": 90,
+  "Iterations": 5818,
+  "Frames": 90,
+  "CompletedPaletteSamples": 180,
+  "MaxStepMilliseconds": 0.1339,
+  "Measurements": [
+    {
+      "Seconds": 0,
+      "ManagedBytes": 3995800,
+      "PrivateBytes": 115449856,
+      "Handles": 547,
+      "Threads": 22,
+      "RetainedRecords": 1
+    },
+    {
+      "Seconds": 15,
+      "ManagedBytes": 3933696,
+      "PrivateBytes": 108384256,
+      "Handles": 548,
+      "Threads": 22,
+      "RetainedRecords": 964
+    },
+    {
+      "Seconds": 30,
+      "ManagedBytes": 5185160,
+      "PrivateBytes": 112656384,
+      "Handles": 551,
+      "Threads": 22,
+      "RetainedRecords": 1932
+    },
+    {
+      "Seconds": 45,
+      "ManagedBytes": 6524200,
+      "PrivateBytes": 115023872,
+      "Handles": 551,
+      "Threads": 22,
+      "RetainedRecords": 2903
+    },
+    {
+      "Seconds": 60,
+      "ManagedBytes": 7220120,
+      "PrivateBytes": 118890496,
+      "Handles": 544,
+      "Threads": 18,
+      "RetainedRecords": 3873
+    },
+    {
+      "Seconds": 75,
+      "ManagedBytes": 8053640,
+      "PrivateBytes": 112771072,
+      "Handles": 541,
+      "Threads": 16,
+      "RetainedRecords": 4847
+    }
+  ]
+}

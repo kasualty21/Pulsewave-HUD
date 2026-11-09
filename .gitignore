@@ -1,0 +1,14 @@
+**/bin/
+**/obj/
+**/publish-win-x64/
+**/publish-pulsewave-win-x64-v0.7.1/
+**/publish-pulsewave-win-x64-v0.8.0/
+work/
+# Built packages (190 MB executables; GitHub's limit is 100 MB): publish them as GitHub Releases instead.
+releases/
+layout-preview.png
+settings-preview.png
+corrupt-palette.png
+soak-report.json
+soak-session.csv
+stability-observation-*.csv

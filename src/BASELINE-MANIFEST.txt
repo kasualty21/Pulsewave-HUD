@@ -1,0 +1,24 @@
+Authoritative uploaded baseline: Graphite-System-Monitor-v0.5.0-source.zip
+SHA256: D2F3524BE50F8EBD3EE5654B8A91C98BCD871AC84C8A90B9678D08B8915C3501
+
+Baseline source comparison:
+MODIFIED (original retained in baseline ZIP) : build-win-x64.ps1
+MODIFIED (original retained in baseline ZIP) : README.md
+UNCHANGED : run-source.ps1
+UNCHANGED : V0.4.1-NOTES.md
+UNCHANGED : GraphiteMonitor\app.manifest
+UNCHANGED : GraphiteMonitor\App.xaml
+UNCHANGED : GraphiteMonitor\App.xaml.cs
+UNCHANGED : GraphiteMonitor\DesktopIntegration.cs
+MODIFIED (original retained in baseline ZIP) : GraphiteMonitor\GraphiteMonitor.csproj
+UNCHANGED : GraphiteMonitor\MainWindow.xaml
+MODIFIED (original retained in baseline ZIP) : GraphiteMonitor\MainWindow.xaml.cs
+UNCHANGED : GraphiteMonitor\SensorCatalog.cs
+UNCHANGED : GraphiteMonitor\SensorManagerForm.cs
+UNCHANGED : GraphiteMonitor\SensorReader.cs
+MODIFIED (original retained in baseline ZIP) : GraphiteMonitor\SettingsStore.cs
+UNCHANGED : GraphiteMonitor\TelemetryEngine.cs
+UNCHANGED : GraphiteMonitor\TelemetryForm.cs
+UNCHANGED : Reference\Original-AIO.ini
+MODIFIED (original retained in baseline ZIP) : Tests\Program.cs
+UNCHANGED : Tests\RegressionChecks.csproj

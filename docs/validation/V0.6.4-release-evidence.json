@@ -1,0 +1,35 @@
+{
+    "Status":  "Passed",
+    "Utc":  "2026-10-19T03:51:57.1866699Z",
+    "Source":  "<workspace>\\src",
+    "StagedSource":  "<workspace>\\work\\release-check-0a256cfc34ff445d81dc3acaa2f363bb\\source",
+    "Version":  "0.6.4",
+    "Steps":  [
+                  {
+                      "Name":  "build",
+                      "ExitCode":  0,
+                      "Log":  "<workspace>\\work\\release-check-0a256cfc34ff445d81dc3acaa2f363bb\\build.log"
+                  },
+                  {
+                      "Name":  "regression",
+                      "ExitCode":  0,
+                      "Log":  "<workspace>\\work\\release-check-0a256cfc34ff445d81dc3acaa2f363bb\\regression.log"
+                  },
+                  {
+                      "Name":  "publish",
+                      "ExitCode":  0,
+                      "Log":  "<workspace>\\work\\release-check-0a256cfc34ff445d81dc3acaa2f363bb\\publish.log"
+                  }
+              ],
+    "Binary":  {
+                   "Path":  "<workspace>\\work\\release-check-0a256cfc34ff445d81dc3acaa2f363bb\\publish-win-x64\\GraphiteMonitor.exe",
+                   "ProductVersion":  "0.6.4",
+                   "SHA256":  "C548D0212BD6D20F59A80320DF5C195D5A23FF21398FF37A32EBD95B7628A813"
+               },
+    "Archive":  {
+                    "Path":  "<workspace>\\work\\release-check-0a256cfc34ff445d81dc3acaa2f363bb\\Graphite-System-Monitor-v0.6.4-source-candidate.zip",
+                    "SHA256":  "442C7132D8C93D53FEBED400035B80B4F45CC6CD53143A5FEC7B2A93EEA82ED2"
+                },
+    "HardwareAcceptance":  "Not performed by this script",
+    "Scope":  "Isolated build, regression, app-owned renders and publish. No overlay launch or live settings writes."
+}
