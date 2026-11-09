@@ -70,18 +70,29 @@ Status 2026-11-08 (user's results and the fixes since, unreleased): 1 done (48 s
 | 10 | Dev workflow: a running Pulsewave locks `bin\Release` and the tests' output folder. Give test runs their own output folder per run. | Fix | Suite runs while the app is open, without hand-picked OutDir folders. |
 | 11 | Close out the open acceptance checklists (V0.7.1, V0.8.0, V0.9.0) by folding still-relevant items into the 0.9.1 checklist. | Docs | One current checklist; older ones marked superseded, not deleted. |
 
-## V0.10 — Planned features (proposals; each needs the user's go-ahead)
-Ordered by how much existing plumbing they reuse. None reintroduces a removed feature or captures the screen.
+## After 0.9.2 — Agreed plan (user-confirmed 2026-11-09)
+Decided in a design review with the user. Released in small steps, each checked on the displays before the next: 0.9.2 first, then 0.10, 0.11, 0.12. None reintroduces a removed feature or captures the screen.
 
-| Feature | What it does | Builds on |
-|---|---|---|
-| Game-aware themes | Switch to a chosen theme (e.g. Halo Gaming) when a game session starts and back when it ends, per game or for all games. | Gaming sessions, playlist / ActiveTheme |
-| Theme in the schedule | A schedule rule can show a theme for a period (Productivity on weekday daytime, Lifestyle evenings). | Schedule rules, tray `theme:` actions |
-| Frame-time history | Chart frame time (or FPS spread) on Halo Gaming to show stutter behind the 1% low. | HWiNFO / RTSS frame-time sensor if present; current FPS chart |
-| Gaming session export | Export the 180-day gaming history to CSV beside the existing session export. | gaming.json, session export |
-| Theme packages | Export / import a custom theme with its pictures and fonts as one file. | Theme JSON, L-Connect importer |
-| Limit alerts | Optional alert when a thermal or power limit lasts longer than a set time. | Limit sensors, Polling & alerts |
-| More tray double-click / hotkey targets | Same action list for global hotkeys (one hotkey per action). | TrayActions, hotkey registry |
+**0.9.2 release gate:** the seven items under "Fixed after 0.9.1" in `validation/V0.9.1-ACCEPTANCE.md` confirmed on hardware (LEDs back on in the saved color, Open OpenRGB, kill-and-restart restoring backlight and display, Steam picker / 48 shortcuts, Auto-pair, FAN OK, outline and centred icons). The rest of that checklist stays open and does not block it.
+
+### V0.10 — The HUD picks the theme for the moment
+- **Game-aware themes.** One default "theme while gaming" plus optional per-game overrides, both in tray → Gaming (a choice at the top; a theme column per game, blank = default). When the session ends (after the existing 30 s grace) the theme from before the game returns, unless the schedule now wants another.
+- **Schedule themes.** "Show theme ___" as a fourth action on the existing rules (beside LEDs, screen, dim). Rules already overlap (up to 16, combined); when two want different themes, the **topmost** rule wins, as it already does for dimming. The Schedule window gains ▲ / ▼ to arrange rules.
+- **Precedence**, highest first: a theme the user picks (tray, gallery, swipe, hotkey; held until the current game or schedule period ends) → a running game → the schedule → the playlist (paused while any of those is in control, resumed after).
+- **Hidden HUD:** switches happen silently; the HUD never unhides itself.
+- Acceptance: precedence, restore-after-game and topmost-wins covered by fixture tests; older settings (no gaming theme, no theme actions) behave exactly as before; checked on the Y70 with a real game.
+
+### V0.11 — Frame time
+- Halo Gaming's card chart becomes frame time in ms (replacing the FPS chart; live FPS stays the hero number), labelled "FRAME TIME · SAMPLED" because HWiNFO passes one reading per poll: it shows sustained stutter, not every single hitch. Dashed guide at 16.7 ms (60 FPS), automatic scale never below 25 ms, amber above 33 ms.
+- 1% low comes from RTSS's "Framerate 1% Low" when paired, else today's slowest-1%-of-seconds figure.
+- Both RTSS readings become optional sensors that Sensor Manager's Auto-pair matches (unit-checked: ms, FPS).
+
+### V0.12 — Hotkeys for any action
+- A tray → Hotkeys window mapping key combinations to any action from the tray double-click list. The three existing hotkeys (next / previous theme, rotation on/off) move in with their keys unchanged.
+
+### Decided against or held
+- **Dropped:** gaming session CSV export; limit alerts (the HUD's limit tags already show it, and pop-ups mid-game are alarm fatigue); named schedule sets (overlapping rules already cover concurrent schedules).
+- **Held until Pulsewave goes public:** theme packages (export / import a theme with its pictures and fonts).
 
 ## Later — Evidence-led refinements (backlog)
 - User reports no noticeable framerate issues in normal use. Defer formal performance profiling and optimization unless a slowdown appears or new workload evidence suggests a need; this is not a benchmark result.
