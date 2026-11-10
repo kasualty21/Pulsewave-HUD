@@ -26,11 +26,12 @@ internal sealed class MediaView : Grid
     private readonly DispatcherTimer _idle = new() { Interval = TimeSpan.FromSeconds(60) };
     private readonly bool _wide;
     private readonly int _maxQueue;
-    private readonly Border _art = new() { CornerRadius = new CornerRadius(28), Background = OneUi.Track, ClipToBounds = true };
+    private readonly Border _art = new() { CornerRadius = new CornerRadius(28), Background = OneUi.Track, ClipToBounds = true,
+        Effect = OneUi.Glow(System.Windows.Media.Color.FromRgb(0xA7, 0x8B, 0xFF), 44, 0.45) };
     private readonly TextBlock _title, _artist, _elapsed, _remaining, _note, _status;
     private readonly SeekBar _seek = new() { Height = 56, Background = Brushes.Transparent, Cursor = System.Windows.Input.Cursors.Hand };
     private double? _seeking; // where a dragging finger holds the seek bar
-    private readonly Border _fill = new() { Background = OneUi.OnFill, CornerRadius = new CornerRadius(5), HorizontalAlignment = HorizontalAlignment.Left, Width = 0 };
+    private readonly Border _fill = new() { Background = OneUi.OnFill, CornerRadius = new CornerRadius(3), HorizontalAlignment = HorizontalAlignment.Left, Width = 0 };
     private readonly Border _shuffle, _repeat, _playPause;
     private readonly PillSlider _volume;
     private readonly StackPanel _queue = new();
@@ -62,8 +63,8 @@ internal sealed class MediaView : Grid
 
         _title = OneUi.Label("", _wide ? 30 : 34, bold: true);
         _artist = OneUi.Label("", _wide ? 21 : 24, OneUi.Secondary);
-        _elapsed = OneUi.Label("", 17, OneUi.Secondary);
-        _remaining = OneUi.Label("", 17, OneUi.Secondary);
+        _elapsed = OneUi.Number("", 18, OneUi.Dim);
+        _remaining = OneUi.Number("", 18, OneUi.Dim);
         _note = OneUi.Label("", 19, OneUi.Secondary);
         _note.TextWrapping = TextWrapping.Wrap;
         _status = OneUi.Label("", 18, OneUi.Secondary);
@@ -90,7 +91,7 @@ internal sealed class MediaView : Grid
         transport.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
         // Seek: a slim bar in a tall tap area; tap where to jump.
-        var bar = new Border { Background = OneUi.Track, CornerRadius = new CornerRadius(5), Height = 10, VerticalAlignment = VerticalAlignment.Center, Child = _fill };
+        var bar = new Border { Background = OneUi.Track, CornerRadius = new CornerRadius(3), Height = 6, VerticalAlignment = VerticalAlignment.Center, Child = _fill };
         _seek.Child = bar;
         _seek.MouseLeftButtonUp += (_, e) =>
         {
@@ -136,7 +137,7 @@ internal sealed class MediaView : Grid
         _seek.Margin = new Thickness(0, _wide ? 4 : 16, 0, 0);
 
         var queueCard = new DockPanel();
-        var queueTitle = OneUi.Label("Up next", 22, bold: true);
+        var queueTitle = OneUi.Caption("Up next");
         queueTitle.Margin = new Thickness(6, 0, 0, 10);
         DockPanel.SetDock(queueTitle, Dock.Top);
         queueCard.Children.Add(queueTitle);
@@ -151,7 +152,7 @@ internal sealed class MediaView : Grid
         var close = OneUi.Circle("", 60, () => CloseRequested?.Invoke());
         DockPanel.SetDock(close, Dock.Right);
         header.Children.Add(close);
-        var title = OneUi.Label("Now playing", 32, bold: true);
+        var title = OneUi.Title("Now playing");
         title.VerticalAlignment = VerticalAlignment.Center;
         DockPanel.SetDock(title, Dock.Left);
         header.Children.Add(title);
@@ -236,7 +237,7 @@ internal sealed class MediaView : Grid
         foreach (var item in upNext)
         {
             var row = new DockPanel();
-            var length = OneUi.Label(Clock(item.DurationMs), 17, OneUi.Secondary);
+            var length = OneUi.Number(Clock(item.DurationMs), 18, OneUi.Dim);
             length.VerticalAlignment = VerticalAlignment.Center;
             DockPanel.SetDock(length, Dock.Right);
             row.Children.Add(length);

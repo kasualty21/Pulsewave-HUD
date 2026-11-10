@@ -106,8 +106,8 @@ internal static class TouchChecks
             "A playlist plays the themes picked for it whatever their shape");
         var sizes = BuiltInTemplates.Names.Select(n => JsonSerializer.Deserialize<ThemeDefinition>(BuiltInTemplates.Read(n), ThemeStore.Json)!).ToList();
         Check(sizes.Any(t => (t.Width, t.Height) == (2560, 682)) && sizes.Any(t => t.Height > t.Width) && sizes.Any(t => (t.Width, t.Height) == (1920, 1200)) &&
-              sizes.Count(t => (t.Width, t.Height) == (1920, 480)) == 24,
-            "Built-in templates include the HYTE Y70, a vertical and tablet layouts beside the twenty-four 8.8\" ones");
+              sizes.Count(t => (t.Width, t.Height) == (1920, 480)) == 27,
+            "Built-in templates include the HYTE Y70, a vertical and tablet layouts beside the twenty-seven 8.8\" ones");
 
         var art = new ThemeElement { Kind = ThemeElementKind.AlbumArt };
         var title = new ThemeElement { Kind = ThemeElementKind.Data, DataName = "MEDIA_TITLE" };

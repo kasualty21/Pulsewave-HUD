@@ -116,18 +116,18 @@ public static class SensorDetails
 /// </summary>
 public sealed class SensorDetailView : Grid
 {
-    private static readonly Brush Sky = OneUi.Frozen(0xFF, 0x7F, 0xD8, 0xFF), Pink = OneUi.Frozen(0xFF, 0xFF, 0x8F, 0xB1),
+    private static readonly Brush Sky = OneUi.Accent, Pink = OneUi.Alert,
         GridLine = OneUi.Frozen(0x1F, 0xFF, 0xFF, 0xFF), AreaFill = AreaBrush();
 
     private readonly TelemetryEngine _telemetry;
     private readonly MonitorSettings _settings;
     private readonly Func<int, string> _subtitle;
     private readonly DispatcherTimer _idle = new() { Interval = TimeSpan.FromSeconds(30) };
-    private readonly TextBlock _title = OneUi.Label("", 32, bold: true), _hardware = OneUi.Label("", 17, OneUi.Secondary);
+    private readonly TextBlock _title = OneUi.Title(""), _hardware = OneUi.Label("", 17, OneUi.Secondary);
     private readonly StackPanel _rows = new();
     private readonly List<Border> _tabs = new();
     private readonly Dictionary<string, (Border Card, TextBlock Label, TextBlock Range, TextBlock Now)> _cards = new();
-    private readonly TextBlock _chartTitle = OneUi.Label("", 20, bold: true), _chartNow = OneUi.Label("", 40, Sky), _health = OneUi.Label("", 14, OneUi.Secondary);
+    private readonly TextBlock _chartTitle = OneUi.Label("", 20, bold: true), _chartNow = OneUi.Number("", 44, Sky, light: true), _health = OneUi.Label("", 14, OneUi.Secondary);
     private readonly Canvas _chart = new() { ClipToBounds = true };
     private readonly bool _narrow;
     private int _group;
@@ -147,7 +147,6 @@ public sealed class SensorDetailView : Grid
         Height = size.Height;
         Background = OneUi.Background();
         _narrow = size.Width < 700;
-        _chartNow.FontFamily = new FontFamily("Segoe UI Light");
         _idle.Tick += (_, _) => { _idle.Stop(); CloseRequested?.Invoke(); };
         // Taps on the page never reach the HUD underneath.
         MouseLeftButtonUp += (_, e) => { e.Handled = true; if (_idle.IsEnabled) { _idle.Stop(); _idle.Start(); } }; // not after ✕ closed it
@@ -250,7 +249,7 @@ public sealed class SensorDetailView : Grid
         {
             var label = OneUi.Label(SensorDetails.Label(id), 18, bold: true);
             var range = OneUi.Label("", 13, OneUi.Secondary);
-            var now = OneUi.Label("--", 26, bold: true);
+            var now = OneUi.Number("--", 28);
             now.VerticalAlignment = VerticalAlignment.Center;
             now.Margin = new Thickness(12, 0, 0, 0);
             var words = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
@@ -340,7 +339,7 @@ public sealed class SensorDetailView : Grid
     /// <summary>The chart's area: sky blue fading to nothing at the bottom.</summary>
     private static Brush AreaBrush()
     {
-        var brush = new LinearGradientBrush(Color.FromArgb(0x59, 0x7F, 0xD8, 0xFF), Color.FromArgb(0x00, 0x7F, 0xD8, 0xFF), 90);
+        var brush = new LinearGradientBrush(Color.FromArgb(0x59, 0x4D, 0xE8, 0xFF), Color.FromArgb(0x00, 0x4D, 0xE8, 0xFF), 90);
         brush.Freeze();
         return brush;
     }

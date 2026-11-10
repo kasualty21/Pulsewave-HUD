@@ -22,7 +22,8 @@ internal sealed class GamingView : Grid
 {
     private readonly DispatcherTimer _idle = new() { Interval = TimeSpan.FromSeconds(60) };
     private readonly bool _wide;
-    private readonly Border _cover = new() { CornerRadius = new CornerRadius(24), Background = OneUi.Track, ClipToBounds = true };
+    private readonly Border _cover = new() { CornerRadius = new CornerRadius(24), Background = OneUi.Track, ClipToBounds = true,
+        Effect = OneUi.Glow(System.Windows.Media.Color.FromRgb(0xFF, 0x5C, 0xCB), 44, 0.4) };
     private readonly TextBlock _state, _name, _session, _today, _week;
     private readonly (TextBlock Value, TextBlock Label)[] _stats;
     private readonly StackPanel _games = new(), _recent = new();
@@ -39,14 +40,16 @@ internal sealed class GamingView : Grid
         _idle.Tick += (_, _) => { _idle.Stop(); CloseRequested?.Invoke(); };
         MouseLeftButtonUp += (_, e) => { e.Handled = true; if (_idle.IsEnabled) { _idle.Stop(); _idle.Start(); } }; // not after ✕ closed it
 
-        _state = OneUi.Label("", 15, OneUi.Secondary, bold: true);
+        _state = OneUi.Number("", 16, OneUi.Secondary);
+        _state.FontWeight = FontWeights.SemiBold;
         _name = OneUi.Label("", _wide ? 28 : 30, bold: true);
         _session = OneUi.Label("", _wide ? 64 : 72);
-        _session.FontFamily = new FontFamily("Segoe UI Light");
+        (_session.FontFamily, _session.FontWeight) = (OneUi.Din, FontWeights.Light);
         _today = OneUi.Label("", 40);
         _week = OneUi.Label("", 40);
-        _today.FontFamily = _week.FontFamily = new FontFamily("Segoe UI Light");
-        _stats = new[] { "AVG FPS", "1% LOW", "PEAK CPU", "PEAK GPU" }.Select(l => (OneUi.Label("--", 26, bold: true), OneUi.Label(l, 12, OneUi.Secondary, bold: true))).ToArray();
+        _today.FontFamily = _week.FontFamily = OneUi.Din;
+        _today.FontWeight = _week.FontWeight = FontWeights.Light;
+        _stats = new[] { "AVG FPS", "1% LOW", "PEAK CPU", "PEAK GPU" }.Select(l => (OneUi.Number("--", 28), OneUi.Caption(l, 12))).ToArray();
 
         // Session: cover beside (bar) or above (tall) the name, timer and stats.
         _cover.Width = _wide ? 200 : 260;
@@ -77,7 +80,7 @@ internal sealed class GamingView : Grid
         foreach (var (value, label) in new[] { (_today, "TODAY"), (_week, "LAST 7 DAYS") })
         {
             var cell = new StackPanel();
-            cell.Children.Add(OneUi.Label(label, 13, OneUi.Secondary, bold: true));
+            cell.Children.Add(OneUi.Caption(label, 13));
             cell.Children.Add(value);
             totals.Children.Add(cell);
         }
@@ -89,7 +92,7 @@ internal sealed class GamingView : Grid
 
         // Recent sessions: a list that scrolls with a drag (or the mouse wheel).
         var recent = new DockPanel();
-        var recentTitle = OneUi.Label("Recent sessions", 20, bold: true);
+        var recentTitle = OneUi.Caption("Recent sessions");
         recentTitle.Margin = new Thickness(4, 0, 0, 10);
         DockPanel.SetDock(recentTitle, Dock.Top);
         recent.Children.Add(recentTitle);
@@ -101,7 +104,7 @@ internal sealed class GamingView : Grid
         var close = OneUi.Circle("", 60, () => CloseRequested?.Invoke());
         DockPanel.SetDock(close, Dock.Right);
         header.Children.Add(close);
-        var title = OneUi.Label("Gaming", 32, bold: true);
+        var title = OneUi.Title("Gaming");
         title.VerticalAlignment = VerticalAlignment.Center;
         header.Children.Add(title);
         DockPanel.SetDock(header, Dock.Top);
@@ -133,7 +136,7 @@ internal sealed class GamingView : Grid
     public void Show(GamingSnapshot g)
     {
         _state.Text = g.Game == null ? "NO GAME YET" : g.Playing ? "PLAYING" : "LAST PLAYED";
-        _state.Foreground = g.Playing ? OneUi.Frozen(0xFF, 0x7F, 0xD8, 0xFF) : OneUi.Secondary;
+        _state.Foreground = g.Playing ? OneUi.AccentWarm : OneUi.Secondary;
         _name.Text = g.Game ?? "Play a game from your Steam library or shortcuts";
         _session.Text = g.Session is { } s ? TouchTimers.Format(s) : g.Recent.FirstOrDefault() is { } last ? ThemeData.PlayTime(last.Length) : "--";
         string unit = "°C";
@@ -162,12 +165,12 @@ internal sealed class GamingView : Grid
             foreach (var (name, played) in top)
             {
                 var row = new DockPanel { Margin = new Thickness(0, 0, 0, 10) };
-                var amount = OneUi.Label(ThemeData.PlayTime(played), 15, OneUi.Secondary, bold: true);
+                var amount = OneUi.Number(ThemeData.PlayTime(played), 16, OneUi.Secondary);
                 DockPanel.SetDock(amount, Dock.Right);
                 row.Children.Add(amount);
                 row.Children.Add(OneUi.Label(name, 16, bold: true));
-                var track = new Border { Background = OneUi.Track, CornerRadius = new CornerRadius(5), Height = 10, Margin = new Thickness(0, 0, 0, 12) };
-                var fill = new Border { Background = OneUi.SliderFillAcross, CornerRadius = new CornerRadius(5), HorizontalAlignment = HorizontalAlignment.Left };
+                var track = new Border { Background = OneUi.Track, CornerRadius = new CornerRadius(3), Height = 6, Margin = new Thickness(0, 0, 0, 12) };
+                var fill = new Border { Background = OneUi.SliderFillAcross, CornerRadius = new CornerRadius(3), HorizontalAlignment = HorizontalAlignment.Left };
                 double share = played.TotalMinutes / most;
                 track.SizeChanged += (_, _) => fill.Width = Math.Max(10, track.ActualWidth * share);
                 track.Child = fill;
@@ -186,7 +189,7 @@ internal sealed class GamingView : Grid
             {
                 var row = new DockPanel();
                 var right = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
-                var length = OneUi.Label(ThemeData.PlayTime(r.Length), 16, bold: true);
+                var length = OneUi.Number(ThemeData.PlayTime(r.Length), 18);
                 length.HorizontalAlignment = HorizontalAlignment.Right;
                 right.Children.Add(length);
                 var fps = OneUi.Label(r.AvgFps is { } a ? $"{a:0} FPS" : "", 13, OneUi.Secondary);

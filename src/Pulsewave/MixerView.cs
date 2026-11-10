@@ -52,7 +52,7 @@ internal sealed class MixerView : Grid
         var close = OneUi.Circle("", 60, () => CloseRequested?.Invoke());
         DockPanel.SetDock(close, Dock.Right);
         header.Children.Add(close);
-        var title = OneUi.Label("Volume", 32, bold: true);
+        var title = OneUi.Title("Volume");
         title.VerticalAlignment = VerticalAlignment.Center;
         header.Children.Add(title);
         DockPanel.SetDock(header, Dock.Top);

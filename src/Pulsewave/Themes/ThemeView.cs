@@ -786,7 +786,15 @@ public sealed class ThemeView : Grid, IDisposable
             _element = element;
             double w = Math.Max(1, element.Width), h = Math.Max(1, element.Height);
             var host = new Canvas { Width = w, Height = h, ClipToBounds = true };
-            _area = new Polygon { Fill = Solid(element.FillColor, Colors.Transparent) };
+            // With a GradientColor the area fades from FillColor under the line to GradientColor at the bottom.
+            Brush areaFill = Solid(element.FillColor, Colors.Transparent);
+            if (element.GradientColor != null)
+            {
+                var top = ParseColor(element.FillColor, Colors.Transparent);
+                areaFill = new LinearGradientBrush(top, ParseColor(element.GradientColor, top), 90);
+                areaFill.Freeze();
+            }
+            _area = new Polygon { Fill = areaFill };
             _line = new Polyline { Stroke = Solid(element.LineColor, Colors.White), StrokeThickness = Math.Max(0.5, element.LineWidth),
                 StrokeLineJoin = PenLineJoin.Round };
             host.Children.Add(_area);

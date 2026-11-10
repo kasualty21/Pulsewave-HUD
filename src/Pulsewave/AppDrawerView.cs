@@ -19,7 +19,7 @@ namespace Pulsewave;
 public sealed class AppDrawerView : Grid
 {
     // Glyph shortcuts (web links, keys) in Halo's sky blue; messages in the page's secondary text.
-    private static readonly Brush Dim = OneUi.Secondary, Accent = Frozen(0xFF, 0x7F, 0xD8, 0xFF);
+    private static readonly Brush Dim = OneUi.Secondary, Accent = Frozen(0xFF, 0x4D, 0xE8, 0xFF);
     private static readonly FontFamily Icons = new("Segoe Fluent Icons, Segoe MDL2 Assets");
 
     /// <summary>Tiles on one page; more shortcuts than this get ‹ › page buttons in the header.</summary>
@@ -56,13 +56,13 @@ public sealed class AppDrawerView : Grid
         DockPanel.SetDock(close, Dock.Right);
         header.Children.Add(close);
         _pageLabel.Foreground = Dim;
-        _pageLabel.FontFamily = OneUi.Font;
+        _pageLabel.FontFamily = OneUi.Din;
         _pager.Children.Add(OneUi.Circle("", 60, () => ShowPage(_page - 1)));
         _pager.Children.Add(_pageLabel);
         _pager.Children.Add(OneUi.Circle("", 60, () => ShowPage(_page + 1)));
         DockPanel.SetDock(_pager, Dock.Right);
         header.Children.Add(_pager);
-        var title = OneUi.Label("Apps", 32, bold: true);
+        var title = OneUi.Title("Apps");
         title.VerticalAlignment = System.Windows.VerticalAlignment.Center;
         title.Margin = new Thickness(8, 0, 0, 0);
         header.Children.Add(title);

@@ -25,7 +25,7 @@ internal static class ThemeColors
         new(ChartFill, e => Is(e, ThemeElementKind.Chart), e => e.FillColor, (e, c) => e.FillColor = c),
         new(Border, e => Is(e, ThemeElementKind.Panel, ThemeElementKind.Shortcut, ThemeElementKind.Chart) && e.BorderWidth > 0, e => e.BorderColor, (e, c) => e.BorderColor = c),
         new(Line, e => Is(e, ThemeElementKind.Line, ThemeElementKind.Chart, ThemeElementKind.Shortcut, ThemeElementKind.AlbumArt), e => e.LineColor, (e, c) => e.LineColor = c),
-        new(Gradient, e => e.GradientColor != null && Is(e, ThemeElementKind.Bar, ThemeElementKind.Arc, ThemeElementKind.Panel, ThemeElementKind.Shortcut),
+        new(Gradient, e => e.GradientColor != null && Is(e, ThemeElementKind.Bar, ThemeElementKind.Arc, ThemeElementKind.Panel, ThemeElementKind.Shortcut, ThemeElementKind.Chart),
             e => e.GradientColor!, (e, c) => e.GradientColor = c),
         new(Glow, e => e.GlowColor != null && !Is(e, ThemeElementKind.Image, ThemeElementKind.Chart), e => e.GlowColor!, (e, c) => e.GlowColor = c),
     ];

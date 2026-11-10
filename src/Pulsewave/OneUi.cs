@@ -14,29 +14,60 @@ using VerticalAlignment = System.Windows.VerticalAlignment;
 namespace Pulsewave;
 
 /// <summary>
-/// The look of the HUD's touch pages, modelled on Samsung One UI's quick panel and tinted in Pulsewave's Halo style: a dark gradient with blue, pink and green glows,
-/// frosted glass cards with large rounded corners, round buttons that fill light when on, and pill
-/// sliders whose light fill carries the icon. Everything is sized for a finger at arm's length.
+/// The look of the HUD's touch pages, in the Lumen style (the layout is still One UI's quick panel): near-black with a
+/// cyan, violet and magenta aurora, see-through glass cards with a hairline edge that catches the light along the top,
+/// round glass buttons that fill with the cyan-to-violet accent (and glow) when on, pill sliders with the same fill,
+/// DIN numerals (Bahnschrift) and letter-spaced small-caps captions. Everything is sized for a finger at arm's length.
 /// </summary>
 internal static class OneUi
 {
-    public static readonly FontFamily Font = new("Segoe UI Variable Display, Segoe UI"), Icons = new("Segoe Fluent Icons, Segoe MDL2 Assets");
-    public static readonly Brush Text = Frozen(0xFF, 0xF5, 0xF7, 0xFA), Secondary = Frozen(0xB8, 0xE6, 0xEA, 0xF0),
-        Glass = Frozen(0x99, 0x14, 0x1A, 0x2C), GlassEdge = Frozen(0x40, 0xFF, 0xFF, 0xFF), Off = Frozen(0x40, 0xFF, 0xFF, 0xFF),
-        OnFill = Frozen(0xFF, 0xE9, 0xEC, 0xF0), OnText = Frozen(0xFF, 0x1D, 0x23, 0x30), Track = Frozen(0x2E, 0xFF, 0xFF, 0xFF),
-        Danger = Frozen(0xFF, 0xFF, 0x8A, 0x8A);
+    public static readonly FontFamily Font = new("Segoe UI Variable Display, Segoe UI"), Icons = new("Segoe Fluent Icons, Segoe MDL2 Assets"),
+        Din = new("Bahnschrift, Segoe UI");
+    private static readonly Color Cyan = Color.FromRgb(0x4D, 0xE8, 0xFF), Violet = Color.FromRgb(0xA7, 0x8B, 0xFF);
+    public static readonly Brush Text = Frozen(0xFF, 0xFF, 0xFF, 0xFF), Secondary = Frozen(0xFF, 0xC9, 0xD1, 0xE0), Dim = Frozen(0xFF, 0xA3, 0xAD, 0xC2),
+        Glass = Frozen(0x14, 0xFF, 0xFF, 0xFF), GlassEdge = Frozen(0x26, 0xFF, 0xFF, 0xFF), ButtonEdge = Frozen(0x40, 0xFF, 0xFF, 0xFF),
+        Off = FrozenGradient(Color.FromArgb(0x26, 0xFF, 0xFF, 0xFF), Color.FromArgb(0x0D, 0xFF, 0xFF, 0xFF), vertical: true),
+        OnFill = FrozenGradient(Cyan, Violet, vertical: false), OnText = Frozen(0xFF, 0x04, 0x12, 0x1A), Track = Frozen(0x1F, 0xFF, 0xFF, 0xFF),
+        Danger = Frozen(0xFF, 0xFF, 0x8A, 0x8A), Accent = Frozen(0xFF, 0x4D, 0xE8, 0xFF), AccentWarm = Frozen(0xFF, 0xFF, 0x5C, 0xCB),
+        Alert = Frozen(0xFF, 0xFF, 0xC5, 0x6B);
 
-    /// <summary>The light slider fill: white at the top easing to a soft grey, like One UI.</summary>
-    public static readonly Brush SliderFill = FrozenGradient(Color.FromRgb(0xC3, 0xA6, 0xFF), Color.FromRgb(0x7F, 0xD8, 0xFF), vertical: true);
-    public static readonly Brush SliderFillAcross = FrozenGradient(Color.FromRgb(0x7F, 0xD8, 0xFF), Color.FromRgb(0xC3, 0xA6, 0xFF), vertical: false);
+    /// <summary>The slider fill: the accent, cyan at the round end easing to violet.</summary>
+    public static readonly Brush SliderFill = FrozenGradient(Violet, Cyan, vertical: true);
+    public static readonly Brush SliderFillAcross = FrozenGradient(Cyan, Violet, vertical: false);
 
-    /// <summary>The page background: deep navy with a soft violet and rose glow, as behind the quick panel.</summary>
+    /// <summary>A glass card's fill (a little lighter at the top) and its edge, brightest along the top like light on a rim.</summary>
+    private static readonly Brush CardFill = FrozenGradient(Color.FromArgb(0x17, 0xFF, 0xFF, 0xFF), Color.FromArgb(0x08, 0xFF, 0xFF, 0xFF), vertical: true), CardEdge = Rim();
+
+    /// <summary>The cyan light under a button that is on.</summary>
+    private static readonly System.Windows.Media.Effects.Effect OnGlow = Glow(Cyan, 24, 0.5);
+
+    /// <summary>A soft colored light behind an element (album art, a cover).</summary>
+    public static System.Windows.Media.Effects.Effect Glow(Color color, double size, double opacity)
+    {
+        var glow = new System.Windows.Media.Effects.DropShadowEffect { Color = color, ShadowDepth = 0, BlurRadius = size, Opacity = opacity,
+            RenderingBias = System.Windows.Media.Effects.RenderingBias.Performance };
+        glow.Freeze();
+        return glow;
+    }
+
+    private static Brush Rim()
+    {
+        var brush = new LinearGradientBrush { StartPoint = new Point(0, 0), EndPoint = new Point(0, 1) };
+        brush.GradientStops.Add(new GradientStop(Color.FromArgb(0x80, 0xFF, 0xFF, 0xFF), 0));
+        brush.GradientStops.Add(new GradientStop(Color.FromArgb(0x26, 0xFF, 0xFF, 0xFF), 0.1));
+        brush.GradientStops.Add(new GradientStop(Color.FromArgb(0x1A, 0xFF, 0xFF, 0xFF), 1));
+        brush.Freeze();
+        return brush;
+    }
+
+    /// <summary>The page background: near-black with the Lumen aurora (cyan, violet, magenta).</summary>
     public static Brush Background()
     {
         var group = new DrawingGroup();
-        group.Children.Add(new GeometryDrawing(FrozenGradient(Color.FromRgb(0x0E, 0x14, 0x24), Color.FromRgb(0x0A, 0x0E, 0x1A), vertical: true), null,
+        group.Children.Add(new GeometryDrawing(FrozenGradient(Color.FromRgb(0x07, 0x09, 0x12), Color.FromRgb(0x03, 0x04, 0x08), vertical: true), null,
             new RectangleGeometry(new Rect(0, 0, 1, 1))));
-        foreach (var (x, y, r, color) in new[] { (0.1, 0.12, 0.55, Color.FromArgb(0x66, 0x36, 0xC2, 0xFF)), (0.95, 0.5, 0.5, Color.FromArgb(0x55, 0xFF, 0x5E, 0x8A)), (0.2, 0.92, 0.55, Color.FromArgb(0x44, 0x44, 0xE0, 0xA0)) })
+        foreach (var (x, y, r, color) in new[] { (0.1, 0.06, 0.55, Color.FromArgb(0x4D, 0x12, 0xA8, 0xE0)), (1.0, 0.4, 0.5, Color.FromArgb(0x40, 0x6A, 0x45, 0xF0)),
+                     (0.0, 0.78, 0.5, Color.FromArgb(0x38, 0xE0, 0x40, 0x9C)), (0.92, 1.0, 0.4, Color.FromArgb(0x2E, 0x12, 0xA8, 0xE0)) })
         {
             var glow = new RadialGradientBrush(color, Color.FromArgb(0, color.R, color.G, color.B)) { Center = new Point(x, y), GradientOrigin = new Point(x, y), RadiusX = r, RadiusY = r };
             glow.Freeze();
@@ -47,11 +78,33 @@ internal static class OneUi
         return brush;
     }
 
-    /// <summary>A frosted glass card.</summary>
+    /// <summary>A see-through glass card.</summary>
     public static Border Card(UIElement child, double radius = 36, double padding = 20) => new()
     {
-        Background = Glass, BorderBrush = GlassEdge, BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(radius),
+        Background = CardFill, BorderBrush = CardEdge, BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(radius),
         Padding = new Thickness(padding), Margin = new Thickness(8), Child = child, ClipToBounds = true
+    };
+
+    /// <summary>A page's title: light DIN, like the themes' clock.</summary>
+    public static TextBlock Title(string text) => new()
+    {
+        Text = text, FontSize = 36, FontFamily = Din, FontWeight = FontWeights.Light, Foreground = Text, TextTrimming = TextTrimming.CharacterEllipsis
+    };
+
+    /// <summary>A section caption: small DIN capitals, letter-spaced (see <see cref="Spaced"/>).</summary>
+    public static TextBlock Caption(string text, double size = 17, Brush? color = null) => new()
+    {
+        Text = Spaced(text), FontSize = size, FontFamily = Din, FontWeight = FontWeights.SemiBold, Foreground = color ?? Dim, TextTrimming = TextTrimming.CharacterEllipsis
+    };
+
+    /// <summary>Capitals with a hair space between the letters (WPF text has no letter-spacing).</summary>
+    public static string Spaced(string text) => string.Join('\u200A', text.ToUpperInvariant().ToCharArray());
+
+    /// <summary>A reading: DIN numerals, light when large.</summary>
+    public static TextBlock Number(string text, double size, Brush? color = null, bool light = false) => new()
+    {
+        Text = text, FontSize = size, FontFamily = Din, FontWeight = light ? FontWeights.Light : FontWeights.Normal, Foreground = color ?? Text,
+        TextTrimming = TextTrimming.CharacterEllipsis
     };
 
     public static TextBlock Label(string text, double size, Brush? color = null, bool bold = false) => new()
@@ -97,13 +150,13 @@ internal static class OneUi
         return brush;
     }
 
-    /// <summary>A round button with a glyph; <see cref="SetOn"/> fills it light (with a dark glyph) when on.</summary>
+    /// <summary>A round glass button with a glyph; <see cref="SetOn"/> fills it with the accent (with a dark glyph and a glow) when on.</summary>
     public static Border Circle(string glyph, double size, Action tap, bool on = false, string? tag = null, double? glyphSize = null)
     {
         var circle = new Border
         {
             Width = size, Height = size, CornerRadius = new CornerRadius(size / 2), Cursor = System.Windows.Input.Cursors.Hand,
-            BorderBrush = Bevel, BorderThickness = new Thickness(Math.Max(1, size / 48)),
+            BorderBrush = ButtonEdge, BorderThickness = new Thickness(1),
             Child = Glyph(glyph, glyphSize ?? size * 0.38), Tag = tag ?? glyph, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center
         };
         SetOn(circle, on);
@@ -114,6 +167,7 @@ internal static class OneUi
     public static void SetOn(Border button, bool on)
     {
         button.Background = on ? OnFill : Off;
+        button.Effect = on ? OnGlow : null;
         foreach (var text in Texts(button.Child)) text.Foreground = on ? OnText : Text;
     }
 
@@ -124,7 +178,7 @@ internal static class OneUi
         if (t.RenderTransform is TranslateTransform { IsFrozen: false } move) move.X = NudgeX(glyph, t.FontSize);
     }
 
-    /// <summary>A rounded pill with a label (and optional glyph), light when selected.</summary>
+    /// <summary>A rounded glass pill with a label (and optional glyph), filled with the accent when selected.</summary>
     public static Border Pill(string text, double height, Action tap, bool selected = false, string? glyph = null, double size = 20, string? tag = null)
     {
         var row = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
@@ -134,7 +188,7 @@ internal static class OneUi
         var pill = new Border
         {
             Height = height, CornerRadius = new CornerRadius(height / 2), Margin = new Thickness(6), Padding = new Thickness(18, 0, 18, 0),
-            Cursor = System.Windows.Input.Cursors.Hand, Child = row, Tag = tag ?? text
+            Cursor = System.Windows.Input.Cursors.Hand, Child = row, Tag = tag ?? text, BorderBrush = ButtonEdge, BorderThickness = new Thickness(1)
         };
         SetOn(pill, selected);
         pill.MouseLeftButtonUp += (_, _) => tap();
@@ -175,7 +229,7 @@ internal interface ITouchDrag
 }
 
 /// <summary>
-/// A One UI pill slider:a translucent track with a light fill that grows from the bottom (or left),
+/// A pill slider: a translucent track with an accent fill that grows from the bottom (or left),
 /// an icon riding at the start of the fill and the level shown at the far end. The HUD turns touches
 /// into taps, so a tap sets the level where it lands (never less than the round end of the fill).
 /// </summary>
@@ -214,7 +268,7 @@ internal sealed class PillSlider : Grid, ITouchDrag
         _icon.HorizontalAlignment = vertical ? HorizontalAlignment.Center : HorizontalAlignment.Left;
         _icon.VerticalAlignment = vertical ? VerticalAlignment.Bottom : VerticalAlignment.Center;
         _icon.Width = _icon.Height = thickness;
-        _value = OneUi.Label("", Math.Max(16, thickness * 0.22), OneUi.Secondary, bold: true);
+        _value = OneUi.Number("", Math.Max(17, thickness * 0.24), OneUi.Secondary);
         _value.HorizontalAlignment = vertical ? HorizontalAlignment.Center : HorizontalAlignment.Right;
         _value.VerticalAlignment = vertical ? VerticalAlignment.Top : VerticalAlignment.Center;
         _value.Margin = vertical ? new Thickness(0, thickness * 0.3, 0, 0) : new Thickness(0, 0, thickness * 0.35, 0);

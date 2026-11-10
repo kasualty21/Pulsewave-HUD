@@ -2025,7 +2025,7 @@ public partial class MainWindow : Window
         row.Children.Add(buttons);
         row.Children.Add(text);
         _suggestionCard = OneUi.Card(row, radius: 40, padding: 14);
-        _suggestionCard.Background = OneUi.Frozen(0xF2, 0x14, 0x1A, 0x2C);
+        _suggestionCard.Background = OneUi.Frozen(0xF2, 0x0C, 0x0F, 0x1A);
         _suggestionCard.VerticalAlignment = VerticalAlignment.Bottom;
         _suggestionCard.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
         _suggestionCard.MaxWidth = Math.Max(300, Root.ActualWidth - 40);

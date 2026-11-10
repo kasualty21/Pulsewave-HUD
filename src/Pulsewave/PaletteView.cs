@@ -29,12 +29,14 @@ internal sealed class PaletteView : Grid
     /// <summary>A palette's name, or "" for the theme's own colors.</summary>
     public event Action<string>? PaletteChosen;
 
+    private readonly bool _wide;
+
     public PaletteView(Size size)
     {
         Width = size.Width;
         Height = size.Height;
         Background = OneUi.Background();
-        bool wide = size.Width >= size.Height;
+        bool wide = _wide = size.Width >= size.Height;
         _tiles = new UniformGrid { Columns = wide ? 5 : 2, VerticalAlignment = VerticalAlignment.Top };
         _tileHeight = wide ? 70 : 96;
         _idle.Tick += (_, _) => { _idle.Stop(); CloseRequested?.Invoke(); };
@@ -45,7 +47,7 @@ internal sealed class PaletteView : Grid
         var close = OneUi.Circle("", 60, () => CloseRequested?.Invoke());
         DockPanel.SetDock(close, Dock.Right);
         header.Children.Add(close);
-        var title = OneUi.Label("Colors", 32, bold: true);
+        var title = OneUi.Title("Colors");
         title.VerticalAlignment = VerticalAlignment.Center;
         DockPanel.SetDock(title, Dock.Left);
         header.Children.Add(title);
@@ -66,7 +68,7 @@ internal sealed class PaletteView : Grid
     {
         _subtitle.Text = theme == null ? "Palettes recolor custom themes; Classic keeps its own look." : theme;
         _tiles.Children.Clear();
-        _tiles.Children.Add(Tile("", "Theme's own colors", ["#FF2A3346", "#FF7FD8FF", "#FFFF8FB1", "#FFC3A6FF"], ThemePalettes.Find(current) == null, theme != null));
+        _tiles.Children.Add(Tile("", _wide ? "Theme's own colors" : "Theme's own", ["#FF2A3346", "#FF7FD8FF", "#FFFF8FB1", "#FFC3A6FF"], ThemePalettes.Find(current) == null, theme != null));
         foreach (var palette in ThemePalettes.All)
             _tiles.Children.Add(Tile(palette.Name, palette.Name, [palette.Surface, .. palette.Accents], ThemePalettes.Find(current) == palette, theme != null));
         _idle.Stop();
@@ -82,10 +84,12 @@ internal sealed class PaletteView : Grid
         foreach (var hex in colors.Skip(1))
             dots.Children.Add(new Border { Width = 22, Height = 22, CornerRadius = new CornerRadius(11), Margin = new Thickness(0, 0, 6, 0), Background = new SolidColorBrush(C(hex)),
                 BorderBrush = OneUi.GlassEdge, BorderThickness = new Thickness(1) });
-        var row = new DockPanel();
-        DockPanel.SetDock(dots, Dock.Left);
+        // On a narrow screen the name goes under the dots, so it is not cut short beside them.
+        var row = new DockPanel { VerticalAlignment = VerticalAlignment.Center };
+        DockPanel.SetDock(dots, _wide ? Dock.Left : Dock.Top);
+        if (!_wide) dots.Margin = new Thickness(0, 0, 0, 6);
         row.Children.Add(dots);
-        var label = OneUi.Label(name, 19, bold: true);
+        var label = OneUi.Label(name, _wide ? 19 : 18, bold: true);
         label.VerticalAlignment = VerticalAlignment.Center;
         row.Children.Add(label);
         var background = new LinearGradientBrush(C(colors[0]), Color.FromArgb(0xCC, C(colors[0]).R, C(colors[0]).G, C(colors[0]).B), 0);

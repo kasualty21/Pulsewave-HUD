@@ -181,5 +181,6 @@ public sealed class ThemeElement
     /// <summary>Chart: faint lines at its bottom (0) and top (its scale), so the height means something.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool ShowBounds { get; set; }
+    // A chart with a GradientColor fades its area from FillColor under the line to GradientColor at the bottom.
     // A chart with WarnAt draws the stretches of its line above that value in WarnColor (CriticalAt is not used).
 }

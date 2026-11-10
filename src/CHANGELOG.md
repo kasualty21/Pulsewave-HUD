@@ -1,6 +1,12 @@
 # Change log
 
 ## Unreleased
+- Lumen, a new built-in theme family in three versions like Halo, each for the 8.8" bar and the HYTE Y70 upright (six templates, forty-five built-in in all): light on near-black with an aurora backdrop, see-through glass slabs, tick-ring gauges with glowing arcs for CPU and GPU, DIN numerals and segmented meters.
+  - Lumen: all-round. Clock and weather, CPU and GPU, memory and network, now playing, quick toggles; the column has hours over minutes as a large stacked clock, the dock and the last game.
+  - Lumen Gaming: the game's live FPS as the hero number with average, 1% low and frame time, the cover and session, CPU and GPU with what is holding them back, memory and VRAM. Follows the Gaming shortcut list.
+  - Lumen Productivity: the timer on an instrument dial with Pomodoro presets, Claude Code and Codex limits as segmented meters, a compact system card with the drive, a now-playing strip. Follows the Productivity shortcut list.
+- The HUD's pages (now playing, volume, lights, colors, apps, gaming, sensor details) are redrawn in the Lumen look for every theme: near-black with the aurora, see-through glass cards whose edge catches the light along the top, glass buttons and pills that fill with the cyan-to-violet accent and glow when on, accent sliders, DIN numerals and letter-spaced captions. Layouts, sizes and what each tap does are unchanged. On vertical screens the Colors page puts each palette's name under its dots, so names are no longer cut short.
+- Charts can fade out downward: a chart with a gradient color fades its area from its fill color under the line to the gradient color at the bottom. Charts without one look as before; palettes recolor the new color too.
 
 ## 0.12.0 (2026-11-09)
 Hotkeys for any action. Settings from 0.11.0 carry over: your next / previous theme, rotation and aesthetic-mode hotkeys keep their keys.

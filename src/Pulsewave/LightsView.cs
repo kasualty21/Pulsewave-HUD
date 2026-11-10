@@ -64,7 +64,7 @@ internal sealed class LightsView : Grid
         var openApp = OneUi.Pill("Open OpenRGB", 60, () => OpenAppRequested?.Invoke(), glyph: "", size: 19);
         DockPanel.SetDock(openApp, Dock.Right);
         header.Children.Add(openApp);
-        var title = OneUi.Label("Lights", 32, bold: true);
+        var title = OneUi.Title("Lights");
         title.VerticalAlignment = VerticalAlignment.Center;
         DockPanel.SetDock(title, Dock.Left);
         header.Children.Add(title);
@@ -221,7 +221,7 @@ internal sealed class LightsView : Grid
     private static Border Section(string title, UIElement body)
     {
         var dock = new DockPanel();
-        var heading = OneUi.Label(title, 20, OneUi.Secondary, bold: true);
+        var heading = OneUi.Caption(title);
         heading.Margin = new Thickness(6, 0, 0, 10);
         DockPanel.SetDock(heading, Dock.Top);
         dock.Children.Add(heading);
