@@ -10,11 +10,14 @@ V0.12.0 adds tray → Hotkeys, mapping key combinations to any action (the exist
 - `docs/RECAP.md`: implementation and validation history.
 - `docs/ROADMAP.md`: milestones and acceptance criteria.
 - `docs/TEAM.md` and `docs/BOARD.md`: coordination rules and task state.
+- `docs/DESIGN.md`: the Lumen design baseline (tokens, components, rules).
 - `work/`: imports and temporary artifacts, not release deliverables.
 
 Releases are on GitHub (the latest is V0.12.0) and, locally, in `releases/` (not tracked in git). See `docs/validation/V0.12.0-release-evidence.md` for build and package hashes, and `docs/validation/V0.9.1-ACCEPTANCE.md` for the device checklist. `docs/ROADMAP.md` lists planned fixes and features.
 
 ## Themes
+Lumen is Pulsewave's baseline look: near-black with an aurora, see-through glass, tick-ring gauges and DIN numerals, in an all-round, a Gaming and a Productivity version for the 8.8" bar and the HYTE Y70. It is listed first in the gallery, and the HUD's touch pages are drawn in it for every theme. `docs/DESIGN.md` describes it and where it lives in the source.
+
 Pulsewave was built for a 1920×480 8.8" bar and also runs on other screens: the HYTE Y70 Touch Infinite (either way up), vertical bars and tablets. Turn click-through off in the tray for touch and click controls: tap now playing to play/pause and a readout for its details page.
 
 For the HYTE Y70: tray → Rotate HUD runs vertical themes on a panel Windows shows sideways, swipe sideways to change theme, and Touch screen setup / Keep other windows off this display fix the usual touch-screen annoyances. No second display? Tray → Dock to screen edge reserves a strip along any edge of your monitor, like the taskbar. Tray → Shortcuts (or drag and drop onto the HUD's tiles) adds games, programs and links that theme tiles and the app drawer open. Themes can also show Claude Code and Codex plan usage (5-hour and weekly limits); Codex needs no setup; for Claude, tray → Claude usage either reads it with the Claude app's sign-in (opt-in, desktop app) or connects Pulsewave as Claude Code's terminal status line.

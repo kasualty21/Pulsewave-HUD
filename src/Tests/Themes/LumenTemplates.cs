@@ -17,10 +17,10 @@ namespace Pulsewave.Regression;
 // Regenerate with `--widget-shots <dir> --write-oneui-templates <dir>` (it writes these too).
 internal static class LumenTemplates
 {
-    private const string Text = "#FFFFFFFF", Soft = "#FFC9D1E0", Dim = "#FFA3ADC2", Cyan = "#FF4DE8FF", Blue = "#FF5B8CFF", Violet = "#FFA78BFF",
-        Magenta = "#FFFF5CCB", Warm = "#FFFFC56B", Track = "#1FFFFFFF", Edge = "#26FFFFFF", Button = "#1CFFFFFF", OnText = "#FF04121A";
-    private const string Ui = "Segoe UI", Din = "Bahnschrift", DinLight = "Bahnschrift Light", DinSemi = "Bahnschrift SemiBold",
-        Icons = "Segoe Fluent Icons", Symbols = "Segoe UI Symbol";
+    // Colors and fonts come from the shared Lumen tokens (src/Pulsewave/Themes/Lumen.cs), which the HUD's pages use too.
+    private const string Text = Lumen.Text, Soft = Lumen.Soft, Dim = Lumen.Dim, Cyan = Lumen.Cyan, Blue = Lumen.Blue, Violet = Lumen.Violet,
+        Magenta = Lumen.Magenta, Warm = Lumen.Warm, Track = Lumen.Track, Edge = Lumen.Edge, Button = Lumen.Button, OnText = Lumen.OnText;
+    private const string Ui = Lumen.Ui, Din = Lumen.Din, DinLight = Lumen.DinLight, DinSemi = Lumen.DinSemi, Icons = Lumen.Icons, Symbols = Lumen.Symbols;
     private const string PinGlyph = "", PrevGlyph = "", NextGlyph = "", LightGlyph = "", PaletteGlyph = "",
         AppsGlyph = "", MixerGlyph = "", MusicGlyph = "";
 
@@ -295,14 +295,14 @@ internal static class LumenTemplates
 
     private static ThemeDefinition New(string name, int w, int h)
     {
-        var t = new ThemeDefinition { Name = name, Source = "Pulsewave template", Width = w, Height = h, BackgroundColor = "#FF04050A" };
+        var t = new ThemeDefinition { Name = name, Source = "Pulsewave template", Width = w, Height = h, BackgroundColor = Lumen.Canvas };
         var e = t.Elements;
-        e.Add(new ThemeElement { Kind = ThemeElementKind.Panel, Width = w, Height = h, FillColor = "#FF070912", GradientColor = "#FF030408", GradientAngle = 90 });
+        e.Add(new ThemeElement { Kind = ThemeElementKind.Panel, Width = w, Height = h, FillColor = Lumen.CanvasTop, GradientColor = Lumen.CanvasBottom, GradientAngle = 90 });
         // The aurora: cyan where the clock is, violet through the middle, magenta at the far end.
         bool tall = h > w;
         var glows = tall
-            ? new (string Color, double X, double Y, double R)[] { ("#3D12A8E0", 0.1, 0.07, 0.3), ("#336A45F0", 1.0, 0.36, 0.3), ("#2EE0409C", 0.0, 0.68, 0.3), ("#2412A8E0", 0.95, 0.97, 0.24) }
-            : [("#3D12A8E0", 0.1, 0.1, 0.3), ("#336A45F0", 0.5, 1.1, 0.3), ("#2EE0409C", 0.94, 0.0, 0.28)];
+            ? new (string Color, double X, double Y, double R)[] { ("#3D" + Lumen.AuroraCyan, 0.1, 0.07, 0.3), ("#33" + Lumen.AuroraViolet, 1.0, 0.36, 0.3), ("#2E" + Lumen.AuroraMagenta, 0.0, 0.68, 0.3), ("#24" + Lumen.AuroraCyan, 0.95, 0.97, 0.24) }
+            : [("#3D" + Lumen.AuroraCyan, 0.1, 0.1, 0.3), ("#33" + Lumen.AuroraViolet, 0.5, 1.1, 0.3), ("#2E" + Lumen.AuroraMagenta, 0.94, 0.0, 0.28)];
         foreach (var (color, gx, gy, gr) in glows)
         {
             double r = Math.Max(w, h) * gr;
@@ -475,8 +475,8 @@ internal static class LumenTemplates
         yield return accent
             ? new ThemeElement { Kind = ThemeElementKind.Panel, X = x, Y = y, Width = w, Height = h, CornerRadius = h / 2, FillColor = Cyan, GradientColor = Violet, GradientAngle = 0,
                 Action = action, GlowColor = "#664DE8FF", GlowSize = 20 }
-            : new ThemeElement { Kind = ThemeElementKind.Panel, X = x, Y = y, Width = w, Height = h, CornerRadius = h / 2, FillColor = "#26FFFFFF", GradientColor = "#0DFFFFFF", GradientAngle = 90,
-                BorderColor = "#40FFFFFF", BorderWidth = 1, Action = action };
+            : new ThemeElement { Kind = ThemeElementKind.Panel, X = x, Y = y, Width = w, Height = h, CornerRadius = h / 2, FillColor = Lumen.ButtonTop, GradientColor = Lumen.ButtonBottom, GradientAngle = 90,
+                BorderColor = Lumen.ButtonEdge, BorderWidth = 1, Action = action };
         double pt = Math.Min(15, Math.Round(h * 0.3)), top = y + (h - pt * 4 / 3 * 1.33) / 2;
         var font = Font(pt, accent ? OnText : Text, bold: true, ThemeTextAlignment.Center);
         yield return data != null ? Value(x + w / 2, top, data, font, unit: false, action: action) : Txt(x + w / 2, top, label!, font, action);
@@ -485,11 +485,11 @@ internal static class LumenTemplates
     /// <summary>A see-through glass slab: a faint fill, a hairline edge, and a highlight fading out along its top.</summary>
     private static void Slab(List<ThemeElement> e, double x, double y, double w, double h, ThemeAction? action = null)
     {
-        e.Add(new ThemeElement { Kind = ThemeElementKind.Panel, X = x, Y = y, Width = w, Height = h, CornerRadius = Radius, FillColor = "#17FFFFFF", GradientColor = "#08FFFFFF",
+        e.Add(new ThemeElement { Kind = ThemeElementKind.Panel, X = x, Y = y, Width = w, Height = h, CornerRadius = Radius, FillColor = Lumen.SlabTop, GradientColor = Lumen.SlabBottom,
             GradientAngle = 90, BorderColor = Edge, BorderWidth = 1, Action = action });
         double half = (w - 2 * Radius) / 2;
-        e.Add(new ThemeElement { Kind = ThemeElementKind.Panel, X = x + Radius, Y = y, Width = half, Height = 1.5, FillColor = "#00FFFFFF", GradientColor = "#8CFFFFFF", GradientAngle = 0 });
-        e.Add(new ThemeElement { Kind = ThemeElementKind.Panel, X = x + Radius + half, Y = y, Width = half, Height = 1.5, FillColor = "#8CFFFFFF", GradientColor = "#00FFFFFF", GradientAngle = 0 });
+        e.Add(new ThemeElement { Kind = ThemeElementKind.Panel, X = x + Radius, Y = y, Width = half, Height = 1.5, FillColor = "#00FFFFFF", GradientColor = Lumen.SlabHighlight, GradientAngle = 0 });
+        e.Add(new ThemeElement { Kind = ThemeElementKind.Panel, X = x + Radius + half, Y = y, Width = half, Height = 1.5, FillColor = Lumen.SlabHighlight, GradientColor = "#00FFFFFF", GradientAngle = 0 });
     }
 
     /// <summary>A rule that fades out at one end (or at the left).</summary>
@@ -654,8 +654,8 @@ internal static class LumenTemplates
 
     private static IEnumerable<ThemeElement> Round(double x, double y, double size, string? glyph, ThemeAction action, string? data = null)
     {
-        yield return new ThemeElement { Kind = ThemeElementKind.Panel, X = x, Y = y, Width = size, Height = size, CornerRadius = size / 2, FillColor = "#26FFFFFF", GradientColor = "#0DFFFFFF",
-            GradientAngle = 90, BorderColor = "#40FFFFFF", BorderWidth = 1, Action = action };
+        yield return new ThemeElement { Kind = ThemeElementKind.Panel, X = x, Y = y, Width = size, Height = size, CornerRadius = size / 2, FillColor = Lumen.ButtonTop, GradientColor = Lumen.ButtonBottom,
+            GradientAngle = 90, BorderColor = Lumen.ButtonEdge, BorderWidth = 1, Action = action };
         double pt = size * 0.3 * 0.75, top = IconTop(y, size, pt);
         var font = Font(pt, Text, align: ThemeTextAlignment.Center, family: Icons);
         yield return data != null ? Value(x + size / 2, top, data, font, unit: false, action: action) : Txt(x + size / 2, top, glyph!, font, action);
@@ -703,7 +703,7 @@ internal static class LumenTemplates
 
     /// <summary>The one label style: small DIN capitals, letter-spaced with hair spaces.</summary>
     private static ThemeElement Label(double x, double y, string text, string color, ThemeTextAlignment align = ThemeTextAlignment.Left) =>
-        Txt(x, y, string.Join(' ', text.ToCharArray()), Font(11, color, align: align, family: DinSemi));
+        Txt(x, y, Lumen.Spaced(text), Font(11, color, align: align, family: DinSemi));
 
     /// <summary>The one number style.</summary>
     private static ThemeFont Num(double size, string color, ThemeTextAlignment align = ThemeTextAlignment.Left) => Font(size, color, align: align, family: Din);

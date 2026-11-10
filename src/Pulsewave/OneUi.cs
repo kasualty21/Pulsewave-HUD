@@ -13,6 +13,8 @@ using VerticalAlignment = System.Windows.VerticalAlignment;
 
 namespace Pulsewave;
 
+using Pulsewave.Themes;
+
 /// <summary>
 /// The look of the HUD's touch pages, in the Lumen style (the layout is still One UI's quick panel): near-black with a
 /// cyan, violet and magenta aurora, see-through glass cards with a hairline edge that catches the light along the top,
@@ -22,21 +24,31 @@ namespace Pulsewave;
 internal static class OneUi
 {
     public static readonly FontFamily Font = new("Segoe UI Variable Display, Segoe UI"), Icons = new("Segoe Fluent Icons, Segoe MDL2 Assets"),
-        Din = new("Bahnschrift, Segoe UI");
-    private static readonly Color Cyan = Color.FromRgb(0x4D, 0xE8, 0xFF), Violet = Color.FromRgb(0xA7, 0x8B, 0xFF);
-    public static readonly Brush Text = Frozen(0xFF, 0xFF, 0xFF, 0xFF), Secondary = Frozen(0xFF, 0xC9, 0xD1, 0xE0), Dim = Frozen(0xFF, 0xA3, 0xAD, 0xC2),
-        Glass = Frozen(0x14, 0xFF, 0xFF, 0xFF), GlassEdge = Frozen(0x26, 0xFF, 0xFF, 0xFF), ButtonEdge = Frozen(0x40, 0xFF, 0xFF, 0xFF),
-        Off = FrozenGradient(Color.FromArgb(0x26, 0xFF, 0xFF, 0xFF), Color.FromArgb(0x0D, 0xFF, 0xFF, 0xFF), vertical: true),
-        OnFill = FrozenGradient(Cyan, Violet, vertical: false), OnText = Frozen(0xFF, 0x04, 0x12, 0x1A), Track = Frozen(0x1F, 0xFF, 0xFF, 0xFF),
-        Danger = Frozen(0xFF, 0xFF, 0x8A, 0x8A), Accent = Frozen(0xFF, 0x4D, 0xE8, 0xFF), AccentWarm = Frozen(0xFF, 0xFF, 0x5C, 0xCB),
-        Alert = Frozen(0xFF, 0xFF, 0xC5, 0x6B);
+        Din = new(Lumen.Din + ", Segoe UI");
+    // Colors come from the shared Lumen tokens (Themes/Lumen.cs), which the Lumen templates use too.
+    private static readonly Color Cyan = C(Lumen.Cyan), Violet = C(Lumen.Violet);
+    public static readonly Brush Text = Solid(Lumen.Text), Secondary = Solid(Lumen.Soft), Dim = Solid(Lumen.Dim),
+        Glass = Frozen(0x14, 0xFF, 0xFF, 0xFF), GlassEdge = Solid(Lumen.Edge), ButtonEdge = Solid(Lumen.ButtonEdge),
+        Off = FrozenGradient(C(Lumen.ButtonTop), C(Lumen.ButtonBottom), vertical: true),
+        OnFill = FrozenGradient(Cyan, Violet, vertical: false), OnText = Solid(Lumen.OnText), Track = Solid(Lumen.Track),
+        Danger = Frozen(0xFF, 0xFF, 0x8A, 0x8A), Accent = Solid(Lumen.Cyan), AccentWarm = Solid(Lumen.Magenta),
+        Alert = Solid(Lumen.Warm);
+
+    private static Color C(string hex) => (Color)System.Windows.Media.ColorConverter.ConvertFromString(hex);
+
+    private static SolidColorBrush Solid(string hex)
+    {
+        var brush = new SolidColorBrush(C(hex));
+        brush.Freeze();
+        return brush;
+    }
 
     /// <summary>The slider fill: the accent, cyan at the round end easing to violet.</summary>
     public static readonly Brush SliderFill = FrozenGradient(Violet, Cyan, vertical: true);
     public static readonly Brush SliderFillAcross = FrozenGradient(Cyan, Violet, vertical: false);
 
     /// <summary>A glass card's fill (a little lighter at the top) and its edge, brightest along the top like light on a rim.</summary>
-    private static readonly Brush CardFill = FrozenGradient(Color.FromArgb(0x17, 0xFF, 0xFF, 0xFF), Color.FromArgb(0x08, 0xFF, 0xFF, 0xFF), vertical: true), CardEdge = Rim();
+    private static readonly Brush CardFill = FrozenGradient(C(Lumen.SlabTop), C(Lumen.SlabBottom), vertical: true), CardEdge = Rim();
 
     /// <summary>The cyan light under a button that is on.</summary>
     private static readonly System.Windows.Media.Effects.Effect OnGlow = Glow(Cyan, 24, 0.5);
@@ -64,10 +76,10 @@ internal static class OneUi
     public static Brush Background()
     {
         var group = new DrawingGroup();
-        group.Children.Add(new GeometryDrawing(FrozenGradient(Color.FromRgb(0x07, 0x09, 0x12), Color.FromRgb(0x03, 0x04, 0x08), vertical: true), null,
+        group.Children.Add(new GeometryDrawing(FrozenGradient(C(Lumen.CanvasTop), C(Lumen.CanvasBottom), vertical: true), null,
             new RectangleGeometry(new Rect(0, 0, 1, 1))));
-        foreach (var (x, y, r, color) in new[] { (0.1, 0.06, 0.55, Color.FromArgb(0x4D, 0x12, 0xA8, 0xE0)), (1.0, 0.4, 0.5, Color.FromArgb(0x40, 0x6A, 0x45, 0xF0)),
-                     (0.0, 0.78, 0.5, Color.FromArgb(0x38, 0xE0, 0x40, 0x9C)), (0.92, 1.0, 0.4, Color.FromArgb(0x2E, 0x12, 0xA8, 0xE0)) })
+        foreach (var (x, y, r, color) in new[] { (0.1, 0.06, 0.55, C("#4D" + Lumen.AuroraCyan)), (1.0, 0.4, 0.5, C("#40" + Lumen.AuroraViolet)),
+                     (0.0, 0.78, 0.5, C("#38" + Lumen.AuroraMagenta)), (0.92, 1.0, 0.4, C("#2E" + Lumen.AuroraCyan)) })
         {
             var glow = new RadialGradientBrush(color, Color.FromArgb(0, color.R, color.G, color.B)) { Center = new Point(x, y), GradientOrigin = new Point(x, y), RadiusX = r, RadiusY = r };
             glow.Freeze();
@@ -98,7 +110,7 @@ internal static class OneUi
     };
 
     /// <summary>Capitals with a hair space between the letters (WPF text has no letter-spacing).</summary>
-    public static string Spaced(string text) => string.Join('\u200A', text.ToUpperInvariant().ToCharArray());
+    public static string Spaced(string text) => Lumen.Spaced(text);
 
     /// <summary>A reading: DIN numerals, light when large.</summary>
     public static TextBlock Number(string text, double size, Brush? color = null, bool light = false) => new()

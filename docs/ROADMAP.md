@@ -103,3 +103,8 @@ Decided in a design review with the user. Released in small steps, each checked 
 
 ## Decisions already established
 Keep Wallpaper Engine independent, maintain the uncluttered dedicated display, preserve existing mappings/settings on upgrade, and retain the V0.6.1 visual design. Keep this chat as coordinator; specialists are delegated tasks, not autonomous permanent services.
+
+## Lumen baseline (unreleased, user-directed 2026-11-09)
+- Lumen (templates 40–45), the restyled HUD pages and the shared tokens are the design baseline; see `DESIGN.md`. Committed on `main`, not yet in a release: the Windows startup entry still points at an older build.
+- Checked by the user on the HYTE Y70 with preview builds: the three Lumen columns and the pages. Not yet seen on hardware: the three 1920×480 bar templates, the pages at bar size, Lumen Gaming during a real game.
+- Candidates, not started and not agreed: move the editor widgets and the editor's controls to the Lumen kit; a release (version, packages, evidence) carrying the baseline.

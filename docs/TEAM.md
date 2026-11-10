@@ -13,7 +13,7 @@ Default writable production files, when assigned: src/Pulsewave/Themes/VideoLoop
 New focused tests may be placed in src/Tests/Reliability/ when included in an assigned task; coordinate any entry-point changes with QA. Review does not imply confirmed defects.
 
 ## Visuals / UX specialist
-Default writable files, when assigned: src/Pulsewave/ThemesForm.cs, the theme editor (src/Pulsewave/Themes/Editor) and scripts/build-templates.py. Focus on template design, gallery and editor experience. Request model/interface changes from the coordinator. No overlay XAML or typography changes by default.
+Default writable files, when assigned: src/Pulsewave/ThemesForm.cs, the theme editor (src/Pulsewave/Themes/Editor), scripts/build-templates.py, the template generators in src/Tests/Themes (LumenTemplates.cs, HaloTemplates.cs and the rest) and the page kit (src/Pulsewave/OneUi.cs with the *View.cs pages). Focus on template design, gallery, pages and editor experience. Visual work follows the Lumen baseline in docs/DESIGN.md; the tokens in src/Pulsewave/Themes/Lumen.cs are a shared contract (coordinator-owned). Request model/interface changes from the coordinator. No overlay XAML or typography changes by default.
 
 ## Release / QA specialist
 Default writable files, when assigned: src/Tests/Program.cs, src/Tests/StabilityExercise.cs, new release-check scripts, docs/validation/ and testing documentation. Own the shared test entry point while assigned. Propose production fixes to the responsible owner rather than editing their files concurrently. Coordinator owns final version bumps and release archive assembly.

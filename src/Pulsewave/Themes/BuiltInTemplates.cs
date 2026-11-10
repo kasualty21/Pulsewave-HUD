@@ -17,10 +17,13 @@ public static class BuiltInTemplates
 
     public static bool IsBuiltIn(string? id) => id?.StartsWith(Prefix, StringComparison.Ordinal) == true;
 
-    /// <summary>Template names, in gallery order (file names sort them: "01-glass-cards" ...).</summary>
+    /// <summary>
+    /// Template names, in gallery order: the Lumen family (the baseline look) first, then the rest; within each, file
+    /// names sort them ("01-glass-cards" ...).
+    /// </summary>
     public static IReadOnlyList<string> Names => typeof(BuiltInTemplates).Assembly.GetManifestResourceNames()
         .Where(n => n.StartsWith(ResourcePrefix, StringComparison.Ordinal) && n.EndsWith(".json", StringComparison.Ordinal))
-        .Select(n => n[ResourcePrefix.Length..^".json".Length]).OrderBy(n => n, StringComparer.Ordinal).ToList();
+        .Select(n => n[ResourcePrefix.Length..^".json".Length]).OrderBy(n => Lumen.IsLumen(n) ? 0 : 1).ThenBy(n => n, StringComparer.Ordinal).ToList();
 
     /// <summary>
     /// Folder for a built-in theme id, written from the embedded copy if missing or out of date.
