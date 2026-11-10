@@ -44,6 +44,9 @@ public sealed class MonitorSettings
     public string HotkeyNextTheme { get; set; } = "Ctrl+Alt+PageDown";
     public string HotkeyPreviousTheme { get; set; } = "Ctrl+Alt+PageUp";
     public string HotkeyTogglePlaylist { get; set; } = "Ctrl+Alt+End";
+    // Since 0.12 every hotkey is a binding (tray → Hotkeys); the four fields above and HotkeyAesthetic only seed them once
+    // and are otherwise left as they were. Null: not migrated yet.
+    public List<HotkeyBinding>? Hotkeys { get; set; }
     public string CpuName { get; set; } = "Intel Core Ultra 7 265K";
     public string GpuName { get; set; } = "NVIDIA GeForce RTX 5070 Ti";
     public string RegistryPath { get; set; } = @"SOFTWARE\HWiNFO64\VSB";
@@ -207,6 +210,7 @@ public static class SettingsStore
         config.ThemePlaylist = (config.ThemePlaylist ?? new()).Where(id => id != null).Distinct(StringComparer.Ordinal).ToList();
         config.PlaylistMinutes = Math.Clamp(config.PlaylistMinutes, 1, 1440);
         config.HotkeyNextTheme ??= ""; config.HotkeyPreviousTheme ??= ""; config.HotkeyTogglePlaylist ??= "";
+        config.Hotkeys = HotkeyBindings.Normalize(config.Hotkeys, config);
         config.PollIntervalMs = Math.Clamp(config.PollIntervalMs, 250, 5000);
         config.HistorySeconds = Math.Clamp(config.HistorySeconds, 30, 600);
         config.HudRotation = config.HudRotation is 90 or 180 or 270 ? config.HudRotation : 0;

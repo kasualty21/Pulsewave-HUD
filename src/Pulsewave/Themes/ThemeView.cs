@@ -779,6 +779,7 @@ public sealed class ThemeView : Grid, IDisposable
         private readonly Polygon _area;
         private readonly Polyline? _warnLine;
         private readonly Line? _guide;
+        private readonly TextBlock? _guideText;
 
         public ChartPart(ThemeElement element, Canvas canvas)
         {
@@ -794,7 +795,18 @@ public sealed class ThemeView : Grid, IDisposable
                 _guide = new Line { X1 = 0, X2 = w, Stroke = Solid(element.LineColor, Colors.White), Opacity = 0.45, StrokeThickness = 1.5,
                     StrokeDashArray = [4, 4] };
                 host.Children.Add(_guide);
+                if (element.GuideLabel is { Length: > 0 } label)
+                {
+                    _guideText = new TextBlock { Text = label, FontFamily = new FontFamily("Segoe UI Semibold"), FontSize = 13, Opacity = 0.8,
+                        Foreground = Solid(element.LineColor, Colors.White) };
+                    _guideText.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                    Canvas.SetLeft(_guideText, w - _guideText.DesiredSize.Width - 2);
+                    host.Children.Add(_guideText);
+                }
             }
+            if (element.ShowBounds)
+                foreach (double y in new[] { 0.5, h - 0.5 })
+                    host.Children.Add(new Line { X1 = 0, X2 = w, Y1 = y, Y2 = y, Stroke = Brushes.White, Opacity = 0.14, StrokeThickness = 1 });
             host.Children.Add(_line);
             if (element.WarnAt is > 0 && !element.LowIsBad)
             {
@@ -828,7 +840,18 @@ public sealed class ThemeView : Grid, IDisposable
             points.Freeze();
             _line.Points = points;
             double Y(double v) => h - Math.Clamp(v / max, 0, 1) * h;
-            if (_guide != null) _guide.Y1 = _guide.Y2 = Math.Round(Y(_element.GuideAt!.Value)) + 0.5;
+            if (_guide != null)
+            {
+                // A guide above the scale (a game running far faster than 60 FPS) is left out rather than pinned to the top.
+                bool inside = _element.GuideAt!.Value <= max;
+                _guide.Visibility = inside ? Visibility.Visible : Visibility.Hidden;
+                _guide.Y1 = _guide.Y2 = Math.Round(Y(_element.GuideAt.Value)) + 0.5;
+                if (_guideText != null)
+                {
+                    _guideText.Visibility = _guide.Visibility;
+                    Canvas.SetTop(_guideText, Math.Max(0, _guide.Y1 - _guideText.DesiredSize.Height - 1));
+                }
+            }
             if (_warnLine != null)
             {
                 _warnLine.Points = points;

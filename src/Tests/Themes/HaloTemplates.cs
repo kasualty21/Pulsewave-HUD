@@ -106,7 +106,7 @@ internal static class HaloTemplates
         Card(e, x, 2130, w, 406);
         e.Add(Header(ix, 2158, "SYSTEM"));
         var stats = new (string Name, string Load, string Detail, string Color)[] { ("CPU", "CPULOAD", "CPUTEMP", Sky), ("GPU", "GPULOAD", "GPUTEMP", Pink), ("MEMORY", "RAMLOAD", "RAM_GB_OF", Violet) };
-        for (int i = 0; i < 3; i++) Ring(e, ix + iw / 6 + i * iw / 3, 2224, 164, stats[i].Load, stats[i].Name, stats[i].Detail, stats[i].Color);
+        for (int i = 0; i < 3; i++) Ring(e, ix + iw / 6 + i * iw / 3, 2210, 180, stats[i].Load, stats[i].Name, stats[i].Detail, stats[i].Color);
         return t;
     }
     // --- Gaming ------------------------------------------------------------------------------
@@ -125,7 +125,7 @@ internal static class HaloTemplates
         Fps(e, 256, 140, 300, 50, 24, 180, 254, 64);
         SessionRow(e, 52, 346, 504, 18);
 
-        Processor(e, 608, 24, 420, 432, "CPU", "CPUMODEL", "CPULOAD", "CPU_LIMIT", Sky, ("TEMP", "CPUTEMP"), ("POWER", "CPUPWR"), ("CLOCK", "CPUCLOCK_G"), ("FAN", "CPUFAN_ALERT"), small: true);
+        Processor(e, 608, 24, 420, 432, "CPU", "CPUMODEL", "CPULOAD", "CPU_LIMIT", Sky, ("TEMP", "CPUTEMP"), ("POWER", "CPUPWR"), ("CLOCK", "CPUCLOCK_G"), ("FAN", "CPUFAN"), small: true);
         Processor(e, 1052, 24, 420, 432, "GPU", "GPUMODEL", "GPULOAD", "GPU_LIMIT", Pink, ("TEMP", "GPUTEMP"), ("POWER", "GPUPWR"), ("CLOCK", "GPUCLOCK_G"), ("VRAM", "GPURAM_GB_OF"), small: true);
 
         // Time, memory and toggles.
@@ -153,7 +153,7 @@ internal static class HaloTemplates
         Fps(e, rx, 386, rw, 64, 24, 210, 520, 64);
         SessionRow(e, ix, 612, iw, 20);
 
-        Processor(e, x, 728, w, 476, "CPU", "CPUMODEL", "CPULOAD", "CPU_LIMIT", Sky, ("TEMP", "CPUTEMP"), ("POWER", "CPUPWR"), ("CLOCK", "CPUCLOCK_G"), ("FAN", "CPUFAN_ALERT"));
+        Processor(e, x, 728, w, 476, "CPU", "CPUMODEL", "CPULOAD", "CPU_LIMIT", Sky, ("TEMP", "CPUTEMP"), ("POWER", "CPUPWR"), ("CLOCK", "CPUCLOCK_G"), ("FAN", "CPUFAN"));
         Processor(e, x, 1228, w, 476, "GPU", "GPUMODEL", "GPULOAD", "GPU_LIMIT", Pink, ("TEMP", "GPUTEMP"), ("POWER", "GPUPWR"), ("CLOCK", "GPUCLOCK_G"), ("VRAM", "GPURAM_GB_OF"));
 
         Card(e, x, 1728, w, 236);
@@ -389,9 +389,9 @@ internal static class HaloTemplates
             StartAngle = 135, SweepAngle = 270, RoundCaps = true, ForeColor = color, GradientColor = Violet, BackColor = Track, Action = ThemeAction.Details };
         if (load == "RAMLOAD") Warn(ring, 85, 95);
         e.Add(ring);
-        e.Add(Value(cx, y + d * 0.32, load, Num(24, Text, ThemeTextAlignment.Center), action: ThemeAction.Details));
-        e.Add(Txt(cx, y + d + 4, name, Font(12, Secondary, bold: true, ThemeTextAlignment.Center)));
-        e.Add(Limited(Value(cx, y + d + 24, detail, Num(16, Text, ThemeTextAlignment.Center), unit: detail != "RAM_GB_OF")));
+        e.Add(Value(cx, y + d * 0.32, load, Num(26, Text, ThemeTextAlignment.Center), action: ThemeAction.Details));
+        e.Add(Txt(cx, y + d + 6, name, Font(13, Secondary, bold: true, ThemeTextAlignment.Center)));
+        e.Add(Limited(Value(cx, y + d + 28, detail, Num(19, Text, ThemeTextAlignment.Center), unit: detail != "RAM_GB_OF")));
     }
 
     /// <summary>
@@ -416,21 +416,25 @@ internal static class HaloTemplates
         double sx = ix + ring + (small ? 26 : 36), big = small ? 30 : 40, gap = small ? 82 : 108;
         Stat(e, sx, ry + 4, a.Label, a.Data, big, labelSize: 13);
         Stat(e, sx, ry + 4 + gap, b.Label, b.Data, big, labelSize: 13);
-        double below = ry + ring + (small ? 14 : 22), half = iw / 2;
-        // A clock HWiNFO doesn't export is left out rather than shown as "--"; the fan shows only when it stops.
-        string? Only(string data) => data.Contains("CLOCK", StringComparison.Ordinal) || data == "CPUFAN_ALERT" ? data : null;
-        Stat(e, ix, below, c.Label, c.Data, small ? 20 : 26, labelSize: 13, showIf: Only(c.Data));
-        Stat(e, ix + half, below, d.Label, d.Data, small ? 20 : 26, labelSize: 13, showIf: Only(d.Data));
-        double chartTop = below + (small ? 58 : 74), chartBottom = y + h - Pad;
+        // The load history right under the ring (no gap when a reading below is missing), with faint 0 and 100% lines;
+        // clock and fan or VRAM along the bottom, the second in line with temperature and power.
+        double rowSize = small ? 20 : 26, row = y + h - Pad - (13 * 1.3 + rowSize * 4 / 3 * 1.33);
+        double chartTop = ry + ring + (small ? 12 : 18), chartBottom = row - (small ? 16 : 22);
         e.Add(Label(ix, chartTop, "LOAD · LAST 60 S"));
-        e.Add(new ThemeElement { Kind = ThemeElementKind.Chart, DataName = load, X = ix, Y = chartTop + 26, Width = iw, Height = chartBottom - chartTop - 26, Samples = 60, Maximum = 100,
-            LineColor = color, LineWidth = 2, FillColor = "#22" + color[3..], Action = ThemeAction.Details });
+        e.Add(new ThemeElement { Kind = ThemeElementKind.Chart, DataName = load, X = ix, Y = chartTop + 24, Width = iw, Height = chartBottom - chartTop - 24, Samples = 60, Maximum = 100,
+            ShowBounds = true, LineColor = color, LineWidth = 2, FillColor = "#22" + color[3..], Action = ThemeAction.Details });
+        // A clock HWiNFO doesn't export (or an unpaired fan) is left out rather than shown as "--".
+        string? Only(string data) => data.Contains("CLOCK", StringComparison.Ordinal) || data == "CPUFAN" ? data : null;
+        Stat(e, ix, row, c.Label, c.Data, rowSize, labelSize: 13, showIf: Only(c.Data));
+        var dv = Stat(e, sx, row, d.Label, d.Data, rowSize, labelSize: 13, showIf: Only(d.Data));
+        if (d.Data == "CPUFAN") dv.LowIsBad = true;
     }
 
     /// <summary>
     /// Live FPS as the hero number, average and 1% low (amber when it drops far below the average) beside it, and frame
-    /// time: one reading per poll, so "sampled" (it shows sustained stutter, not every hitch). Dashed at 16.7 ms (60 FPS),
-    /// scaled to at least 25 ms, amber above 33 ms (below 30 FPS).
+    /// time with its current value: scaled to the game (at least 12 ms, so 120–144 FPS sits mid-chart), a dashed "60 FPS" line at 16.7 ms when the scale
+    /// reaches it, faint 0 and top lines, and amber above 33 ms (below 30 FPS). One reading per poll, so it shows sustained
+    /// stutter rather than every single slow frame.
     /// </summary>
     private static void Fps(List<ThemeElement> e, double x, double y, double w, double hero, double small, double side, double chartY, double chartH)
     {
@@ -442,9 +446,11 @@ internal static class HaloTemplates
         var low = Stat(e, x + side, y + small * 4 / 3 + 30, "1% LOW", "GAME_FPS_LOW", small);
         low.ShowUnit = false;
         low.ColorBy = "GAME_FPS_LOW_PCT"; low.LowIsBad = true; low.WarnAt = 60; low.CriticalAt = 40;
-        e.Add(Label(x, chartY, "FRAME TIME · SAMPLED"));
-        e.Add(new ThemeElement { Kind = ThemeElementKind.Chart, DataName = "FRAMETIME", X = x, Y = chartY + 18, Width = w, Height = chartH - 18, Samples = 60, Maximum = 0,
-            MinimumScale = 25, GuideAt = 16.7, WarnAt = 33, LineColor = Sky, LineWidth = 2, FillColor = "#227FD8FF", Action = ThemeAction.GamingPage });
+        e.Add(Label(x, chartY, "FRAME TIME"));
+        e.Add(Value(x + w, chartY - 2, "FRAMETIME", Num(14, Text, ThemeTextAlignment.Right)));
+        e.Add(new ThemeElement { Kind = ThemeElementKind.Chart, DataName = "FRAMETIME", X = x, Y = chartY + 20, Width = w, Height = chartH - 20, Samples = 60, Maximum = 0,
+            MinimumScale = 12, GuideAt = 16.7, GuideLabel = "60 FPS", ShowBounds = true, WarnAt = 33, LineColor = Sky, LineWidth = 2, FillColor = "#227FD8FF",
+            Action = ThemeAction.GamingPage });
     }
 
     /// <summary>The session in one format: its length, today, this week, and the session's peak temperatures.</summary>
@@ -503,7 +509,11 @@ internal static class HaloTemplates
         e.Add(Value(x, y, "FOCUS_MODE", Font(13, Secondary, bold: true), unit: false, action: ThemeAction.FocusSwitch));
         e.AddRange(PillValue(x + w - 132, y - 10, 132, 36, "FOCUS_SWITCH", ThemeAction.FocusSwitch, 12));
         double clockY = y + h * 0.1;
-        e.Add(Value(cx, clockY, "FOCUS_CLOCK", Num(clock, Text, ThemeTextAlignment.Center), unit: false, action: ThemeAction.FocusToggle));
+        // Sky while it runs, white while stopped; the Pomodoro round between the mode and its switch.
+        var running = Value(cx, clockY, "FOCUS_CLOCK", Num(clock, Text, ThemeTextAlignment.Center), unit: false, action: ThemeAction.FocusToggle);
+        running.ColorBy = "FOCUS_RUNNING"; running.WarnAt = 1; running.WarnColor = Sky;
+        e.Add(running);
+        e.Add(Value(x + (w - 132) / 2 + 30, y, "FOCUS_ROUND", Font(13, Secondary, bold: true, ThemeTextAlignment.Center), unit: false));
         double buttons = clockY + clock * 4 / 3 * 1.36 + 8, bh = Math.Round(clock * 0.72);
         double main = 150, reset = 110, add = 110;
         double bx = cx - (main + reset + add + 24) / 2;
@@ -604,6 +614,7 @@ internal static class HaloTemplates
             "GPUTEMP" or "GAME_PEAK_GPU" => (83, 90),
             "HDDTEMP" => (70, 80),
             "CPUFAN_STATE" or "CPUFAN_ALERT" => (50, 100), // red only when the fan stops
+            "CPUFAN" => (1, 1), // with LowIsBad below: red at 0 RPM
             _ => null
         };
         return limits is { } l ? Warn(value, l.Item1, l.Item2) : value;

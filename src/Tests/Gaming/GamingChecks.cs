@@ -252,8 +252,8 @@ internal static class GamingChecks
                         return amber;
                     }
                     int calm = Amber(false), stutter = Amber(true);
-                    Check(calm == 0 && stutter > 20 && chart is { MinimumScale: 25, GuideAt: 16.7, WarnAt: 33, Maximum: 0 },
-                        $"{theme.Name} charts frame time with a 16.7 ms guide and a 25 ms floor: a steady 120 FPS stays its own color, seconds at 20 FPS turn the line amber");
+                    Check(calm == 0 && stutter > 20 && chart is { MinimumScale: 12, GuideAt: 16.7, GuideLabel: "60 FPS", ShowBounds: true, WarnAt: 33, Maximum: 0 },
+                        $"{theme.Name} charts frame time scaled to the game (at least 12 ms) with a labelled 60 FPS line: a steady 120 FPS stays its own color, seconds at 20 FPS turn the line amber");
                 }
             }
             catch (Exception ex) { failure = ex; }

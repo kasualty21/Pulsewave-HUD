@@ -1,7 +1,7 @@
 namespace Pulsewave;
 
 /// <summary>
-/// What double-clicking the tray icon does (tray → Double-click the icon). Saved as an id: a fixed action below,
+/// What double-clicking the tray icon does (tray → Double-click the icon), and what a hotkey does (tray → Hotkeys). Saved as an id: a fixed action below,
 /// "theme:&lt;theme id&gt;" to show one theme, or "launch:&lt;slot&gt;" to open one of the user's shortcuts.
 /// </summary>
 public static class TrayActions
@@ -16,7 +16,7 @@ public static class TrayActions
         ("themes", "Open Themes"), ("nextTheme", "Next theme"), ("previousTheme", "Previous theme"),
         ("rotate", "Theme rotation on / off"), ("playlist", "Open the theme playlist"), ("nextPalette", "Next color palette"),
         ("", ""),
-        ("shortcuts", "Open Shortcuts"), ("drawer", "Show the app drawer on the HUD"),
+        ("shortcuts", "Open Shortcuts"), ("drawer", "Show the app drawer on the HUD"), ("hotkeys", "Open Hotkeys"),
         ("", ""),
         ("media", "Show the media page"), ("lightsPage", "Show the Lights page"), ("lightsToggle", "Lights on / off"),
         ("aesthetic", "Aesthetic mode on / off"), ("gaming", "Open Gaming"), ("schedule", "Open the schedule"),

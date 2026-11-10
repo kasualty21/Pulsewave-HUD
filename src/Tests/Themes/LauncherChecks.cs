@@ -133,6 +133,11 @@ internal static class LauncherChecks
         Check(ThemeData.Read("CLAUDE_5H", null, false, expired).Number == 0 && ThemeData.Read("CLAUDE_5H_RESET", null, false, expired).Text == "--" &&
               AiUsageReader.Until(DateTimeOffset.Now.AddMinutes(5.5), DateTimeOffset.Now) == "6m",
             "A window past its reset time shows nothing used");
+        var idle = new ThemeDataContext { Now = sample.Now, Usage = new AiUsage(new UsageWindow(97, new DateTimeOffset(sample.Now.AddMinutes(-1))), new UsageWindow(41, new DateTimeOffset(sample.Now.AddDays(3))), null, null) };
+        var none = new ThemeDataContext { Now = sample.Now, Usage = new AiUsage(null, new UsageWindow(41, new DateTimeOffset(sample.Now.AddDays(3))), null, null) };
+        Check(ThemeData.Display(ThemeData.Read("CLAUDE_5H", null, false, idle), true) == "0%" && ThemeData.Read("CLAUDE_5H_RESET", "resets", false, idle).Text == "not started" &&
+              ThemeData.Read("CLAUDE_5H_RESET", "resets", false, none).Text == "not started" && ThemeData.Read("CLAUDE_WEEK", null, false, none).Number == 41,
+            "With the weekly limit known, a 5-hour window that ran out or hasn't begun reads 0% and \"not started\" instead of --");
 
         // Codex: limits from its session log format, newest first, other limit ids ignored.
         const string line = "{\"timestamp\":\"2026-11-06T15:41:32.656Z\",\"type\":\"event_msg\",\"payload\":{\"type\":\"token_count\",\"info\":{},\"rate_limits\":" +

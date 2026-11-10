@@ -1,4 +1,10 @@
-# Pulsewave System Monitor V0.11.0
+# Pulsewave System Monitor V0.12.0
+
+## V0.12.0 - Hotkeys for any action
+
+**Hotkeys.** Tray → Hotkeys: key combinations that work from any app, each doing what you pick: anything the tray icon's double-click can do, show a particular theme, or open one of your shortcuts (up to 32). Your next / previous theme, rotation and aesthetic-mode hotkeys move in with their keys unchanged; the playlist window is now just the playlist.
+
+**From the second design audit.** Halo Gaming's load charts sit right under the rings with faint 0 / 100% lines, VRAM lines up with temperature and power, and the CPU card shows the fan speed. The frame-time chart shows the current ms, is scaled to the game and labels its "60 FPS" line. The timer says Resume when paused partway, turns blue while running and shows the Pomodoro round. An idle 5-hour AI window reads "not started".
 
 ## V0.11.0 - Frame time, RTSS's 1% low and shortcut lists
 

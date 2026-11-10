@@ -20,6 +20,13 @@ public sealed class TouchTimers
     /// <summary>"FOCUS" or "BREAK" during a Pomodoro, otherwise "".</summary>
     public string Phase => _pomodoro == null ? "" : _onBreak ? "BREAK" : "FOCUS";
 
+    /// <summary>Which focus round of the Pomodoro this is (its break counts with it), from 1; 0 without a Pomodoro.</summary>
+    public int Round => _pomodoro == null ? 0 : _round;
+    private int _round;
+
+    /// <summary>The countdown is stopped partway: started, not finished, not reset.</summary>
+    public bool TimerPaused(DateTime now) => _timerSince == null && _timerUsed > TimeSpan.Zero && TimerLeft(now) > TimeSpan.Zero;
+
     /// <summary>Whether a one-card theme shows the stopwatch rather than the timer.</summary>
     public bool StopwatchShown { get; private set; }
 
@@ -30,6 +37,7 @@ public sealed class TouchTimers
     {
         _pomodoro = (TimeSpan.FromMinutes(focusMinutes), TimeSpan.FromMinutes(breakMinutes));
         _onBreak = false;
+        _round = 1;
         _length = _pomodoro.Value.Focus;
         StopwatchShown = false;
         ResetTimer();
@@ -44,7 +52,7 @@ public sealed class TouchTimers
     {
         if (StopwatchShown) { ResetStopwatch(); return; }
         if (_pomodoro != null && _timerSince == null && _timerUsed == TimeSpan.Zero && !_onBreak) { _pomodoro = null; return; }
-        if (_pomodoro is { } p) { _onBreak = false; _length = p.Focus; }
+        if (_pomodoro is { } p) { _onBreak = false; _length = p.Focus; _round = 1; }
         ResetTimer();
     }
 
@@ -91,6 +99,7 @@ public sealed class TouchTimers
         {
             // Focus ends: the break starts at once (and the other way round).
             _onBreak = !_onBreak;
+            if (!_onBreak) _round++;
             _length = _onBreak ? p.Break : p.Focus;
             _timerUsed = TimeSpan.Zero;
             _timerSince = now;

@@ -7,11 +7,11 @@ using Forms = System.Windows.Forms;
 namespace Pulsewave;
 
 /// <summary>What the playlist window saves.</summary>
-public sealed record PlaylistChoice(List<string> Playlist, bool Enabled, int Minutes, string Next, string Previous, string Toggle, string Aesthetic = "");
+public sealed record PlaylistChoice(List<string> Playlist, bool Enabled, int Minutes);
 
 /// <summary>
-/// Theme playlist and hotkeys: tick the themes to rotate through, order them, pick the interval,
-/// and set the global next / previous / rotate hotkeys.
+/// Theme playlist: tick the themes to rotate through, order them and pick the interval
+/// (hotkeys moved to tray → Hotkeys in 0.12).
 /// </summary>
 public sealed class PlaylistForm : Forms.Form
 {
@@ -21,7 +21,6 @@ public sealed class PlaylistForm : Forms.Form
     private readonly Forms.CheckedListBox _themes = new();
     private readonly Forms.CheckBox _enabled = new();
     private readonly Forms.NumericUpDown _minutes = new();
-    private readonly Forms.TextBox _next = new(), _previous = new(), _toggle = new(), _aestheticKey = new();
     private readonly List<(string Id, string Name, int Width, int Height)> _items;
     private readonly HashSet<string> _ticked;
     private readonly List<int> _shown = []; // the _items index of each list row
@@ -33,7 +32,7 @@ public sealed class PlaylistForm : Forms.Form
     private readonly Func<PlaylistChoice, IReadOnlyList<string>> _save;
     private bool _filling;
 
-    /// <param name="save">Stores the choice and registers the hotkeys; returns problems (unsaved settings, hotkeys in use), if any.</param>
+    /// <param name="save">Stores the choice; returns problems (unsaved settings), if any.</param>
     /// <param name="displaySize">The HUD's size, for the "Fits this display" filter.</param>
     /// <param name="filterChanged">Saves the shape filter (shared with the Themes gallery) when it is changed.</param>
     public PlaylistForm(MonitorSettings settings, IReadOnlyList<(string Id, string Name, int Width, int Height)> available, Func<PlaylistChoice, IReadOnlyList<string>> save,
@@ -43,7 +42,7 @@ public sealed class PlaylistForm : Forms.Form
         _settings = settings;
         _displaySize = displaySize;
         _filterChanged = filterChanged;
-        Text = "Pulsewave · Theme playlist and hotkeys";
+        Text = "Pulsewave · Theme playlist";
         StartPosition = Forms.FormStartPosition.CenterScreen;
         Size = new Size(620, 800);
         MinimumSize = new Size(520, 600);
@@ -107,7 +106,7 @@ public sealed class PlaylistForm : Forms.Form
 
         var options = new Forms.TableLayoutPanel
         {
-            Dock = Forms.DockStyle.Bottom, Height = 262, Padding = new Forms.Padding(16, 12, 16, 0), ColumnCount = 2, RowCount = 6
+            Dock = Forms.DockStyle.Bottom, Height = 92, Padding = new Forms.Padding(16, 12, 16, 0), ColumnCount = 2, RowCount = 2
         };
         options.ColumnStyles.Add(new Forms.ColumnStyle(Forms.SizeType.Absolute, 220));
         options.ColumnStyles.Add(new Forms.ColumnStyle(Forms.SizeType.Percent, 100));
@@ -120,16 +119,12 @@ public sealed class PlaylistForm : Forms.Form
         minutesRow.Controls.AddRange([_minutes, new Forms.Label { Text = "minutes", AutoSize = true, Padding = new Forms.Padding(4, 6, 0, 0) }]);
         options.Controls.Add(_enabled, 0, 0);
         options.Controls.Add(minutesRow, 1, 0);
-        AddHotkey(options, 1, "Next theme", _next, settings.HotkeyNextTheme);
-        AddHotkey(options, 2, "Previous theme", _previous, settings.HotkeyPreviousTheme);
-        AddHotkey(options, 3, "Rotation on / off", _toggle, settings.HotkeyTogglePlaylist);
-        AddHotkey(options, 4, "Aesthetic mode on / off", _aestheticKey, settings.HotkeyAesthetic);
         options.Controls.Add(new Forms.Label
         {
             AutoSize = true, ForeColor = Color.FromArgb(160, 185, 201), MaximumSize = new Size(540, 0),
-            Text = "Click a hotkey box and press the combination (Ctrl, Alt or Win plus a key; F13–F24 work alone). Backspace clears it."
-        }, 0, 5);
-        options.SetColumnSpan(options.GetControlFromPosition(0, 5)!, 2);
+            Text = "Hotkeys for next / previous theme and rotation are in tray → Hotkeys, with any other action."
+        }, 0, 1);
+        options.SetColumnSpan(options.GetControlFromPosition(0, 1)!, 2);
 
         var footer = new Forms.FlowLayoutPanel
         {
@@ -141,7 +136,6 @@ public sealed class PlaylistForm : Forms.Form
         saveButton.Click += (_, _) => Save();
         cancel.Click += (_, _) => Close();
         footer.Controls.AddRange([saveButton, cancel]);
-        AcceptButton = null; // Enter belongs to the hotkey boxes
 
         Controls.Add(listArea);
         Controls.Add(options);
@@ -155,35 +149,6 @@ public sealed class PlaylistForm : Forms.Form
         Text = text, Width = 104, Height = 34, Margin = new Forms.Padding(4, 0, 4, 6),
         FlatStyle = Forms.FlatStyle.Flat, BackColor = color, ForeColor = Color.White
     };
-
-    private static void AddHotkey(Forms.TableLayoutPanel table, int row, string label, Forms.TextBox box, string value)
-    {
-        table.Controls.Add(new Forms.Label { Text = label, AutoSize = true, Padding = new Forms.Padding(0, 6, 0, 0) }, 0, row);
-        box.Text = value;
-        box.Width = 240;
-        box.ReadOnly = true;
-        box.BackColor = Color.FromArgb(27, 38, 50);
-        box.ForeColor = Color.FromArgb(232, 242, 249);
-        box.KeyDown += (_, e) =>
-        {
-            e.SuppressKeyPress = true;
-            e.Handled = true;
-            if (e.KeyCode is Forms.Keys.Back or Forms.Keys.Delete && e.Modifiers == Forms.Keys.None) { box.Text = ""; return; }
-            if (Hotkey.IsModifierKey(e.KeyCode)) return;
-            var modifiers = HotkeyModifiers.None;
-            if (e.Control) modifiers |= HotkeyModifiers.Ctrl;
-            if (e.Alt) modifiers |= HotkeyModifiers.Alt;
-            if (e.Shift) modifiers |= HotkeyModifiers.Shift;
-            if (System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.LWin) || System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.RWin))
-                modifiers |= HotkeyModifiers.Win;
-            var hotkey = new Hotkey(modifiers, e.KeyCode);
-            if (hotkey.IsAllowed) box.Text = hotkey.ToString();
-            else System.Media.SystemSounds.Beep.Play();
-        };
-        // Alt+key would otherwise move focus to a menu mnemonic before KeyDown sees it.
-        box.PreviewKeyDown += (_, e) => e.IsInputKey = true;
-        table.Controls.Add(box, 1, row);
-    }
 
     private string FilterKey => _filter.SelectedIndex >= 0 ? DisplaySizes.Filters[_filter.SelectedIndex].Key : "";
 
@@ -238,10 +203,10 @@ public sealed class PlaylistForm : Forms.Form
 
     private void Save()
     {
-        var problems = _save(new PlaylistChoice(Playlist, _enabled.Checked, (int)_minutes.Value, _next.Text, _previous.Text, _toggle.Text, _aestheticKey.Text));
+        var problems = _save(new PlaylistChoice(Playlist, _enabled.Checked, (int)_minutes.Value));
         if (problems.Count > 0)
             Forms.MessageBox.Show(this, "Some of this needs attention:\n\n" + string.Join("\n", problems),
-                "Pulsewave · Hotkeys", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Warning);
+                "Pulsewave · Theme playlist", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Warning);
         Close();
     }
 }

@@ -66,6 +66,71 @@ public readonly record struct Hotkey(HotkeyModifiers Modifiers, Forms.Keys Key)
         Forms.Keys.LWin or Forms.Keys.RWin;
 }
 
+/// <summary>A key combination and what it does: any action the tray icon's double-click can do (see TrayActions).</summary>
+public sealed class HotkeyBinding
+{
+    public string Keys { get; set; } = "";
+    public string Action { get; set; } = "";
+}
+
+/// <summary>
+/// The user's hotkeys (tray → Hotkeys). Settings from before 0.12 had four fixed ones (next / previous theme,
+/// rotation, aesthetic mode); they become the first bindings, with their keys unchanged. The old fields are left
+/// as they were in settings.json.
+/// </summary>
+public static class HotkeyBindings
+{
+    public const int MaxCount = 32;
+    /// <summary>RegisterHotKey ids: binding i is FirstId + i.</summary>
+    public const int FirstId = 100;
+
+    /// <summary>The four fixed hotkeys of earlier versions, as bindings (blank keys left out).</summary>
+    public static List<HotkeyBinding> FromLegacy(MonitorSettings s) =>
+        new[] { (s.HotkeyNextTheme, "nextTheme"), (s.HotkeyPreviousTheme, "previousTheme"), (s.HotkeyTogglePlaylist, "rotate"), (s.HotkeyAesthetic, "aesthetic") }
+            .Where(p => !string.IsNullOrWhiteSpace(p.Item1)).Select(p => new HotkeyBinding { Keys = p.Item1.Trim(), Action = p.Item2 }).ToList();
+
+    /// <summary>
+    /// Bindings as saved, cleaned: none yet (older settings) migrates the fixed hotkeys; blank keys, unknown actions
+    /// and a second use of the same keys are dropped; at most 32.
+    /// </summary>
+    public static List<HotkeyBinding> Normalize(List<HotkeyBinding>? saved, MonitorSettings legacy)
+    {
+        var list = saved ?? FromLegacy(legacy);
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var clean = new List<HotkeyBinding>();
+        foreach (var b in list)
+        {
+            if (b is null || string.IsNullOrWhiteSpace(b.Keys) || !TrayActions.IsKnown(b.Action?.Trim())) continue;
+            string keys = Hotkey.TryParse(b.Keys, out var parsed) ? parsed.ToString() : b.Keys.Trim();
+            if (!seen.Add(keys)) continue;
+            clean.Add(new HotkeyBinding { Keys = keys, Action = b.Action!.Trim() });
+            if (clean.Count == MaxCount) break;
+        }
+        return clean;
+    }
+
+    /// <summary>The keys of the first hotkey for an action, for the tray menu ("Next theme · Ctrl+Alt+PageDown").</summary>
+    public static string? KeysFor(IEnumerable<HotkeyBinding>? bindings, string action) =>
+        bindings?.FirstOrDefault(b => b.Action == action && Hotkey.TryParse(b.Keys, out _))?.Keys;
+
+    /// <summary>What is wrong with a list before saving: incomplete rows, keys that would steal typing, keys used twice.</summary>
+    public static List<string> Problems(IReadOnlyList<HotkeyBinding> bindings, Func<string, string> describe)
+    {
+        var problems = new List<string>();
+        var seen = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var b in bindings)
+        {
+            if (string.IsNullOrWhiteSpace(b.Keys)) { problems.Add($"{describe(b.Action)}: no keys yet."); continue; }
+            if (!Hotkey.TryParse(b.Keys, out var key)) { problems.Add($"{b.Keys}: needs Ctrl, Alt or Win (F13–F24 work alone)."); continue; }
+            if (!TrayActions.IsKnown(b.Action)) { problems.Add($"{key}: pick what it does."); continue; }
+            if (seen.TryGetValue(key.ToString(), out var other)) problems.Add($"{key} is used twice ({other} and {describe(b.Action)}).");
+            else seen[key.ToString()] = describe(b.Action);
+        }
+        if (bindings.Count > MaxCount) problems.Add($"Up to {MaxCount} hotkeys.");
+        return problems;
+    }
+}
+
 /// <summary>
 /// Registers system-wide hotkeys for a window with the documented RegisterHotKey API; Windows
 /// posts WM_HOTKEY to that window. A combination another app already owns cannot be registered.

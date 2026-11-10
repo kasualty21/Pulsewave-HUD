@@ -114,6 +114,8 @@ if(args.Contains("--form-shots"))
             ("themes", new ThemesForm(settings, themes, _ => { }, displaySize: () => (682, 2560))),
             ("playlist", new PlaylistForm(settings, Pulsewave.Themes.ThemeCycle.Available(themes), _ => [], displaySize: () => (682, 2560))),
             ("shortcuts", new ShortcutsForm(settings.Shortcuts, settings.ShortcutLists, (_, _) => null)),
+            ("hotkeys", new HotkeysForm(HotkeyBindings.Normalize(null, settings).Append(new HotkeyBinding{Keys="Ctrl+Alt+M",Action="lightsToggle"}).Append(new HotkeyBinding{Keys="F13",Action="launch:1"}),
+                [("builtin:30-halo-gaming","Halo Gaming")], settings.Shortcuts, _ => [])),
             ("shortcuts-gaming", new ShortcutsForm([..settings.Shortcuts, new AppShortcut{Name="Steam",Target="steam://open/main"}, new AppShortcut{Name="Discord mute",Kind=AppShortcut.KeysKind,Target="Ctrl+Shift+M"}],
                 new Dictionary<string, List<int>>{["Gaming"]=[3,4]}, (_, _) => null, ShortcutLists.Gaming)),
             ("lights", new LightsForm(new LightsSettings(), _ => { }, () => { }, () => null)),

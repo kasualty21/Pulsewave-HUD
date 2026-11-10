@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 0.12.0 (2026-11-09)
+Hotkeys for any action. Settings from 0.11.0 carry over: your next / previous theme, rotation and aesthetic-mode hotkeys keep their keys.
+- Tray → Hotkeys: key combinations that work from any app, each doing what you pick. That can be anything the tray icon's double-click can do (show or hide the HUD, step themes, rotation, the next palette, the app drawer, media or Lights page, lights or aesthetic mode, open a window), show a particular theme, or open one of your shortcuts. Up to 32. Press the combination in the keys box; Ctrl, Alt or Win plus a key, or F13–F24 alone. Save refuses keys used twice and says which combinations another app already owns.
+- The theme hotkeys that were in the playlist window (next / previous theme, rotation on / off) and the aesthetic-mode hotkey move into Hotkeys with their keys unchanged. Removing them all stays removed. The old settings fields are left as they were in settings.json.
+- The playlist window is now just the playlist (tray → Theme playlist). Open Hotkeys is also a double-click action. The tray menu shows the keys for Next theme and aesthetic mode from your hotkeys.
+- From the second design audit (release candidate 2):
+  - Halo Gaming's CPU and GPU cards: the load chart sits right under the ring, with faint 0 and 100% lines so its height means something. Clock and fan or VRAM move to the bottom row, the second in line with TEMP and POWER (VRAM was out of line). The CPU card shows the fan's speed (red at 0 RPM) instead of a fan row that was usually hidden, so no gap opens when the clock isn't exported.
+  - The frame-time chart reads "FRAME TIME" with the current value ("8.3 ms"), is scaled to the game (at least 12 ms, so 120–144 FPS sits mid-chart), labels its dashed line "60 FPS" and leaves it out when the scale is below it, and has faint bounds. "SAMPLED" is gone.
+  - Timer card: a countdown stopped partway says Resume; the clock turns sky blue while running; a Pomodoro shows its round ("Round 2 / 4"). New data FOCUS_RUNNING, FOCUS_ROUND.
+  - Claude Code and Codex: with the weekly limit known, a 5-hour window that ran out or hasn't begun reads 0% and "not started" instead of "--".
+  - Halo Lifestyle Column: larger system rings and readings fill the System card.
+  - New chart options: GuideLabel and ShowBounds.
+
 ## 0.11.0 (2026-11-09)
 Frame time on Halo Gaming, RTSS's own 1% low, and separate shortcut lists for Halo Gaming and Halo Productivity. Settings from 0.10.0 carry over; until you pair the RTSS readings or tick shortcuts for a list, everything reads and opens as before.
 - Halo Gaming (bar and column): the FPS chart becomes frame time in ms, labelled "FRAME TIME · SAMPLED". Live FPS stays the big number. It is one reading per poll, so it shows sustained stutter rather than every single slow frame. It has a dashed guide at 16.7 ms (60 FPS), an automatic scale that never drops below 25 ms (so a steady game stays a calm low line), and the line turns amber above 33 ms (below 30 FPS).

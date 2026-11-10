@@ -80,7 +80,7 @@ public partial class MainWindow : Window
     private ThemesForm? _themesForm;
     private PlaylistForm? _playlistForm;
     private GlobalHotkeys? _hotkeys;
-    private const int HotkeyNext = 1, HotkeyPrevious = 2, HotkeyToggle = 3, HotkeyAesthetic = 4;
+    private HotkeysForm? _hotkeysForm;
     private readonly DispatcherTimer _playlistTimer = new();
     private SensorSnapshot _lastValues = new();
     private string? _settingsLoadError;
@@ -170,7 +170,7 @@ public partial class MainWindow : Window
         ApplyInputStyle();
         _hotkeys = new GlobalHotkeys(_hwnd);
         if (RegisterHotkeys() is { Count: > 0 } problems)
-            _tray?.ShowBalloonTip(6000, "Some theme hotkeys are not active", string.Join("\n", problems), Forms.ToolTipIcon.Warning);
+            _tray?.ShowBalloonTip(6000, "Some hotkeys are not active", string.Join("\n", problems), Forms.ToolTipIcon.Warning);
     }
 
     private void OnLoaded(object sender, RoutedEventArgs args)
@@ -445,6 +445,7 @@ public partial class MainWindow : Window
             Stopwatch = _timers.StopwatchElapsed(now),
             TimerRunning = _timers.TimerRunning, StopwatchRunning = _timers.StopwatchRunning,
             TimerPhase = _timers.Phase, StopwatchShown = _timers.StopwatchShown,
+            TimerPaused = _timers.TimerPaused(now), PomodoroRound = _timers.Round,
             Gaming = _showsGaming ? _games.Snapshot(now, GameTile) : null,
             Weather = _showsWeather && _weather != null && _weather.City == _settings.Weather.City ? _weather with { Fahrenheit = _settings.Weather.Fahrenheit } : null
         };
@@ -1506,21 +1507,40 @@ public partial class MainWindow : Window
 
     // --- Theme playlist and hotkeys ---------------------------------------------------------
 
-    private IReadOnlyList<string> RegisterHotkeys() => _hotkeys?.Register([
-        (HotkeyNext, "Next theme", _settings.HotkeyNextTheme),
-        (HotkeyPrevious, "Previous theme", _settings.HotkeyPreviousTheme),
-        (HotkeyToggle, "Rotation on / off", _settings.HotkeyTogglePlaylist),
-        (HotkeyAesthetic, "Aesthetic mode on / off", _settings.HotkeyAesthetic)]) ?? [];
+    private List<HotkeyBinding> Bindings => _settings.Hotkeys ??= HotkeyBindings.Normalize(null, _settings);
 
+    private IReadOnlyList<string> RegisterHotkeys() => _hotkeys?.Register(Bindings.Select((b, i) =>
+        (HotkeyBindings.FirstId + i, DescribeAction(b.Action), b.Keys))) ?? [];
+
+    /// <summary>A hotkey does what its binding says, exactly as the tray icon's double-click would.</summary>
     private void OnHotkey(int id)
     {
-        switch (id)
-        {
-            case HotkeyNext: StepTheme(+1); break;
-            case HotkeyPrevious: StepTheme(-1); break;
-            case HotkeyToggle: TogglePlaylist(announce: true); break;
-            case HotkeyAesthetic: SetAesthetic(!_settings.Aesthetic, announce: true); break;
-        }
+        int i = id - HotkeyBindings.FirstId;
+        if (i >= 0 && i < Bindings.Count) RunTrayAction(Bindings[i].Action);
+    }
+
+    private string DescribeAction(string action)
+    {
+        var themes = ThemeCycle.Available(ThemeStore.RootPath);
+        return TrayActions.Describe(action, id => themes.FirstOrDefault(t => t.Id == id).Name,
+            slot => slot <= _settings.Shortcuts.Count && !_settings.Shortcuts[slot - 1].IsEmpty ? _settings.Shortcuts[slot - 1].DisplayName : null);
+    }
+
+    private void OpenHotkeys()
+    {
+        if (_hotkeysForm is { IsDisposed: false }) { _hotkeysForm.Activate(); return; }
+        _hotkeysForm = new HotkeysForm(Bindings, ThemeCycle.Available(ThemeStore.RootPath).Select(t => (t.Id, t.Name)).ToList(), _settings.Shortcuts, SaveHotkeys);
+        _hotkeysForm.Show(); _hotkeysForm.Activate();
+    }
+
+    /// <summary>Saves the hotkeys and registers them; returns the ones another app already owns.</summary>
+    private IReadOnlyList<string> SaveHotkeys(List<HotkeyBinding> bindings)
+    {
+        var prior = _settings.Hotkeys;
+        try { _settings.Hotkeys = HotkeyBindings.Normalize(bindings, _settings); SettingsStore.Save(_settings); }
+        catch (Exception ex) { _settings.Hotkeys = prior; return ["Not saved: " + ex.Message]; }
+        RebuildTrayMenu();
+        return RegisterHotkeys();
     }
 
     /// <summary>
@@ -1571,24 +1591,20 @@ public partial class MainWindow : Window
 
     private IReadOnlyList<string> SavePlaylist(PlaylistChoice choice)
     {
-        var prior = (_settings.ThemePlaylist, _settings.PlaylistEnabled, _settings.PlaylistMinutes,
-            _settings.HotkeyNextTheme, _settings.HotkeyPreviousTheme, _settings.HotkeyTogglePlaylist, _settings.HotkeyAesthetic);
+        var prior = (_settings.ThemePlaylist, _settings.PlaylistEnabled, _settings.PlaylistMinutes);
         try
         {
-            (_settings.ThemePlaylist, _settings.PlaylistEnabled, _settings.PlaylistMinutes,
-                _settings.HotkeyNextTheme, _settings.HotkeyPreviousTheme, _settings.HotkeyTogglePlaylist, _settings.HotkeyAesthetic) =
-                (choice.Playlist, choice.Enabled, Math.Clamp(choice.Minutes, 1, 1440), choice.Next, choice.Previous, choice.Toggle, choice.Aesthetic);
+            (_settings.ThemePlaylist, _settings.PlaylistEnabled, _settings.PlaylistMinutes) = (choice.Playlist, choice.Enabled, Math.Clamp(choice.Minutes, 1, 1440));
             SettingsStore.Save(_settings);
         }
         catch (Exception ex)
         {
-            (_settings.ThemePlaylist, _settings.PlaylistEnabled, _settings.PlaylistMinutes,
-                _settings.HotkeyNextTheme, _settings.HotkeyPreviousTheme, _settings.HotkeyTogglePlaylist, _settings.HotkeyAesthetic) = prior;
+            (_settings.ThemePlaylist, _settings.PlaylistEnabled, _settings.PlaylistMinutes) = prior;
             return ["Settings were not saved: " + ex.Message];
         }
         RestartPlaylist();
         RebuildTrayMenu();
-        return RegisterHotkeys();
+        return [];
     }
 
     private void UpdateNowPlaying()
@@ -1694,6 +1710,7 @@ public partial class MainWindow : Window
             case "playlist": OpenPlaylist(); break;
             case "nextPalette": SetPalette(ThemePalettes.Next(_settings.ThemePalettes.GetValueOrDefault(ShownTheme))); break;
             case "shortcuts": OpenShortcuts(); break;
+            case "hotkeys": OpenHotkeys(); break;
             case "drawer": RestoreOverlay(); ShowDrawer(); break;
             case "media": RestoreOverlay(); ShowMediaPage(); break;
             case "lightsPage": RestoreOverlay(); ShowLights(); break;
@@ -1834,12 +1851,13 @@ public partial class MainWindow : Window
 
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("Themes · gallery / import", null, (_, _) => Dispatcher.Invoke(OpenThemes));
-        menu.Items.Add("Next theme" + (Hotkey.TryParse(_settings.HotkeyNextTheme, out var nextKey) ? $"  ·  {nextKey}" : ""), null,
+        menu.Items.Add("Next theme" + (HotkeyBindings.KeysFor(Bindings, "nextTheme") is { } nextKey ? $"  ·  {nextKey}" : ""), null,
             (_, _) => Dispatcher.Invoke(() => StepTheme(+1)));
         var rotate = new Forms.ToolStripMenuItem($"Rotate themes · every {_settings.PlaylistMinutes} min") { Checked = _settings.PlaylistEnabled };
         rotate.Click += (_, _) => Dispatcher.Invoke(() => TogglePlaylist(announce: false));
         menu.Items.Add(rotate);
-        menu.Items.Add("Theme playlist / hotkeys…", null, (_, _) => Dispatcher.Invoke(OpenPlaylist));
+        menu.Items.Add("Theme playlist…", null, (_, _) => Dispatcher.Invoke(OpenPlaylist));
+        menu.Items.Add("Hotkeys · any action…", null, (_, _) => Dispatcher.Invoke(OpenHotkeys));
         menu.Items.Add("Shortcuts · apps and games…", null, (_, _) => Dispatcher.Invoke(OpenShortcuts));
         menu.Items.Add("Lights · OpenRGB…", null, (_, _) => Dispatcher.Invoke(OpenLights));
         menu.Items.Add("Schedule · lights and screen off/on…", null, (_, _) => Dispatcher.Invoke(OpenSchedule));
@@ -1874,7 +1892,7 @@ public partial class MainWindow : Window
     private Forms.ToolStripMenuItem AestheticMenu()
     {
         var root = new Forms.ToolStripMenuItem("Aesthetic mode · show the wallpaper") { Checked = _settings.Aesthetic };
-        var on = new Forms.ToolStripMenuItem("On" + (Hotkey.TryParse(_settings.HotkeyAesthetic, out var key) ? $"  ·  {key}" : "")) { Checked = _settings.Aesthetic };
+        var on = new Forms.ToolStripMenuItem("On" + (HotkeyBindings.KeysFor(Bindings, "aesthetic") is { } key ? $"  ·  {key}" : "")) { Checked = _settings.Aesthetic };
         on.Click += (_, _) => Dispatcher.Invoke(() => SetAesthetic(!_settings.Aesthetic, announce: false));
         root.DropDownItems.Add(on);
         root.DropDownItems.Add(new Forms.ToolStripSeparator());

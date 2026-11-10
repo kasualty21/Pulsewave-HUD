@@ -185,9 +185,29 @@ internal static class ThemeChecks
             "Pomodoro: focus then break start by themselves; the card's switch shows the stopwatch; +1 min turns it back into a plain countdown");
         var ctx = new ThemeDataContext { TimerRunning = true, StopwatchShown = true, TimerPhase = "FOCUS", Stopwatch = TimeSpan.FromSeconds(75), Timer = TimeSpan.FromMinutes(3) };
         Check(ThemeData.Read("FOCUS_MODE", null, false, ctx).Text == "STOPWATCH" && ThemeData.Read("FOCUS_CLOCK", null, false, ctx).Text == "1:15" &&
-              ThemeData.Read("FOCUS_ACTION", null, false, ctx).Text == "Start" && ThemeData.Read("FOCUS_SWITCH", null, false, ctx).Text == "Timer" &&
+              ThemeData.Read("FOCUS_ACTION", null, false, ctx).Text == "Resume" && ThemeData.Read("FOCUS_SWITCH", null, false, ctx).Text == "Timer" &&
               ThemeData.Read("TIMER_ACTION", null, false, ctx).Text == "Pause",
-            "The timer card shows whichever clock is chosen, and its buttons say Start or Pause for it");
+            "The timer card shows whichever clock is chosen, and its buttons say Start, Pause or Resume for it");
+
+        // Resume after a pause partway; the running color; Pomodoro rounds 1-4.
+        var countdown = new TouchTimers();
+        countdown.ToggleTimer(t0);
+        countdown.ToggleTimer(t0.AddSeconds(13));
+        bool paused = countdown.TimerPaused(t0.AddMinutes(1));
+        countdown.ResetTimer();
+        bool fresh = !countdown.TimerPaused(t0.AddMinutes(1));
+        string Act(bool running, bool pausedTimer) => ThemeData.Read("FOCUS_ACTION", null, false, new ThemeDataContext { TimerRunning = running, TimerPaused = pausedTimer }).Text;
+        var pomo = new TouchTimers();
+        pomo.StartPomodoro(t0, 25, 5);
+        int first = pomo.Round;
+        var at = t0;
+        for (int i = 0; i < 2; i++) { at = at.AddMinutes(25); pomo.Finished(at); at = at.AddMinutes(5); pomo.Finished(at); }
+        int third = pomo.Round;
+        string Round(int r) => ThemeData.Read("FOCUS_ROUND", null, false, new ThemeDataContext { PomodoroRound = r }).Text;
+        Check(paused && fresh && Act(false, true) == "Resume" && Act(false, false) == "Start" && Act(true, false) == "Pause" &&
+              ThemeData.Read("FOCUS_RUNNING", null, false, new ThemeDataContext { TimerRunning = true }).Number == 1 &&
+              first == 1 && third == 3 && Round(3) == "Round 3 / 4" && Round(5) == "Round 1 / 4" && Round(0) == "" && new TouchTimers().Round == 0,
+            "A countdown stopped partway says Resume (Start once reset or finished); the card knows when it runs; a Pomodoro counts its focus rounds in fours");
     }
 
     private static void BackgroundPlacement(string root)

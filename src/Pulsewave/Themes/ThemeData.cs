@@ -31,6 +31,10 @@ public sealed class ThemeDataContext
     public bool StopwatchRunning { get; init; }
     /// <summary>"FOCUS" or "BREAK" during a Pomodoro, otherwise "".</summary>
     public string TimerPhase { get; init; } = "";
+    /// <summary>The countdown is stopped partway (it resumes rather than starts).</summary>
+    public bool TimerPaused { get; init; }
+    /// <summary>The Pomodoro's focus round, counting from 1; 0 without a Pomodoro.</summary>
+    public int PomodoroRound { get; init; }
     /// <summary>Whether a one-card theme shows the stopwatch rather than the timer.</summary>
     public bool StopwatchShown { get; init; }
     /// <summary>Free and total space of a drive ("" = the Windows drive); null reads Windows' own drive information.</summary>
@@ -147,7 +151,7 @@ public static class ThemeData
         ("TIMER_ACTION", "Timer: Start / Pause (for its button)"), ("STOPWATCH_ACTION", "Stopwatch: Start / Pause (for its button)"),
         ("TIMER_PHASE", "Timer: FOCUS / BREAK during a Pomodoro"),
         ("FOCUS_CLOCK", "Timer card: the timer or stopwatch, whichever is shown"), ("FOCUS_MODE", "Timer card: TIMER / FOCUS / BREAK / STOPWATCH"),
-        ("FOCUS_ACTION", "Timer card: Start / Pause"), ("FOCUS_SWITCH", "Timer card: the other mode (Timer / Stopwatch)"),
+        ("FOCUS_ACTION", "Timer card: Start / Pause / Resume"), ("FOCUS_RUNNING", "Timer card: 1 while running (for colors)"), ("FOCUS_ROUND", "Timer card: Pomodoro round (Round 2 / 4)"), ("FOCUS_SWITCH", "Timer card: the other mode (Timer / Stopwatch)"),
         ("WEATHER_FEELS_NOTE", "Weather: \"Feels 16°\" (blank within 2°)"), ("WEATHER_RAIN", "Weather: Rain from 15:00 / until / none next 12 h"),
         ("WEATHER_KIND", "Weather: 0 clear, 1 cloud or night, 2 wet (for symbol colors)"),
         ("WEATHER_D1_KIND", "Weather tomorrow: kind (for symbol colors)"), ("WEATHER_D2_KIND", "Weather in 2 days: kind"),
@@ -221,6 +225,10 @@ public static class ThemeData
         var now = new DateTimeOffset(c.Now);
         // A window past its reset time has nothing used yet.
         ThemeValue Used(UsageWindow? window) => Num(window?.At(now).UsedPercent, "%");
+        // A 5-hour window that hasn't started (none yet, or the last one ran out) while the weekly one is known: 0%, "not started".
+        bool Idle(UsageWindow? session, UsageWindow? week) => week != null && session?.At(now).ResetsAt == null;
+        ThemeValue SessionUsed(UsageWindow? session, UsageWindow? week) => Idle(session, week) ? Num(0, "%") : Used(session);
+        ThemeValue SessionResets(UsageWindow? session, UsageWindow? week, string? f) => Idle(session, week) ? new("not started", null, "") : Worded(Resets(session), f);
         ThemeValue Resets(UsageWindow? window) => new(AiUsageReader.Until(window?.ResetsAt, now), null, "");
 
         return (name ?? "").ToUpperInvariant() switch
@@ -288,13 +296,13 @@ public static class ThemeData
             "MEDIA_TIME" => c.MediaPosition is { } pt ? new($"{TouchTimers.Format(pt.Elapsed)} / {TouchTimers.Format(pt.Length)}", pt.Elapsed.TotalSeconds, "") : new("", null, ""),
             "MEDIA_REMAINING" => c.MediaPosition is { } pr ? new("−" + TouchTimers.Format(pr.Length - pr.Elapsed), (pr.Length - pr.Elapsed).TotalSeconds, "") : new("", null, ""),
             "APP_NAME" => new(c.Shortcut(slot)?.Name ?? "", null, ""), // an empty slot shows nothing
-            "CLAUDE_5H" => Used(c.Usage?.ClaudeSession),
+            "CLAUDE_5H" => SessionUsed(c.Usage?.ClaudeSession, c.Usage?.ClaudeWeek),
             "CLAUDE_WEEK" => Used(c.Usage?.ClaudeWeek),
-            "CLAUDE_5H_RESET" => Worded(Resets(c.Usage?.ClaudeSession), format),
+            "CLAUDE_5H_RESET" => SessionResets(c.Usage?.ClaudeSession, c.Usage?.ClaudeWeek, format),
             "CLAUDE_WEEK_RESET" => Worded(Resets(c.Usage?.ClaudeWeek), format),
-            "CODEX_5H" => Used(c.Usage?.CodexSession),
+            "CODEX_5H" => SessionUsed(c.Usage?.CodexSession, c.Usage?.CodexWeek),
             "CODEX_WEEK" => Used(c.Usage?.CodexWeek),
-            "CODEX_5H_RESET" => Worded(Resets(c.Usage?.CodexSession), format),
+            "CODEX_5H_RESET" => SessionResets(c.Usage?.CodexSession, c.Usage?.CodexWeek, format),
             "CODEX_WEEK_RESET" => Worded(Resets(c.Usage?.CodexWeek), format),
             "VOLUME" => c.Volume is { Muted: true } ? new("Muted", 0, "") : Num(c.Volume?.Level, "%"),
             "VOLUME_ICON" => new(c.Volume is { Muted: true } ? MutedGlyph : SpeakerGlyph, null, ""),
@@ -306,7 +314,13 @@ public static class ThemeData
             // One card for both: the timer or the stopwatch, whichever is shown.
             "FOCUS_MODE" => new(c.StopwatchShown ? "STOPWATCH" : c.TimerPhase.Length > 0 ? c.TimerPhase : "TIMER", null, ""),
             "FOCUS_CLOCK" => c.StopwatchShown ? Read("STOPWATCH", null, false, c) : Read("TIMER", null, false, c),
-            "FOCUS_ACTION" => new((c.StopwatchShown ? c.StopwatchRunning : c.TimerRunning) ? "Pause" : "Start", null, ""),
+            // Stopped partway, it resumes rather than starts.
+            "FOCUS_ACTION" => new((c.StopwatchShown ? c.StopwatchRunning : c.TimerRunning) ? "Pause"
+                : (c.StopwatchShown ? c.Stopwatch is { TotalSeconds: >= 1 } : c.TimerPaused) ? "Resume" : "Start", null, ""),
+            // 1 while the shown clock runs (for a running color), else 0.
+            "FOCUS_RUNNING" => new("", (c.StopwatchShown ? c.StopwatchRunning : c.TimerRunning) ? 1 : 0, ""),
+            // "Round 2 / 4" during a Pomodoro, else blank.
+            "FOCUS_ROUND" => new(c.PomodoroRound > 0 ? $"Round {(c.PomodoroRound - 1) % 4 + 1} / 4" : "", c.PomodoroRound > 0 ? c.PomodoroRound : null, ""),
             "FOCUS_SWITCH" => new(c.StopwatchShown ? "Timer" : "Stopwatch", null, ""),
             "DRIVE_FREE" => Drive(c, format) is { } d ? new($"{d.FreeGb:F0}", d.FreeGb, "GB free") : new(Missing, null, "GB free"),
             // Like memory: used of total, in TB from 1 TB ("1.5 / 2 TB", "180 / 500 GB").

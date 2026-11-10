@@ -176,5 +176,10 @@ public sealed class ThemeElement
     public double MinimumScale { get; set; }
     /// <summary>Chart: a dashed guide line at this value (16.7 ms is 60 FPS); null draws none.</summary>
     public double? GuideAt { get; set; }
+    /// <summary>Chart: a small label at the guide line's right end ("60 FPS"); the line and label hide when the scale is below them.</summary>
+    public string? GuideLabel { get; set; }
+    /// <summary>Chart: faint lines at its bottom (0) and top (its scale), so the height means something.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool ShowBounds { get; set; }
     // A chart with WarnAt draws the stretches of its line above that value in WarnColor (CriticalAt is not used).
 }

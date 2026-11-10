@@ -81,7 +81,7 @@ public static class ThemeSampleData
             CpuName = "Intel Core Ultra 7 265K", GpuName = "NVIDIA GeForce RTX 5070 Ti", AverageFps = averageFps,
             Media = new NowPlaying(MediaPlayback.Playing, title, artist, "Sample", SampleCover.Value) { Album = title.Length > 40 ? "Hurry Up, We're Dreaming (Deluxe Remastered 10th Anniversary Edition)" : "Hurry Up, We're Dreaming" },
             DriveSpace = _ => title.Length > 40 ? (12.4, 8001) : (412, 1863),
-            TimerRunning = true, TimerPhase = "FOCUS",
+            TimerRunning = true, TimerPhase = "FOCUS", PomodoroRound = 2,
             Memory = (memory.UsedGb * 1024, (memory.TotalGb - memory.UsedGb) * 1024, memory.TotalGb * 1024),
             MediaPosition = (new TimeSpan(0, 2, 41), new TimeSpan(0, 4, 3)),
             Gaming = new GamingSnapshot(game, true, new TimeSpan(1, 24, 10), gaming.Avg, gaming.Low, gaming.PeakCpu, gaming.PeakGpu, new TimeSpan(2, 5, 0), new TimeSpan(9, 40, 0),

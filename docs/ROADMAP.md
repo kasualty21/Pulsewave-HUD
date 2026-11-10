@@ -88,7 +88,7 @@ Decided in a design review with the user. Released in small steps, each checked 
 - Both RTSS readings become optional sensors that Sensor Manager's Auto-pair matches (unit-checked: ms, FPS).
 - Added by the user when 0.11 started (2026-11-09): separate shortcut priority per Halo setup. Tray → Shortcuts → List picks and orders shortcuts for Gaming and Productivity; Halo Gaming and Halo Productivity show their list on their tiles and first in their app drawer (then the rest); Halo Lifestyle and other themes keep the main list; an empty list behaves as before.
 
-### V0.12 — Hotkeys for any action
+### V0.12 — Hotkeys for any action (released 2026-11-09)
 - A tray → Hotkeys window mapping key combinations to any action from the tray double-click list. The three existing hotkeys (next / previous theme, rotation on/off) move in with their keys unchanged.
 
 ### Decided against or held
