@@ -1,6 +1,9 @@
 # Change log
 
 ## Unreleased
+
+## 0.13.0 (2026-11-09)
+Lumen, the new baseline look, and the HUD's pages redrawn to match. Settings from 0.12.0 carry over; no theme, palette, playlist or schedule is changed for you.
 - Lumen, a new built-in theme family in three versions like Halo, each for the 8.8" bar and the HYTE Y70 upright (six templates, forty-five built-in in all): light on near-black with an aurora backdrop, see-through glass slabs, tick-ring gauges with glowing arcs for CPU and GPU, DIN numerals and segmented meters.
   - Lumen: all-round. Clock and weather, CPU and GPU, memory and network, now playing, quick toggles; the column has hours over minutes as a large stacked clock, the dock and the last game.
   - Lumen Gaming: the game's live FPS as the hero number with average, 1% low and frame time, the cover and session, CPU and GPU with what is holding them back, memory and VRAM. Follows the Gaming shortcut list.

@@ -1,4 +1,12 @@
-# Pulsewave System Monitor V0.12.0
+# Pulsewave System Monitor V0.13.0
+
+## V0.13.0 - Lumen, the new baseline look
+
+**Lumen.** A new built-in theme family, listed first in tray → Themes: light on near-black with an aurora backdrop, see-through glass, tick-ring gauges with glowing arcs for CPU and GPU, DIN numerals and segmented meters. Three versions, each for the 8.8" bar and the HYTE Y70 upright: Lumen (clock and weather, system, now playing; on the Y70 hours over minutes as a large stacked clock), Lumen Gaming (the game's live FPS as the hero number, frame time, the session, CPU and GPU, memory and VRAM; follows your Gaming shortcut list) and Lumen Productivity (the timer on an instrument dial with Pomodoro, Claude Code and Codex limits, a compact system card; follows your Productivity list). Nothing is switched for you: your theme, palettes, playlist, "theme while gaming" and schedule stay as they are until you pick Lumen.
+
+**Pages.** Now playing, Volume, Lights, Colors, Apps, Gaming and the sensor details page are redrawn in the same look for every theme. Their layouts and what each tap does are unchanged. On vertical screens the Colors page shows palette names in full.
+
+**Upgrading.** Settings from 0.12.0 carry over unchanged. Lumen's numerals use Bahnschrift, which ships with Windows 10 and 11.
 
 ## V0.12.0 - Hotkeys for any action
 
