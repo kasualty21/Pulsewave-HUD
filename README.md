@@ -1,41 +1,225 @@
-# Pulsewave System Monitor — collaborative workspace
+# Pulsewave HUD
 
-This workspace is coordinated in this chat. Specialist work is assigned to bounded tasks; the coordinator integrates changes and owns versioned releases.
+**A system monitor built for the little screen in or beside your PC.** Pulsewave turns an 8.8" bar, a HYTE Y70 touch panel, a spare tablet-sized display or just the edge of your main monitor into a live instrument panel: temperatures and load, FPS and frame time, what's playing, the weather, your AI plan limits, a game launcher and your RGB lights, in a look you choose or build yourself.
 
-## Current position
-V0.13.0 brings Lumen, the new baseline look: six templates (all-round, Gaming and Productivity, each for the 8.8" bar and the HYTE Y70) and the HUD's touch pages redrawn to match for every theme. V0.12.0 adds tray → Hotkeys, mapping key combinations to any action (the existing theme hotkeys carry over), with a second round of design-audit fixes to Halo Gaming's charts, the timer card and AI usage. V0.11.0 brings frame time to Halo Gaming (RTSS's frame time and 1% low when paired) and separate Gaming and Productivity shortcut lists for Halo Gaming and Halo Productivity, with the fixes and polish from a design audit with real data. V0.10.0 lets the HUD pick the theme for the moment: a theme while gaming (with per-game picks) and themes in the schedule, with your own theme returning afterwards and hand picks taking priority. V0.9.2 fixed the schedule's LEDs, Open OpenRGB, icon centring on the HUD pages and the volume slider, restores the backlight and display after a crash, and adds 48 shortcuts with a paged app drawer and Sensor Manager Auto-pair. V0.9.1 brought Halo in three versions (Lifestyle, Gaming, Productivity), the monochrome Graphite, Paper and Noir templates (thirty-nine built-in in all), warning colors, gaming sessions, stale-sensor dimming, night dimming, performance-limit tags, a reworked theme editor and an assignable tray double-click. V0.9.0 brought themes, the theme editor and L-Connect import, One UI-style touch pages, LED control through OpenRGB with a schedule, weather, aesthetic mode and color palettes. Classic keeps its default Midnight look.
+![Lumen on an 8.8-inch bar](docs/images/lumen-bar.png)
 
-- `src/`: editable application and build instructions.
-- `releases/`: immutable versioned source and Windows packages.
+Windows 10 1809 or later, x64. One self-contained `Pulsewave.exe`, no installer and no .NET runtime to install. Sensors come from [HWiNFO](https://www.hwinfo.com/).
+
+**[Download the latest release](https://github.com/kasualty21/Pulsewave-HUD/releases/latest)** · [Change log](src/CHANGELOG.md) · [What's planned](docs/ROADMAP.md)
+
+> Every picture on this page is rendered by Pulsewave itself with built-in sample readings, not captured from anyone's desktop.
+
+## Contents
+
+- [One screen, many faces](#one-screen-many-faces)
+- [Lumen, the baseline look](#lumen-the-baseline-look)
+- [Any screen shape](#any-screen-shape)
+- [Forty-five built-in themes](#forty-five-built-in-themes)
+- [Recolor anything](#recolor-anything)
+- [Touch pages](#touch-pages)
+- [What it can show](#what-it-can-show)
+- [It changes with what you're doing](#it-changes-with-what-youre-doing)
+- [Build your own theme](#build-your-own-theme)
+- [Pulsewave Classic](#pulsewave-classic)
+- [Getting started](#getting-started)
+- [Privacy and safety](#privacy-and-safety)
+- [Building from source](#building-from-source)
+- [Project layout](#project-layout)
+
+## One screen, many faces
+
+The same bar, fourteen of the built-in themes. Switch by tray menu, a swipe, a hotkey, a timed playlist, or let the HUD pick for you when a game starts.
+
+![The same bar cycling through themes](docs/images/themes.gif)
+
+## Lumen, the baseline look
+
+Lumen is Pulsewave's signature style: light on near-black with an aurora behind it, see-through glass, tick-ring gauges with glowing arcs, DIN numerals and segmented meters. It comes in three versions, each made for a job.
+
+**Lumen** (pictured at the top) is the all-rounder: clock and weather, CPU and GPU, FPS and frame time, memory and network, now playing and quick toggles.
+
+**Lumen Gaming** puts the game first. Live FPS is the hero number, with the session average, 1% low and a frame-time chart (a dashed line marks 60 FPS, and the trace turns amber above 33 ms). Beside it: the game's cover, how long you've played today and this week, peak temperatures, and CPU and GPU cards that say when a thermal or power limit is holding them back.
+
+![Lumen Gaming](docs/images/lumen-gaming-bar.png)
+
+**Lumen Productivity** is for work: a timer or stopwatch on an instrument dial with Pomodoro presets, your Claude Code and Codex plan limits with when they reset, a compact system card with the drive, and a now-playing strip.
+
+![Lumen Productivity](docs/images/lumen-productivity-bar.png)
+
+All three also come as tall layouts for a vertical screen, where the all-round and Productivity versions stack hours over minutes as a huge clock:
+
+![Lumen, Lumen Gaming and Lumen Productivity as columns](docs/images/lumen-columns.png)
+
+## Any screen shape
+
+Pulsewave was born on a 1920×480 bar, but a theme can be any size. Built-in layouts cover:
+
+| Screen | Size | Notes |
+|---|---|---|
+| 8.8" bar | 1920×480 | The original. Twenty-seven built-in themes. |
+| HYTE Y70 Touch Infinite, upright | 682×2560 | Fifteen built-in themes. Tray → Rotate HUD runs them on a panel Windows shows sideways. |
+| HYTE Y70, landscape | 2560×682 | Infinity. |
+| Tablets and spare monitors | 1920×1200 | Desk Tablet and Command Deck. |
+| No second display | a strip of your main monitor | Tray → Dock to screen edge reserves 15–40% along any edge, like the taskbar. |
+
+A theme that doesn't match the screen is letterboxed rather than stretched, and the gallery can filter to the shapes that fit.
+
+![Infinity, Desk Tablet and Command Deck](docs/images/other-shapes.png)
+
+## Forty-five built-in themes
+
+Glass cards, sci-fi HUDs, gauges, a terminal, synthwave, a vinyl player, a launcher, light themes, monochrome themes, and three complete families (Lumen, Halo and One UI) with gaming and productivity versions. Every one is read-only; **Duplicate** makes a copy you can edit.
+
+Every 8.8" bar theme:
+
+![All twenty-seven bar themes](docs/images/bar-themes.png)
+
+The other vertical themes (Lumen's three are above):
+
+![Twelve more vertical themes](docs/images/column-themes.png)
+
+Each built-in theme has to pass an automated quality gate before it ships: every font found, nothing off screen, no overlapping text, readable contrast, with ordinary readings and with worst-case ones (100% loads, five-digit fan speeds, very long song titles).
+
+## Recolor anything
+
+Eighteen palettes recolor any theme on the fly without touching its files, and each theme remembers its own choice. Light themes are handled too: their cards become the palette's dark surfaces and their text stays readable. Step through palettes from the tray, a hotkey, or the Colors page on the HUD.
+
+![Lumen stepping through palettes](docs/images/palettes.gif)
+
+## Touch pages
+
+Turn click-through off and the HUD becomes a control surface. Tap the album art for the music player, a gauge for sensor history, a toggle for lights or volume. On a mouse-only setup the same pages work with clicks. They are sized for a finger at arm's length and drawn in the Lumen look whatever theme you run.
+
+![The touch pages on a vertical screen](docs/images/pages-vertical.png)
+
+| Page | What it does |
+|---|---|
+| **Now playing** | Art, title and artist, play / pause / skip for any app that uses Windows media controls. With Plexamp: seek, shuffle, repeat, volume and the play queue. |
+| **Volume** | A slider and mute for the system and for each app making sound. |
+| **Lights** | Your OpenRGB setup: on / off, brightness, ten colors, your saved profiles and effects. |
+| **Colors** | The palettes, as big tiles. |
+| **Gaming** | The current or last game, session length, average FPS, 1% low, peak temperatures, play time today and over seven days, recent sessions. |
+| **Sensor details** | Load, temperature, power and fan for CPU, GPU and system, each with min / avg / max and a four-minute chart with its alert level. |
+| **Apps** | A paged drawer of up to 48 shortcuts: games, programs, folders, links, key presses, lock and sleep. |
+
+The same pages on the bar:
+
+![Four of the pages on an 8.8-inch bar](docs/images/pages-bar.png)
+
+On a touch screen Pulsewave handles the finger itself, so a tap doesn't drag your mouse cursor onto the HUD. Swipe sideways to change theme. Tray → Touch screen setup and **Keep other windows off this display** fix the usual touch-panel annoyances.
+
+## What it can show
+
+**Hardware (through HWiNFO).** CPU and GPU load, temperature, power, clock, voltage and fans; memory and VRAM used of total; drive activity, temperature and space; pump and case fans; download and upload. Sensor Manager's **Auto-pair** maps them for you. Readings turn amber and red at real limits (CPU 90 / 98 °C, GPU 83 / 90 °C, memory and drives nearly full), busy alone never warns, and if HWiNFO stops updating the readings dim instead of showing a stale number as live.
+
+**Performance.** FPS, average FPS and frame time. Pair RivaTuner Statistics Server's frame time and 1% low in HWiNFO and Pulsewave uses those; otherwise frame time is worked out from FPS. Optional HWiNFO limit sensors show THERMAL, POWER or VOLTAGE LIMIT tags when something is being held back.
+
+**Games.** Pulsewave finds your library (Steam, GOG, Xbox, games Windows knows about, and any you add), notices when one is running, and records sessions: length, average FPS, 1% low and peak temperatures, with play time per day and week. It asks once before tracking a full-screen program it doesn't recognize.
+
+**Music.** Whatever is playing through Windows media controls, with art. Plexamp gets a progress ring, time played and the queue.
+
+**Weather.** Current conditions, feels-like, high and low, the next hours, the next days, rain in the next twelve hours and the next sunrise or sunset, from Open-Meteo. No account or key.
+
+**AI plan usage.** Claude Code and Codex 5-hour and weekly limits, with when each resets. Codex needs no setup. Claude is opt-in, either from the Claude desktop app's sign-in or by connecting Pulsewave as Claude Code's terminal status line.
+
+**Time.** Clocks and dates in several formats, a timer, a stopwatch and Pomodoro rounds (25 / 5 and 50 / 10).
+
+**Shortcuts.** Up to 48 tiles that open games, programs, folders and links or send keys. Import your Steam library with covers, or drag and drop onto the Shortcuts window or straight onto the HUD's tiles. Separate Gaming and Productivity lists let the gaming and work themes show different docks.
+
+## It changes with what you're doing
+
+- **While gaming.** Choose a theme to show whenever a game runs, with per-game overrides. Your own theme comes back when the session ends.
+- **On a schedule.** Up to sixteen rules can show a theme, switch your LEDs, dim the screen or turn it off at set times and days. Night dimming also lowers the panel's backlight where the display supports it, and restores it afterwards, even after a crash.
+- **Playlist.** Rotate through themes on a timer.
+- **Hotkeys.** Bind up to 32 key combinations to any action: step themes, the next palette, open a page, toggle lights, show a particular theme, launch a shortcut. They work from inside any app or game.
+- **Aesthetic mode.** Fade the HUD to 10–40% or hide it to show off your wallpaper; a tap brings it back for a minute.
+- **Tray double-click.** Yours to assign.
+
+When several want a say, the order is: your own pick, then the game, then the schedule, then the playlist.
+
+## Build your own theme
+
+The editor is drag and drop, with snapping, nudging, undo and redo, and sample or live values while you work.
+
+![The theme editor with Lumen open](docs/images/editor.png)
+
+- **Ten kinds of element:** text, readings, bars, gauges, charts, panels, lines, pictures, album art and shortcut tiles.
+- **Ready-made widgets:** clock, weather, now playing, gaming, lights, volume, quick toggles, dock and more, dropped in as a group you can move and scale together.
+- **Backgrounds:** a color, a picture or a looping video, with fit, zoom and position. Or leave it see-through.
+- **Warning colors:** per element: at what value it turns amber and red, or which other reading decides.
+- **Tap actions:** what each element does when touched: open a page, control media, start a timer, switch theme.
+- **Color tools:** change a color everywhere it is used, by role, keeping each use's opacity.
+- **Any size:** presets for the screens above, or type your own.
+- **L-Connect import:** bring in Lian Li L-Connect 3 `.template` and `.zip` themes, video backgrounds included.
+- **Your fonts:** anything installed in Windows, plus a fonts folder of Pulsewave's own.
+
+Themes are plain `theme.json` files in a folder, so they are easy to back up and share.
+
+## Pulsewave Classic
+
+The original dashboard is still here: a transparent overlay made to sit over a live wallpaper (Wallpaper Engine, for instance) on a 1920×480 display, with large clocks and telemetry you can read from across the room, twelve HWiNFO readings, session statistics and CSV export. The picture below is its layout test with deliberately worst-case values.
+
+![Pulsewave Classic layout test](docs/images/classic.png)
+
+## Getting started
+
+1. **Install HWiNFO** and, in its sensor settings, turn on reporting to the **HWiNFO Gadget** for the readings you want. Pulsewave reads what HWiNFO publishes there.
+2. **Download** the latest [release](https://github.com/kasualty21/Pulsewave-HUD/releases/latest), unzip it into a permanent folder and run `Pulsewave.exe`. It lives in the notification area.
+3. **Pick the display:** tray → Display selection. Pulsewave remembers the monitor itself, not its number, and recovers when it disconnects and returns.
+4. **Map the sensors:** tray → Sensor Manager → Auto-pair, then adjust anything it guessed wrong.
+5. **Pick a theme:** tray → Themes. Lumen is listed first.
+6. **For touch or clicks,** turn off tray → Click-through.
+7. **Optional:** tray → Launch with Windows, Shortcuts, Weather, Lights, Gaming, Schedule and Hotkeys.
+
+OpenRGB lights need OpenRGB's SDK server running; see [docs/OpenRGB-Setup.md](docs/OpenRGB-Setup.md). For upgrade notes between versions, see [src/README.md](src/README.md).
+
+Lumen's numerals use Bahnschrift, which ships with Windows 10 and 11.
+
+## Privacy and safety
+
+- **It never captures your screen, apps or games.** Everything shown comes from sensors, Windows' public media and audio APIs, and files you point it at.
+- **Settings stay on your PC,** in `%LOCALAPPDATA%\Pulsewave`. Saves are atomic with a backup, and a damaged settings file is kept rather than silently replaced.
+- **Network use is narrow and opt-in:** Open-Meteo for weather once you set a city; your own Plex server and the local Plexamp player if you enter a Plex token (stored encrypted with Windows DPAPI, sent only to Plex and local-network servers); `api.anthropic.com` only if you turn on Claude usage from your sign-in, saving nothing but percentages.
+- **Lights are controlled only when you ask:** a tap, a click or a schedule you made. Pulsewave talks to OpenRGB on this PC only, with a short list of allowed commands, and never saves over your OpenRGB profiles.
+- **No administrator rights.** Startup registration is per-user and yours to switch on.
+
+## Building from source
+
+You need the .NET 10 SDK on Windows.
+
+Compile:
+
+```powershell
+dotnet build .\src\Pulsewave\Pulsewave.csproj -c Release
+```
+
+Run the regression suite (442 checks; it builds into a new folder under `work\test-runs`, so a running Pulsewave never blocks it):
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Run-Tests.ps1
+```
+
+Publish a self-contained Windows x64 executable:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\src\build-win-x64.ps1
+```
+
+The suite renders every theme and page off-screen and never launches the real overlay, edits your settings, changes startup entries or touches display topology.
+
+## Project layout
+
+Development is coordinated through the files below; contributors (human or agent) should read `AGENTS.md` first.
+
+- `src/`: the application (`src/Pulsewave`), its regression checks (`src/Tests`) and upgrade notes.
+- `docs/DESIGN.md`: the Lumen design baseline: tokens, components and rules for new visual work.
+- `docs/ROADMAP.md`: milestones and what is planned.
+- `docs/TEAM.md` and `docs/BOARD.md`: ownership rules and task state.
 - `docs/RECAP.md`: implementation and validation history.
-- `docs/ROADMAP.md`: milestones and acceptance criteria.
-- `docs/TEAM.md` and `docs/BOARD.md`: coordination rules and task state.
-- `docs/DESIGN.md`: the Lumen design baseline (tokens, components, rules).
-- `work/`: imports and temporary artifacts, not release deliverables.
+- `docs/validation/`: release evidence (build and package hashes) and the device acceptance checklist, `V0.9.1-ACCEPTANCE.md`.
+- `docs/images/`: the pictures on this page, built by rendering themes and pages with sample readings.
+- `scripts/`: the test runner, the release gate and the generator for templates 01–25. Templates 26–45 are generated by `src/Tests/Themes`.
+- `releases/` and `work/`: local packages and scratch files, not tracked in git.
 
-Releases are on GitHub (the latest is V0.13.0) and, locally, in `releases/` (not tracked in git). See `docs/validation/V0.13.0-release-evidence.md` for build and package hashes, and `docs/validation/V0.9.1-ACCEPTANCE.md` for the device checklist. `docs/ROADMAP.md` lists planned fixes and features.
-
-## Themes
-Lumen is Pulsewave's baseline look: near-black with an aurora, see-through glass, tick-ring gauges and DIN numerals, in an all-round, a Gaming and a Productivity version for the 8.8" bar and the HYTE Y70. It is listed first in the gallery, and the HUD's touch pages are drawn in it for every theme. `docs/DESIGN.md` describes it and where it lives in the source.
-
-Pulsewave was built for a 1920×480 8.8" bar and also runs on other screens: the HYTE Y70 Touch Infinite (either way up), vertical bars and tablets. Turn click-through off in the tray for touch and click controls: tap now playing to play/pause and a readout for its details page.
-
-For the HYTE Y70: tray → Rotate HUD runs vertical themes on a panel Windows shows sideways, swipe sideways to change theme, and Touch screen setup / Keep other windows off this display fix the usual touch-screen annoyances. No second display? Tray → Dock to screen edge reserves a strip along any edge of your monitor, like the taskbar. Tray → Shortcuts (or drag and drop onto the HUD's tiles) adds games, programs and links that theme tiles and the app drawer open. Themes can also show Claude Code and Codex plan usage (5-hour and weekly limits); Codex needs no setup; for Claude, tray → Claude usage either reads it with the Claude app's sign-in (opt-in, desktop app) or connects Pulsewave as Claude Code's terminal status line.
-
-Open Themes from the tray. Pulsewave Classic is the transparent overlay dashboard; the forty-five built-in templates (twenty-seven for the 8.8" bar, including the three Lumen and three Halo versions, One UI, Graphite, Paper and Noir; Infinity for the HYTE Y70 in landscape; Tower, Pillar, Spin, Command Column, Daylight Column, One UI Column, the Lumen and Halo columns and the monochrome columns for vertical screens; Desk Tablet and Command Deck for tablets) are read-only (Duplicate to customize in the editor); L-Connect 3 themes can be imported. A playlist rotates themes on a timer, and global hotkeys (default Ctrl+Alt+PageDown / PageUp, Ctrl+Alt+End for rotation on/off) switch them from any app. Templates are generated by `scripts/build-templates.py` and must pass the template quality gate in the regression checks.
-
-## Build
-From this directory, compile the Windows WPF project with:
-
-    dotnet build .\src\Pulsewave\Pulsewave.csproj -c Release
-
-To run the regression suite (it builds into a new folder under `work\test-runs`, so a running Pulsewave never blocks it):
-
-    powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Run-Tests.ps1
-
-To publish a ready-to-run Windows x64 build, use PowerShell:
-
-    powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\src\build-win-x64.ps1
-
-For settings migration and startup registration details, read `src/README.md`.
-
+The latest release is V0.13.0; its evidence is in [docs/validation/V0.13.0-release-evidence.md](docs/validation/V0.13.0-release-evidence.md). Lumen was checked on a HYTE Y70; the 8.8" bar layouts of Lumen have so far been checked in automated renders only.
