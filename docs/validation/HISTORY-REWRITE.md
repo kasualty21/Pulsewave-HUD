@@ -50,4 +50,4 @@ The source archive of each release from 0.9.1 to 0.13.0 was rebuilt with that on
 
 - GitHub can keep unreachable commits for a while and serve them to anyone who has the old id; only GitHub Support can purge them. The repository was private with no forks at the time.
 - Copies made before the rewrite (clones, downloaded archives) still hold the old content.
-- A local backup of the old refs and archives was kept outside git, in `work/pii-backup/`; it contains the removed details and is for the owner to delete.
+- A local backup of the old refs and archives, kept outside git during the rewrite, was deleted the same day at the owner's request once the result was verified. The owner's local git store may still hold the old commits as unreachable objects until git prunes them.
