@@ -35,7 +35,7 @@ internal static class LumenTemplates
 
     public static ThemeDefinition Bar()
     {
-        var t = New("Lumen", 1920, 480);
+        var t = New("Lumen Lifestyle", 1920, 480);
         var e = t.Elements;
 
         HeroBar(e, media: false);
@@ -70,7 +70,7 @@ internal static class LumenTemplates
 
     public static ThemeDefinition Column()
     {
-        var t = New("Lumen Column", 682, 2560);
+        var t = New("Lumen Lifestyle Column", 682, 2560);
         var e = t.Elements;
         const double x = Margin, w = 682 - 2 * Margin, ix = x + Pad, iw = w - 2 * Pad, right = 682 - Margin - Pad;
 
@@ -295,7 +295,7 @@ internal static class LumenTemplates
 
     private static ThemeDefinition New(string name, int w, int h)
     {
-        var t = new ThemeDefinition { Name = name, Source = "Pulsewave template", Width = w, Height = h, BackgroundColor = Lumen.Canvas };
+        var t = new ThemeDefinition { Name = name, Source = "Lumen HUD template", Width = w, Height = h, BackgroundColor = Lumen.Canvas };
         var e = t.Elements;
         e.Add(new ThemeElement { Kind = ThemeElementKind.Panel, Width = w, Height = h, FillColor = Lumen.CanvasTop, GradientColor = Lumen.CanvasBottom, GradientAngle = 90 });
         // The aurora: cyan where the clock is, violet through the middle, magenta at the far end.

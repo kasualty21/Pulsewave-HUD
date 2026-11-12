@@ -33,7 +33,7 @@ public sealed class VideoLoop : IDisposable
     {
         _path = path;
         _ui = ui;
-        _thread = new Thread(Run) { IsBackground = true, Name = "Pulsewave theme video" };
+        _thread = new Thread(Run) { IsBackground = true, Name = "Lumen HUD theme video" };
         _thread.Start();
     }
 

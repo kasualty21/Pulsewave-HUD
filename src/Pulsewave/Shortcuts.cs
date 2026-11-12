@@ -346,7 +346,7 @@ public static class ShortcutLauncher
     public static string? Launch(AppShortcut shortcut)
     {
         if (shortcut.Kind == AppShortcut.KeysKind)
-            return KeySender.Send(shortcut.Target) ? null : $"'{shortcut.Target}' is not a key combination Pulsewave can send.";
+            return KeySender.Send(shortcut.Target) ? null : $"'{shortcut.Target}' is not a key combination Lumen HUD can send.";
         if (shortcut.Kind == AppShortcut.SystemKind)
         {
             bool done = shortcut.Target.Trim().ToLowerInvariant() switch

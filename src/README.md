@@ -1,4 +1,10 @@
-# Pulsewave System Monitor V0.13.0
+# Lumen HUD V0.14.0
+
+## V0.14.0 - Pulsewave is now Lumen HUD
+
+**Upgrading from Pulsewave.** Exit Pulsewave from its tray, unzip Lumen HUD into a permanent folder and run `LumenHUD.exe`. It copies your settings, themes, shortcuts, gaming sessions and Plex token from `%LOCALAPPDATA%\Pulsewave` to `%LOCALAPPDATA%\Lumen HUD` (the Pulsewave folder is left as it was) and takes over Pulsewave's Launch with Windows entry. You can delete the old Pulsewave folder and program once you're happy.
+
+**Base theme and legacy themes.** Lumen Lifestyle is the base theme, and Classic is gone: if you used it, you'll see Lumen Lifestyle. The themes from before Lumen are legacy themes, imported from Themes → Import → Legacy theme; any you were using are imported for you.
 
 ## V0.13.0 - Lumen, the new baseline look
 

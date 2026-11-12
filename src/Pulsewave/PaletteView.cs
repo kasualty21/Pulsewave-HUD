@@ -63,10 +63,10 @@ internal sealed class PaletteView : Grid
         Children.Add(layout);
     }
 
-    /// <summary>Shows the palettes with <paramref name="current"/> ("" = the theme's own) marked; <paramref name="theme"/> is null for Classic.</summary>
+    /// <summary>Shows the palettes with <paramref name="current"/> ("" = the theme's own) marked; <paramref name="theme"/> is null when no theme is showing.</summary>
     public void Open(string current, string? theme)
     {
-        _subtitle.Text = theme == null ? "Palettes recolor custom themes; Classic keeps its own look." : theme;
+        _subtitle.Text = theme == null ? "Palettes recolor the theme that is showing." : theme;
         _tiles.Children.Clear();
         _tiles.Children.Add(Tile("", _wide ? "Theme's own colors" : "Theme's own", ["#FF2A3346", "#FF7FD8FF", "#FFFF8FB1", "#FFC3A6FF"], ThemePalettes.Find(current) == null, theme != null));
         foreach (var palette in ThemePalettes.All)

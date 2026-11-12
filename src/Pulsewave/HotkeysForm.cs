@@ -32,7 +32,7 @@ public sealed class HotkeysForm : Forms.Form
         foreach (var b in _items.Where(b => _actions.All(a => a.Id != b.Action)))
             _actions.Add((b.Action, Describe(b.Action) + " (no longer there)"));
         _save = save;
-        Text = "Pulsewave · Hotkeys";
+        Text = "Lumen HUD · Hotkeys";
         StartPosition = Forms.FormStartPosition.CenterScreen;
         Size = new Size(900, 560);
         MinimumSize = new Size(760, 440);

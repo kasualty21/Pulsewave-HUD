@@ -6,10 +6,10 @@ namespace Pulsewave.Themes;
 /// <summary>Which theme comes next for the playlist and the next/previous hotkeys.</summary>
 public static class ThemeCycle
 {
-    /// <summary>Every theme that can be shown, in gallery order: Classic, built-in templates, then the user's themes.</summary>
+    /// <summary>Every theme that can be shown, in gallery order: the Lumen templates, then the user's themes.</summary>
     public static IReadOnlyList<(string Id, string Name, int Width, int Height)> Available(string themesRoot)
     {
-        var themes = new List<(string, string, int, int)> { (ThemeStore.ClassicId, "Pulsewave Classic", 1920, 480) };
+        var themes = new List<(string, string, int, int)>();
         foreach (var name in BuiltInTemplates.Names)
         {
             string title = name;

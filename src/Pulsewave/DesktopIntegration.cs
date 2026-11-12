@@ -33,22 +33,37 @@ internal static class DisplayIdentity
 internal static class WindowsStartup
 {
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
-    private const string ValueName = "Pulsewave";
-    private const string LegacyValueName = "GraphiteMonitor";
+    public const string ExecutableName = "LumenHUD.exe";
+    private const string ValueName = "Lumen HUD";
+    // Earlier names of the app's own entry: Pulsewave (0.7.1–0.13) and GraphiteMonitor (before).
+    private static readonly string[] LegacyValueNames = ["Pulsewave", "GraphiteMonitor"];
 
     public static bool Enabled
     {
-        get { using var key = Registry.CurrentUser.OpenSubKey(RunKey); return key?.GetValue(ValueName) != null || key?.GetValue(LegacyValueName) != null; }
+        get { using var key = Registry.CurrentUser.OpenSubKey(RunKey); return key?.GetValue(ValueName) != null || LegacyValueNames.Any(n => key?.GetValue(n) != null); }
     }
 
     public static void SetEnabled(bool enabled)
     {
         using var key = Registry.CurrentUser.CreateSubKey(RunKey);
-        if (!enabled) { key.DeleteValue(ValueName, false); key.DeleteValue(LegacyValueName, false); return; }
+        if (!enabled) { key.DeleteValue(ValueName, false); foreach (var n in LegacyValueNames) key.DeleteValue(n, false); return; }
         var executable = Environment.ProcessPath ?? throw new InvalidOperationException("Cannot locate the executable.");
-        if (!System.IO.Path.GetFileName(executable).Equals("Pulsewave.exe", StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException("Publish Pulsewave first, then enable startup from Pulsewave.exe.");
+        if (!System.IO.Path.GetFileName(executable).Equals(ExecutableName, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("Publish Lumen HUD first, then enable startup from " + ExecutableName + ".");
         key.SetValue(ValueName, $"\"{executable}\" --startup");
-        key.DeleteValue(LegacyValueName, false);
+        foreach (var n in LegacyValueNames) key.DeleteValue(n, false);
+    }
+
+    /// <summary>
+    /// After the rename: when Pulsewave was set to launch with Windows, this copy takes its place (the old entry would
+    /// start the old app). Only from a published LumenHUD.exe; returns whether it changed anything.
+    /// </summary>
+    public static bool TakeOverPulsewaveEntry()
+    {
+        using var key = Registry.CurrentUser.OpenSubKey(RunKey, writable: true);
+        if (key?.GetValue("Pulsewave") == null || key.GetValue(ValueName) != null) return false;
+        if (!System.IO.Path.GetFileName(Environment.ProcessPath ?? "").Equals(ExecutableName, StringComparison.OrdinalIgnoreCase)) return false;
+        SetEnabled(true);
+        return true;
     }
 }

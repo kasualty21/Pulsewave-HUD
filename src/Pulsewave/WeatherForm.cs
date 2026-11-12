@@ -26,7 +26,7 @@ internal sealed class WeatherForm : Forms.Form
     {
         _settings = settings;
         _save = save;
-        Text = "Pulsewave · Weather";
+        Text = "Lumen HUD · Weather";
         StartPosition = Forms.FormStartPosition.CenterScreen;
         Size = new Size(620, 460);
         MinimumSize = new Size(520, 380);

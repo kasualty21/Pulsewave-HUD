@@ -25,10 +25,7 @@ public partial class MainWindow : Window
     private const int WmDisplayChange = 0x007E;
     private const int MaNoActivate = 3;
 
-    private Brush? _mintBrush, _blueBrush, _lavenderBrush, _amberBrush, _dangerBrush;
     private readonly NowPlayingMonitor _media = new();
-    private NowPlaying? _shownMedia;
-    private Brush? _artPlaceholder;
     private PlexTokenForm? _plexTokenForm;
     private ThemeView? _themeView;
     private SensorDetailView? _detail;
@@ -84,6 +81,25 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _playlistTimer = new();
     private SensorSnapshot _lastValues = new();
     private string? _settingsLoadError;
+    private List<string> _importedLegacy = [];
+
+    /// <summary>
+    /// 0.14 moved the templates from before Lumen out of the gallery. Any the settings still use (shown theme, playlist,
+    /// gaming or schedule theme, colors, hotkeys, double-click) is imported into the user's themes once and the settings
+    /// point at the copy, so nothing in use disappears.
+    /// </summary>
+    private void ImportLegacyThemesInUse()
+    {
+        try
+        {
+            _importedLegacy = LegacyThemes.Migrate(_settings, ThemeStore.RootPath);
+            if (_importedLegacy.Count > 0) SettingsStore.Save(_settings);
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException or System.Text.Json.JsonException or System.IO.InvalidDataException)
+        {
+            _settingsLoadError = "Legacy themes in use were not imported: " + ex.Message;
+        }
+    }
     private MonitorSettings _settings;
     private SensorReader _reader;
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromSeconds(1) };
@@ -124,6 +140,7 @@ public partial class MainWindow : Window
         Opacity = 0; // suppress the first frame until display placement / tray-only state is applied
         try { _settings = SettingsStore.Load(); }
         catch (Exception ex) { _settings = new MonitorSettings(); _settingsLoadError = ex.Message; } // Save guard preserves original.
+        if (_settingsLoadError == null) ImportLegacyThemesInUse();
         _reader = new SensorReader(_settings);
         _shortcutViews = _settings.Shortcuts.Select(ShortcutView.From).ToList();
         ArrangeShortcuts();
@@ -142,7 +159,7 @@ public partial class MainWindow : Window
         };
         _timer.Interval = TimeSpan.FromMilliseconds(_settings.PollIntervalMs);
         _telemetry.ThresholdCrossed += message =>
-            _tray?.ShowBalloonTip(5000, "Pulsewave · telemetry alert", message, Forms.ToolTipIcon.Warning);
+            _tray?.ShowBalloonTip(5000, "Lumen HUD · telemetry alert", message, Forms.ToolTipIcon.Warning);
         SourceInitialized += OnSourceInitialized;
         // A hidden overlay should not keep decoding a theme's background video.
         IsVisibleChanged += (_, _) => { if (IsVisible) _themeView?.Resume(); else _themeView?.Pause(); };
@@ -175,15 +192,20 @@ public partial class MainWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs args)
     {
+        // Renamed from Pulsewave: when Pulsewave launched with Windows, this copy takes over that entry.
+        try { WindowsStartup.TakeOverPulsewaveEntry(); }
+        catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException or System.IO.IOException or InvalidOperationException) { }
         PlaceOnTargetMonitor();
         Opacity = 1;
-        UpdateHistoryCaptions();
         ApplyTheme();
         RestartPlaylist();
         RefreshReadings();
         _timer.Start();
         UpdateGuard();
         if (_settingsLoadError != null) _tray?.ShowBalloonTip(8000, "Settings need attention · temporary defaults", _settingsLoadError, Forms.ToolTipIcon.Warning);
+        else if (_importedLegacy.Count > 0)
+            _tray?.ShowBalloonTip(8000, "Legacy themes kept", $"{string.Join(", ", _importedLegacy)} moved out of the built-in themes in Lumen HUD 0.14. " +
+                "You were using them, so they are now in your own themes and still show where you had them.", Forms.ToolTipIcon.Info);
     }
 
     private void OnClosing(object? sender, System.ComponentModel.CancelEventArgs args)
@@ -321,7 +343,7 @@ public partial class MainWindow : Window
         var bounds = target.Bounds;
         if (_settings.DockEdge.Length > 0 && !_userHidden && _appBar != null)
         {
-            // Classic is a 1920x480 layout; fitting the dock follows the shown theme's shape.
+            // Fitting the dock follows the shown theme's shape (a bar until one shows).
             var (themeWidth, themeHeight) = _themeView is { } shown ? (shown.Theme.Width, shown.Theme.Height) : (1920, 480);
             if (_settings.HudRotation is 90 or 270) (themeWidth, themeHeight) = (themeHeight, themeWidth); // the theme lies on its side
             string key = $"{target.Bounds}|{_settings.DockEdge}|{_settings.DockPercent}" + (_settings.DockPercent == 0 ? $"|{themeWidth}x{themeHeight}" : "");
@@ -367,7 +389,7 @@ public partial class MainWindow : Window
         if (_timers.Finished(now))
         {
             System.Media.SystemSounds.Exclamation.Play();
-            _tray?.ShowBalloonTip(5000, "Pulsewave", "Timer done", Forms.ToolTipIcon.Info);
+            _tray?.ShowBalloonTip(5000, "Lumen HUD", "Timer done", Forms.ToolTipIcon.Info);
         }
         if (BlankCover.Visibility == Visibility.Visible || _aestheticShown == 0) return; // nothing to draw while the screen is off or hidden
         if (_themeView != null)
@@ -375,53 +397,7 @@ public partial class MainWindow : Window
             if (_showsClaude) PollClaudeAccount(now);
             if (_showsWeather) PollWeather(now);
             _themeView.Update(ThemeContext(now, values));
-            return; // the Classic layout is hidden; skip its updates
         }
-
-        ClockTime.Text = now.ToString("HH:mm");
-        ClockSeconds.Text = now.ToString("ss");
-        ClockDate.Text = now.ToString("dddd, MMMM d").ToUpperInvariant();
-        var uptime = TimeSpan.FromMilliseconds(Environment.TickCount64);
-        UptimeLabel.Text = $"{(int)uptime.TotalDays:00}D  {uptime.Hours:00}H  {uptime.Minutes:00}M";
-        UpdateNowPlaying();
-        CpuName.Text = HardwareNameReader.Cpu(values, _settings);
-        GpuName.Text = HardwareNameReader.Gpu(values, _settings);
-        CpuLoad.Text = Display(values.Get("CpuLoad"), "F0");
-        CpuTemp.Text = Display(values.Get("CpuTemp"), "F0", "°C");
-        CpuPower.Text = Display(values.Get("CpuPower"), "F0", " W");
-        CpuFan.Text = Display(values.Get("CpuFan"), "F0", " RPM");
-        GpuLoad.Text = Display(values.Get("GpuLoad"), "F0");
-        GpuTemp.Text = Display(values.Get("GpuTemp"), "F0", "°C");
-        GpuPower.Text = Display(values.Get("GpuPower"), "F0", " W");
-        GpuFps.Text = Display(values.Get("GpuFps"), "F0");
-        MemoryLoad.Text = Display(values.Get("MemoryLoad"), "F0", "%");
-        DownRate.Text = Display(values.Get("NetDownload"), "F2", " MB/s");
-        UpRate.Text = Display(values.Get("NetUpload"), "F2", " MB/s");
-        // Convert only explicitly MB-formatted HWiNFO VRAM values. Other units stay untouched.
-        var vramText = values.GetText("GpuVram");
-        var vramMb = vramText?.Contains("MB", StringComparison.OrdinalIgnoreCase) == true
-            ? SensorReader.ParseNumber(vramText) : null;
-        GpuVram.Text = vramMb is > 0 ? $"{vramMb / 1024:0.0} GB"
-            : string.IsNullOrWhiteSpace(vramText) ? "--" : vramText;
-        MemoryFill.Width = values.Get("MemoryLoad") is { } mem ? 438 * Math.Clamp(mem, 0, 100) / 100 : 0;
-        // Colors communicate urgency without relying on tiny captions.
-        var warning = _amberBrush ??= (Brush)FindResource("Amber");
-        var critical = _dangerBrush ??= (Brush)FindResource("Danger");
-        CpuTemp.Foreground = WarningBrush(values.Get("CpuTemp"), _settings.CpuTemperatureAlertC, _mintBrush ??= (Brush)FindResource("Mint"), warning, critical);
-        GpuTemp.Foreground = WarningBrush(values.Get("GpuTemp"), _settings.GpuTemperatureAlertC, _blueBrush ??= (Brush)FindResource("Blue"), warning, critical);
-        var memoryColor = WarningBrush(values.Get("MemoryLoad"), _settings.MemoryAlertPercent, _lavenderBrush ??= (Brush)FindResource("Lavender"), warning, critical);
-        MemoryLoad.Foreground = memoryColor;
-        MemoryFill.Background = memoryColor;
-
-        UpdateGraph(CpuGraph, _telemetry.History("CpuLoad", now, _settings.HistorySeconds),
-            now, _settings.HistorySeconds);
-        UpdateGraph(GpuGraph, _telemetry.History("GpuLoad", now, _settings.HistorySeconds),
-            now, _settings.HistorySeconds);
-
-        SensorCount.Text = $"{values.ValidCount:00} / {values.ExpectedCount:00} OK";
-        HeaderStatus.Text = values.ValidCount == 0 ? "SENSORS OFFLINE"
-            : _sensorFeed.State == SensorFeedState.Frozen ? "SENSORS PAUSED"
-            : values.ValidCount == values.ExpectedCount ? "LIVE SENSORS" : "PARTIAL SENSOR FEED";
     }
 
     /// <summary>Whether HWiNFO's feed is live; updated once per sensor read.</summary>
@@ -451,7 +427,6 @@ public partial class MainWindow : Window
         };
     }
 
-    /// <summary>Shows the selected custom theme, or the Classic layout when none is set or it fails to load.</summary>
     // --- Which theme shows (0.10) ---------------------------------------------------------------
     // _settings.ActiveTheme is the user's own theme (their picks and the playlist). A game or a schedule period can
     // show another over it (_autoTheme) without changing it, so when they end the user's theme simply returns.
@@ -505,8 +480,16 @@ public partial class MainWindow : Window
         _shortcutList = null;
         ThemeHost.Child = null;
         string shown = ShownTheme;
-        if (!string.IsNullOrEmpty(shown))
+        // No theme yet (new settings, or Classic before 0.14): Lumen Lifestyle, for the display's shape.
+        if (string.IsNullOrEmpty(shown))
         {
+            shown = BaseTheme();
+            if (_autoTheme == null && _settings.ActiveTheme.Length == 0)
+                try { _settings.ActiveTheme = shown; SettingsStore.Save(_settings); } catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException) { }
+        }
+        for (int attempt = 0; attempt < 2 && _themeView == null; attempt++)
+        {
+            if (attempt == 1) shown = BaseTheme(); // the shown theme failed: the base theme instead
             try
             {
                 string dir = BuiltInTemplates.IsBuiltIn(shown)
@@ -523,7 +506,6 @@ public partial class MainWindow : Window
                                             e.DataName?.StartsWith("MEDIA_", StringComparison.OrdinalIgnoreCase) == true))
                     _media.Start();
                 else _media.Stop();
-                _shownMedia = null;
                 _showsClaude = theme.Elements.Any(e => e.DataName?.StartsWith("CLAUDE_", StringComparison.OrdinalIgnoreCase) == true);
                 _showsVolume = theme.Elements.Any(e => ThemeData.IsVolume(e.DataName));
                 _showsWeather = theme.Elements.Any(e => ThemeData.IsWeather(e.DataName));
@@ -532,13 +514,12 @@ public partial class MainWindow : Window
             catch (Exception ex) when (ex is System.IO.IOException or System.IO.InvalidDataException or
                                        System.Text.Json.JsonException or UnauthorizedAccessException or UriFormatException)
             {
-                _tray?.ShowBalloonTip(6000, "Theme not loaded · showing Classic", ex.Message, Forms.ToolTipIcon.Warning);
+                if (attempt == 0) _tray?.ShowBalloonTip(6000, "Theme not loaded · showing Lumen Lifestyle", ex.Message, Forms.ToolTipIcon.Warning);
             }
         }
         ArrangeShortcuts();
         bool themed = _themeView != null;
         ThemeHost.Visibility = themed ? Visibility.Visible : Visibility.Collapsed;
-        ClassicView.Visibility = themed ? Visibility.Collapsed : Visibility.Visible;
         // A dock sized to fit the theme follows a theme of another shape.
         if (_appBar?.Docked == true && _settings.DockPercent == 0) PlaceOnTargetMonitor();
         FitLayout();
@@ -546,17 +527,16 @@ public partial class MainWindow : Window
         if (IsLoaded) RefreshReadings();
     }
 
-    /// <summary>
-    /// Classic fills a bar-shaped display and keeps its shape elsewhere; a theme of another shape
-    /// than the display is letterboxed with its own background color, not the desktop.
-    /// </summary>
+    /// <summary>The base theme for this display: Lumen Lifestyle, or its column on a tall screen.</summary>
+    private string BaseTheme() => Shown.Height > Shown.Width ? BuiltInTemplates.DefaultColumn : BuiltInTemplates.Default;
+
+    /// <summary>A theme of another shape than the display is letterboxed with its own background color, not the desktop.</summary>
     private void FitLayout()
     {
         HideDetails(); // it is laid out for the display's shape
-        // Rotating the whole HUD (themes, Classic, details) lets a display Windows shows sideways run upright themes;
+        // Rotating the whole HUD (theme and pages) lets a display Windows shows sideways run upright themes;
         // taps and drops are read through the same turn.
         Root.LayoutTransform = _settings.HudRotation == 0 ? Transform.Identity : new RotateTransform(_settings.HudRotation);
-        ClassicView.Stretch = DisplaySizes.SameShape(Shown.Width, Shown.Height, 1920, 480) ? Stretch.Fill : Stretch.Uniform;
         Root.Background = _themeView is { } view ? new SolidColorBrush(ThemeView.ParseColor(view.Theme.BackgroundColor, Colors.Black)) : System.Windows.Media.Brushes.Transparent;
         ApplyAesthetic(DateTime.Now, animate: false, force: true); // a new theme or shape starts at the current level
     }
@@ -758,20 +738,8 @@ public partial class MainWindow : Window
             return;
         }
         _pressAt = null;
-        if (_themeView != null)
-        {
-            if (_themeView.ElementAt(TapPosition(e, _themeView)) is { } element)
-                RunAction(ThemeActions.Effective(element), ThemeActions.SensorFor(element.DataName), element.Slot);
-            return;
-        }
-        for (var node = e.OriginalSource as DependencyObject; node != null;
-             node = node is Visual ? VisualTreeHelper.GetParent(node) : LogicalTreeHelper.GetParent(node))
-        {
-            if (node == NowPlayingBlock) { RunAction(ThemeAction.PlayPause, null); return; }
-            if (node == CpuPanel) { RunAction(ThemeAction.Details, "CpuLoad"); return; }
-            if (node == GpuPanel) { RunAction(ThemeAction.Details, "GpuLoad"); return; }
-            if (node == SystemPanel) { RunAction(ThemeAction.Details, "MemoryLoad"); return; }
-        }
+        if (_themeView?.ElementAt(TapPosition(e, _themeView)) is { } element)
+            RunAction(ThemeActions.Effective(element), ThemeActions.SensorFor(element.DataName), element.Slot);
     }
 
     /// <summary>
@@ -1437,9 +1405,9 @@ public partial class MainWindow : Window
     private void ToggleClaudeAccount()
     {
         if (!_settings.ClaudeAccountUsage && Forms.MessageBox.Show(
-                "Pulsewave can ask Anthropic for your Claude plan usage (5-hour and weekly limits) with the sign-in the Claude app keeps on this PC " +
+                "Lumen HUD can ask Anthropic for your Claude plan usage (5-hour and weekly limits) with the sign-in the Claude app keeps on this PC " +
                 "(" + ClaudeAccountUsage.CredentialsFile + "). It works without a terminal and updates every 3 minutes while a theme shows Claude usage.\n\n" +
-                "The sign-in is sent only to api.anthropic.com and is never saved, logged or renewed by Pulsewave. This uses the same usage page Claude's " +
+                "The sign-in is sent only to api.anthropic.com and is never saved, logged or renewed by Lumen HUD. This uses the same usage page Claude's " +
                 "own apps read; Anthropic does not document it for other apps, so it may stop working after an update. Turn it on?",
                 "Claude usage", Forms.MessageBoxButtons.YesNo, Forms.MessageBoxIcon.Question) != Forms.DialogResult.Yes) return;
         bool prior = _settings.ClaudeAccountUsage;
@@ -1463,14 +1431,14 @@ public partial class MainWindow : Window
         {
             if (state == ClaudeStatusLine.State.Connected)
             {
-                if (Forms.MessageBox.Show("Stop showing Claude Code usage? This removes Pulsewave's status line from " + claude + ".",
+                if (Forms.MessageBox.Show("Stop showing Claude Code usage? This removes Lumen HUD's status line from " + claude + ".",
                         "Claude Code usage", Forms.MessageBoxButtons.YesNo, Forms.MessageBoxIcon.Question) != Forms.DialogResult.Yes) return;
                 ClaudeStatusLine.Disconnect(claude, launcher);
             }
             else if (state == ClaudeStatusLine.State.OtherStatusLine)
             {
                 Forms.MessageBox.Show("Claude Code already runs another status line:\n\n" + command +
-                    "\n\nPulsewave leaves it in place. To show Claude usage on the HUD instead, remove that status line and connect again.",
+                    "\n\nLumen HUD leaves it in place. To show Claude usage on the HUD instead, remove that status line and connect again.",
                     "Claude Code usage", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Information);
                 return;
             }
@@ -1478,7 +1446,7 @@ public partial class MainWindow : Window
             {
                 if (Environment.ProcessPath is not { } exe) return;
                 if (Forms.MessageBox.Show(
-                        "Claude Code shares its 5-hour and weekly plan limits only with its status line command. Pulsewave can be that command: " +
+                        "Claude Code shares its 5-hour and weekly plan limits only with its status line command. Lumen HUD can be that command: " +
                         "it saves the limits for the HUD and shows model, context and usage in Claude Code's status line.\n\n" +
                         "This adds a \"statusLine\" setting to " + claude + " (a backup is kept next to it). Usage appears after Claude Code's next reply. Connect?",
                         "Claude Code usage", Forms.MessageBoxButtons.YesNo, Forms.MessageBoxIcon.Question) != Forms.DialogResult.Yes) return;
@@ -1562,7 +1530,7 @@ public partial class MainWindow : Window
     {
         SavePreference(() => _settings.PlaylistEnabled = !_settings.PlaylistEnabled, RestartPlaylist);
         if (announce)
-            _tray?.ShowBalloonTip(2500, "Pulsewave", _settings.PlaylistEnabled ? $"Theme rotation on · every {_settings.PlaylistMinutes} min" : "Theme rotation off",
+            _tray?.ShowBalloonTip(2500, "Lumen HUD", _settings.PlaylistEnabled ? $"Theme rotation on · every {_settings.PlaylistMinutes} min" : "Theme rotation off",
                 Forms.ToolTipIcon.Info);
     }
 
@@ -1607,63 +1575,6 @@ public partial class MainWindow : Window
         return [];
     }
 
-    private void UpdateNowPlaying()
-    {
-        bool enabled = _settings.ShowNowPlaying;
-        UptimeBlock.Visibility = enabled ? Visibility.Collapsed : Visibility.Visible;
-        NowPlayingBlock.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
-        if (!enabled) { _media.Stop(); _shownMedia = null; return; }
-        _media.Start();
-        // The monitor only publishes a new snapshot when something changed.
-        var media = _media.Current;
-        if (ReferenceEquals(media, _shownMedia)) return;
-        _shownMedia = media;
-        var view = NowPlayingView.From(media);
-        NowPlayingStatus.Text = view.Status;
-        NowPlayingStatus.Foreground = media.State == MediaPlayback.Playing
-            ? _mintBrush ??= (Brush)FindResource("Mint") : (Brush)FindResource("MutedText");
-        NowPlayingTitle.Text = view.Title;
-        NowPlayingTitle.Foreground = (Brush)FindResource(view.Dim ? "DimText" : "BaseText");
-        NowPlayingArtist.Text = view.Artist;
-        NowPlayingArtist.Visibility = view.Artist.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
-        _artPlaceholder ??= NowPlayingArt.Background;
-        NowPlayingArt.Background = media.Art is { } art
-            ? new ImageBrush(art) { Stretch = Stretch.UniformToFill }
-            : _artPlaceholder;
-        NowPlayingArtPlaceholder.Visibility = media.Art is null ? Visibility.Visible : Visibility.Collapsed;
-    }
-
-    // Advisory colors only. Notification thresholds remain separately opt-in in V0.3.
-    private static Brush WarningBrush(double? value, double threshold, Brush normal, Brush warning, Brush critical)
-    {
-        if (!value.HasValue || !double.IsFinite(value.Value)) return normal;
-        if (value.Value >= threshold) return critical;
-        if (value.Value >= threshold - 10) return warning;
-        return normal;
-    }
-
-    private static string Display(double? n, string format, string suffix = "") =>
-        n.HasValue && double.IsFinite(n.Value) ? n.Value.ToString(format) + suffix : "--" + suffix;
-
-    private static void UpdateGraph(System.Windows.Shapes.Polyline polyline,
-        IReadOnlyList<TelemetryPoint> history, DateTime now, int windowSeconds)
-    {
-        var points = new PointCollection();
-        // Do not draw across missing periods. Start after the last missing sample.
-        int start = 0;
-        for (int i = 0; i < history.Count; i++)
-            if (!history[i].Value.HasValue) start = i + 1;
-        for (int i = start; i < history.Count; i++)
-        {
-            var point = history[i];
-            if (!point.Value.HasValue) continue;
-            var age = (now - point.Time).TotalSeconds;
-            double x = 447 * (1 - Math.Clamp(age, 0, windowSeconds) / windowSeconds);
-            double y = 81 - Math.Clamp(point.Value.Value, 0, 100) * 0.76;
-            points.Add(new Point(x, y));
-        }
-        polyline.Points = points;
-    }
 
     private void BuildTray()
     {
@@ -1675,7 +1586,7 @@ public partial class MainWindow : Window
         }
         _tray = new Forms.NotifyIcon
         {
-            Text = "Pulsewave System Monitor",
+            Text = "Lumen HUD",
             Icon = _trayIcon ?? SystemIcons.Application,
             Visible = true
         };
@@ -1696,7 +1607,7 @@ public partial class MainWindow : Window
                 RestartPlaylist();
                 RestoreOverlay();
             }
-            else _tray?.ShowBalloonTip(3000, "Pulsewave", "That theme is no longer installed. Pick another under Double-click the icon.", Forms.ToolTipIcon.Warning);
+            else _tray?.ShowBalloonTip(3000, "Lumen HUD", "That theme is no longer installed. Pick another under Double-click the icon.", Forms.ToolTipIcon.Warning);
             return;
         }
         if (id.StartsWith("launch:", StringComparison.Ordinal) && int.TryParse(id[7..], out int slot)) { Launch(slot); return; }
@@ -1757,7 +1668,7 @@ public partial class MainWindow : Window
         var previous = _trayMenu;
         var menu = new Forms.ContextMenuStrip();
         var version = typeof(MainWindow).Assembly.GetName().Version;
-        menu.Items.Add(new Forms.ToolStripMenuItem($"Pulsewave System Monitor · V{version?.Major}.{version?.Minor}.{version?.Build}") { Enabled = false });
+        menu.Items.Add(new Forms.ToolStripMenuItem($"Lumen HUD · V{version?.Major}.{version?.Minor}.{version?.Build}") { Enabled = false });
         if (_targetMissing) menu.Items.Add(new Forms.ToolStripMenuItem("Selected display disconnected · waiting") { Enabled = false });
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("Restore overlay", null, (_, _) => Dispatcher.Invoke(RestoreOverlay));
@@ -1839,9 +1750,6 @@ public partial class MainWindow : Window
         });
         menu.Items.Add(topMost);
 
-        var nowPlaying = new Forms.ToolStripMenuItem("Show now playing (replaces uptime)") { Checked = _settings.ShowNowPlaying };
-        nowPlaying.Click += (_, _) => SavePreference(() => _settings.ShowNowPlaying = !_settings.ShowNowPlaying, UpdateNowPlaying);
-        menu.Items.Add(nowPlaying);
         menu.Items.Add("Plexamp · set Plex token…", null, (_, _) =>
         {
             if (_plexTokenForm is { IsDisposed: false }) { _plexTokenForm.Activate(); return; }
@@ -1880,7 +1788,7 @@ public partial class MainWindow : Window
         menu.Items.Add("Sensor Manager · discover / map", null, (_, _) => Dispatcher.Invoke(OpenSensorManager));
         menu.Items.Add("Telemetry · session stats / settings", null, (_, _) => Dispatcher.Invoke(OpenTelemetry));
         menu.Items.Add(new Forms.ToolStripSeparator());
-        menu.Items.Add("Exit Pulsewave", null, (_, _) => Dispatcher.Invoke(Close));
+        menu.Items.Add("Exit Lumen HUD", null, (_, _) => Dispatcher.Invoke(Close));
 
         _trayMenu = menu;
         if (_tray != null) _tray.ContextMenuStrip = menu;
@@ -2130,7 +2038,7 @@ public partial class MainWindow : Window
             ApplyAesthetic(DateTime.Now);
             RefreshReadings();
         });
-        if (announce) _tray?.ShowBalloonTip(2000, "Pulsewave", _settings.Aesthetic ? "Aesthetic mode on · tap the HUD to use it" : "Aesthetic mode off", Forms.ToolTipIcon.Info);
+        if (announce) _tray?.ShowBalloonTip(2000, "Lumen HUD", _settings.Aesthetic ? "Aesthetic mode on · tap the HUD to use it" : "Aesthetic mode off", Forms.ToolTipIcon.Info);
     }
 
     /// <summary>
@@ -2146,10 +2054,9 @@ public partial class MainWindow : Window
         _aestheticShown = level;
         var duration = animate ? TimeSpan.FromMilliseconds(dimming ? 1200 : 250) : TimeSpan.Zero;
         var fade = new System.Windows.Media.Animation.DoubleAnimation(level, duration);
-        ClassicView.BeginAnimation(OpacityProperty, fade);
         ThemeHost.BeginAnimation(OpacityProperty, fade);
-        // An opaque theme background fades with the HUD (never quite to nothing); Classic and see-through
-        // themes have none to fade, so an invisible catcher keeps taps on the window instead.
+        // An opaque theme background fades with the HUD (never quite to nothing); see-through themes have none to
+        // fade, so an invisible catcher keeps taps on the window instead.
         var themeBack = _themeView is { } view ? ThemeView.ParseColor(view.Theme.BackgroundColor, Colors.Black) : Colors.Transparent;
         if (themeBack.A >= 128)
         {
@@ -2163,7 +2070,7 @@ public partial class MainWindow : Window
         else if (IsVisible) _themeView?.Resume();
     }
 
-    /// <summary>Classic's see-through background while aesthetic: invisible, but taps still land on the window.</summary>
+    /// <summary>A see-through theme's background while aesthetic: invisible, but taps still land on the window.</summary>
     private static readonly SolidColorBrush AestheticCatcher = Frozen(System.Windows.Media.Color.FromArgb(3, 0, 0, 0));
 
     private static SolidColorBrush Frozen(System.Windows.Media.Color color)
@@ -2197,12 +2104,6 @@ public partial class MainWindow : Window
         editor.Activate();
     }
 
-    private void UpdateHistoryCaptions()
-    {
-        CpuGraphCaption.Text = $"CPU LOAD · {_settings.HistorySeconds}s";
-        GpuGraphCaption.Text = $"GPU LOAD · {_settings.HistorySeconds}s";
-    }
-
     private void OpenTelemetry()
     {
         if (_telemetryForm is { IsDisposed: false })
@@ -2214,7 +2115,6 @@ public partial class MainWindow : Window
         var panel = new TelemetryForm(_telemetry, _settings, () =>
         {
             _timer.Interval = TimeSpan.FromMilliseconds(_settings.PollIntervalMs);
-            UpdateHistoryCaptions();
         });
         _telemetryForm = panel;
         panel.FormClosed += (_, _) =>

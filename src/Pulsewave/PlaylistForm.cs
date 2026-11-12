@@ -42,7 +42,7 @@ public sealed class PlaylistForm : Forms.Form
         _settings = settings;
         _displaySize = displaySize;
         _filterChanged = filterChanged;
-        Text = "Pulsewave · Theme playlist";
+        Text = "Lumen HUD · Theme playlist";
         StartPosition = Forms.FormStartPosition.CenterScreen;
         Size = new Size(620, 800);
         MinimumSize = new Size(520, 600);
@@ -206,7 +206,7 @@ public sealed class PlaylistForm : Forms.Form
         var problems = _save(new PlaylistChoice(Playlist, _enabled.Checked, (int)_minutes.Value));
         if (problems.Count > 0)
             Forms.MessageBox.Show(this, "Some of this needs attention:\n\n" + string.Join("\n", problems),
-                "Pulsewave · Theme playlist", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Warning);
+                "Lumen HUD · Theme playlist", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Warning);
         Close();
     }
 }

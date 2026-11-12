@@ -74,9 +74,9 @@ internal static class PaletteChecks
                 if (shots != null) Directory.CreateDirectory(shots);
                 int checkedCount = 0;
                 var failures = new List<string>();
-                foreach (var name in BuiltInTemplates.Names)
+                foreach (var name in BuiltInTemplates.Names.Concat(BuiltInTemplates.LegacyNames))
                 {
-                    string dir = BuiltInTemplates.Ensure(BuiltInTemplates.Prefix + name, templates)!;
+                    string dir = BuiltInTemplates.Ensure(BuiltInTemplates.Prefix + name, templates, legacy: true)!;
                     string before = File.ReadAllText(Path.Combine(dir, "theme.json"));
                     foreach (var palette in ThemePalettes.All)
                     {

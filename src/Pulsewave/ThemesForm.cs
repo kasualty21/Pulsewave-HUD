@@ -10,7 +10,7 @@ using Forms = System.Windows.Forms;
 namespace Pulsewave;
 
 /// <summary>
-/// Theme gallery: Pulsewave Classic plus imported and custom themes, with import, apply, delete,
+/// Theme gallery: the Lumen templates plus imported and custom themes, with import (L-Connect or legacy), apply, delete,
 /// fonts, the editor and the playlist.
 /// </summary>
 public sealed class ThemesForm : Forms.Form
@@ -18,7 +18,6 @@ public sealed class ThemesForm : Forms.Form
     /// <summary>The Halo desktop look (DesktopStyle), applied once everything in the window exists.</summary>
     protected override void OnLoad(EventArgs e) { DesktopStyle.Apply(this); base.OnLoad(e); }
 
-    private const string ClassicKey = "\0classic";
     private readonly MonitorSettings _settings;
     private readonly string _root;
     private readonly Action<string> _apply;
@@ -47,7 +46,7 @@ public sealed class ThemesForm : Forms.Form
         _apply = apply;
         _live = live;
         _themeSaved = themeSaved;
-        Text = "Pulsewave · Themes";
+        Text = "Lumen HUD · Themes";
         StartPosition = Forms.FormStartPosition.CenterScreen;
         Size = new Size(1100, 640);
         MinimumSize = new Size(820, 460);
@@ -59,8 +58,8 @@ public sealed class ThemesForm : Forms.Form
         var title = new Forms.Label
         {
             Dock = Forms.DockStyle.Top, Height = 74, Padding = new Forms.Padding(18, 14, 18, 0),
-            Text = "THEMES\nPick a built-in template, import L-Connect 3 themes, or design your own, then choose what the display shows. " +
-                   "Pulsewave Classic keeps the transparent Wallpaper Engine overlay.",
+            Text = "THEMES\nPick a Lumen template, design your own, or import an L-Connect 3 theme or one of the legacy themes from " +
+                   "before Lumen, then choose what the display shows.",
             Font = new Font("Segoe UI", 9.5f), ForeColor = Color.FromArgb(176, 196, 209)
         };
 
@@ -92,7 +91,14 @@ public sealed class ThemesForm : Forms.Form
         _addFont = Button("Add font…", Color.FromArgb(44, 62, 83));
         _openFolder = Button("Open folder", Color.FromArgb(44, 62, 83));
         _applyButton.Click += (_, _) => ApplySelected();
-        _import.Click += async (_, _) => await ImportAsync();
+        // Import: an L-Connect 3 download, or a legacy template (before Lumen) copied into your themes.
+        var importMenu = new Forms.ContextMenuStrip();
+        importMenu.Items.Add("L-Connect 3 theme (.zip, .template)…", null, async (_, _) => await ImportAsync());
+        var legacy = new Forms.ToolStripMenuItem("Legacy theme (before Lumen)");
+        foreach (var (name, themeName, w, h) in LegacyThemes.List())
+            legacy.DropDownItems.Add($"{themeName}  ·  {w}×{h}", null, (_, _) => ImportLegacy(name));
+        importMenu.Items.Add(legacy);
+        _import.Click += (_, _) => importMenu.Show(_import, new System.Drawing.Point(0, _import.Height));
         _delete.Click += (_, _) => DeleteSelected();
         _addFont.Click += (_, _) => AddFont();
         _openFolder.Click += (_, _) =>
@@ -164,11 +170,6 @@ public sealed class ThemesForm : Forms.Form
 
         var (dw, dh) = _displaySize?.Invoke() ?? (0, 0);
         string filter = FilterKey;
-        if (DisplaySizes.Matches(filter, 1920, 480, dw, dh))
-        {
-            _thumbs.Images.Add(ClassicKey, ClassicThumbnail());
-            _list.Items.Add(new Forms.ListViewItem(Label("Pulsewave Classic", ThemeStore.ClassicId), ClassicKey) { Tag = ThemeStore.ClassicId });
-        }
         foreach (var theme in _themes)
         {
             // Unreadable themes have no shape: they show under All shapes only.
@@ -177,7 +178,7 @@ public sealed class ThemesForm : Forms.Form
             _list.Items.Add(new Forms.ListViewItem(Label(theme.Name, theme.Id), theme.Id) { Tag = theme.Id });
         }
         _list.EndUpdate();
-        int total = _themes.Count + 1;
+        int total = _themes.Count;
         _count.Text = filter.Length == 0 ? $"{total} themes" : $"{_list.Items.Count} of {total} themes";
         var match = _list.Items.Cast<Forms.ListViewItem>().FirstOrDefault(i => (string)i.Tag! == (select ?? ""));
         if (match != null) { match.Selected = true; match.EnsureVisible(); }
@@ -201,14 +202,6 @@ public sealed class ThemesForm : Forms.Form
         if (BuiltInTemplates.IsBuiltIn(id)) _delete.Enabled = false; // templates stay as shipped
         _addFont.Enabled = true;
         if (id == null) { _details.Text = "Select a theme."; return; }
-        if (id == ThemeStore.ClassicId)
-        {
-            _delete.Enabled = false;
-            _details.Text = "PULSEWAVE CLASSIC\n\nThe built-in dashboard: clock with now playing, CPU, GPU and system panels, " +
-                            "Midnight colors and the transparent Wallpaper Engine overlay.\n\n" +
-                            (_settings.ActiveTheme == id ? "Currently showing." : "");
-            return;
-        }
         var info = _themes.FirstOrDefault(t => t.Id == id);
         if (info?.Definition is not { } theme)
         {
@@ -301,7 +294,7 @@ public sealed class ThemesForm : Forms.Form
         // A new theme starts at the size of the display it will run on.
         var (width, height) = _displaySize?.Invoke() ?? (1920, 480);
         if (width is < 1 or > 8192 || height is < 1 or > 8192) (width, height) = (1920, 480);
-        ThemeStore.Save(Path.Combine(_root, id), new ThemeDefinition { Name = "New theme", Source = "Pulsewave editor", BackgroundColor = "#FF0A0E1A",
+        ThemeStore.Save(Path.Combine(_root, id), new ThemeDefinition { Name = "New theme", Source = "Lumen HUD editor", BackgroundColor = "#FF0A0E1A",
             Width = width, Height = height });
         Reload(id);
         OpenEditor(id, draft: true);
@@ -360,7 +353,7 @@ public sealed class ThemesForm : Forms.Form
         }
         SetBusy(false, null);
         Reload(lastId ?? SelectedId);
-        Forms.MessageBox.Show(this, string.Join("\n\n", messages), "Pulsewave · Import", Forms.MessageBoxButtons.OK,
+        Forms.MessageBox.Show(this, string.Join("\n\n", messages), "Lumen HUD · Import", Forms.MessageBoxButtons.OK,
             Forms.MessageBoxIcon.Information);
     }
 
@@ -372,14 +365,28 @@ public sealed class ThemesForm : Forms.Form
                 "Delete theme", Forms.MessageBoxButtons.YesNo, Forms.MessageBoxIcon.Question) != Forms.DialogResult.Yes) return;
         try
         {
-            if (_settings.ActiveTheme == id) _apply(ThemeStore.ClassicId); // releases the video file first
+            if (_settings.ActiveTheme == id) _apply(BuiltInTemplates.Default); // releases the video file first
             ThemeStore.Delete(_root, id);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             Forms.MessageBox.Show(this, "Could not delete the theme: " + ex.Message, "Delete theme");
         }
-        Reload(ThemeStore.ClassicId);
+        Reload(null);
+    }
+
+    /// <summary>Copies a legacy template into the user's themes and selects it there.</summary>
+    private void ImportLegacy(string name)
+    {
+        try
+        {
+            string id = LegacyThemes.Import(name, _root);
+            Reload(id);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or System.Text.Json.JsonException)
+        {
+            Forms.MessageBox.Show(this, "Could not import the theme: " + ex.Message, "Lumen HUD · Import");
+        }
     }
 
     private void AddFont()
@@ -466,23 +473,5 @@ public sealed class ThemesForm : Forms.Form
         g.FillRectangle(back, box);
         using var accent = new System.Drawing.SolidBrush(Color.FromArgb(118, 245, 217));
         g.DrawString(text, font, accent, box.X + 3, box.Y + 1);
-    }
-
-    internal static System.Drawing.Image ClassicThumbnail()
-    {
-        var bitmap = new System.Drawing.Bitmap(ThumbSize.Width, ThumbSize.Height);
-        using var g = System.Drawing.Graphics.FromImage(bitmap);
-        g.Clear(TileBack);
-        // A 1920x480 sketch, laid out on 256x64 and scaled into the tile.
-        var area = Fit(1920, 480);
-        g.TranslateTransform(area.X, area.Y);
-        g.ScaleTransform(area.Width / 256f, area.Height / 64f);
-        using (var back = new System.Drawing.SolidBrush(Color.FromArgb(11, 21, 33))) g.FillRectangle(back, 0, 0, 256, 64);
-        using var panel = new System.Drawing.SolidBrush(Color.FromArgb(30, 48, 64));
-        foreach (var (x, w) in new[] { (4, 44), (52, 64), (120, 64), (188, 64) }) g.FillRectangle(panel, x, 10, w, 50);
-        using var accent = new System.Drawing.SolidBrush(Color.FromArgb(118, 245, 217));
-        using var font = new Font("Segoe UI Semibold", 8);
-        g.DrawString("PULSEWAVE", font, accent, 4, 0);
-        return bitmap;
     }
 }

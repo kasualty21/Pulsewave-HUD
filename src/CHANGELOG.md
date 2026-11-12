@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.14.0 (2026-11-12)
+Pulsewave is now **Lumen HUD**, with a new logo, Lumen Lifestyle as the base theme, and the themes from before Lumen moved to Legacy. Your settings, themes, shortcuts, sessions and Plex token carry over by themselves.
+- **New name and logo.** The app, its windows and tray menu, the executable (`LumenHUD.exe`) and the release files are Lumen HUD. The logo is a glass tile with a Lumen gauge whose end is a point of light around an L, in Lumen's cyan, violet and magenta.
+- **Settings move with it.** On first start Lumen HUD copies `%LOCALAPPDATA%\Pulsewave` (settings and their backup, your themes, gaming sessions, Plex token, weather and AI usage) into `%LOCALAPPDATA%\Lumen HUD`, without overwriting anything, and leaves the Pulsewave folder as it was. If Pulsewave launched with Windows, Lumen HUD takes over that entry.
+- **Lumen Lifestyle is the base theme.** The all-round Lumen theme is now called Lumen Lifestyle (Lumen Lifestyle Column on a tall screen; same template ids). A new HUD starts on it, and it stands in whenever a theme can't be loaded.
+- **Classic is removed.** The built-in Classic dashboard and its "Show now playing" tray option are gone. Settings that showed Classic now show Lumen Lifestyle, and Classic leaves the theme playlist.
+- **Legacy themes.** Only the six Lumen templates are built in. The 39 themes from before Lumen (Glass Cards to Daylight Column, One UI, Halo, Graphite, Paper, Noir) are legacy themes: Themes → Import → Legacy theme copies one into your own themes. Any legacy theme your settings use (the theme showing, the playlist, a gaming or schedule theme, theme colors, a hotkey or the tray double-click) is imported for you on first start, and the settings point at the copy, so nothing you use disappears; a tray message lists them. Legacy themes keep passing the quality gate.
+
 ## 0.13.0 (2026-11-09)
 Lumen, the new baseline look, and the HUD's pages redrawn to match. Settings from 0.12.0 carry over; no theme, palette, playlist or schedule is changed for you.
 - Lumen, a new built-in theme family in three versions like Halo, each for the 8.8" bar and the HYTE Y70 upright (six templates, forty-five built-in in all): light on near-black with an aurora backdrop, see-through glass slabs, tick-ring gauges with glowing arcs for CPU and GPU, DIN numerals and segmented meters.

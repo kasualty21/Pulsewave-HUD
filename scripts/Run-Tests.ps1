@@ -3,7 +3,7 @@ param(
     # Extra arguments for the regression runner (e.g. --stress or a shots folder).
     [string[]]$TestArgs = @()
 )
-# Builds and runs the regression suite in a new folder under work\test-runs, so a running Pulsewave
+# Builds and runs the regression suite in a new folder under work\test-runs, so a running Lumen HUD
 # (which locks src\Pulsewave\bin and the tests' usual bin folder) never blocks a test build.
 # Nothing under src is written apart from obj\ (not locked by a running app). Old runs can be deleted by hand.
 $ErrorActionPreference = 'Stop'

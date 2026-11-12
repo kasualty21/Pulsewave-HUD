@@ -73,7 +73,7 @@ internal sealed class OpenRgbClient : IDisposable
         if (reply.Length != 4) throw new InvalidDataException("Invalid OpenRGB protocol response.");
         Protocol = Math.Min(MaxProtocol, BinaryPrimitives.ReadUInt32LittleEndian(reply));
         if (Protocol < 1) throw new InvalidDataException("OpenRGB SDK protocol 1 or newer is required (OpenRGB 0.5 or later).");
-        Send(0, SetClientName, Encoding.UTF8.GetBytes("Pulsewave\0"));
+        Send(0, SetClientName, Encoding.UTF8.GetBytes("Lumen HUD\0"));
     }
 
     /// <summary>Connects to OpenRGB's SDK server at a loopback address; throws when it is not running.</summary>

@@ -41,7 +41,7 @@ internal sealed class LightsForm : Forms.Form
         _run = run;
         _refresh = refresh;
         _save = save;
-        Text = "Pulsewave · Lights";
+        Text = "Lumen HUD · Lights";
         StartPosition = Forms.FormStartPosition.CenterScreen;
         Size = new Size(1040, 620);
         MinimumSize = new Size(880, 520);

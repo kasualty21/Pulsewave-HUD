@@ -43,7 +43,7 @@ internal sealed class ScheduleForm : Forms.Form
         _themes = (themes ?? []).Where(t => t.Id.Length > 0).ToList();
         _rules = rules.Select(r => r.Copy()).ToList();
         _save = save;
-        Text = "Pulsewave · Schedule";
+        Text = "Lumen HUD · Schedule";
         StartPosition = Forms.FormStartPosition.CenterScreen;
         Size = new Size(920, 640);
         MinimumSize = new Size(800, 560);

@@ -55,7 +55,7 @@ internal static class OpenRgbApp
         finally { foreach (var p in processes) p.Dispose(); }
         if (windowless) return (false, "OpenRGB is running but its window couldn't be found; open it from its tray icon.");
         if (Executable(settings.AppPath, File.Exists) is not { } exe)
-            return (false, "OpenRGB isn't installed in Program Files. Start it once and Pulsewave remembers where it is.");
+            return (false, "OpenRGB isn't installed in Program Files. Start it once and Lumen HUD remembers where it is.");
         try
         {
             AllowSetForegroundWindow(AsfwAny); // the HUD never takes focus; let OpenRGB come to the front

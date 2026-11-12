@@ -7,7 +7,7 @@ if(args.Contains("--refresh-templates"))
     // Writes the feature-refreshed copies of built-in templates 01-25 to a folder (see Themes/TemplateRefresh.cs).
     string outDir=args[Array.IndexOf(args,"--refresh-templates")+1];
     System.IO.Directory.CreateDirectory(outDir);
-    foreach(var name in Pulsewave.Themes.BuiltInTemplates.Names.Where(n => int.TryParse(n[..2],out int k) && k<=25))
+    foreach(var name in Pulsewave.Themes.BuiltInTemplates.LegacyNames.Where(n => int.TryParse(n[..2],out int k) && k<=25))
         System.IO.File.WriteAllText(System.IO.Path.Combine(outDir,name+".json"),Pulsewave.Regression.TemplateRefresh.Apply(Pulsewave.Themes.BuiltInTemplates.Read(name)));
     return;
 }
@@ -17,9 +17,9 @@ if(args.Contains("--template-shots"))
     string shots=args[Array.IndexOf(args,"--template-shots")+1];
     System.IO.Directory.CreateDirectory(shots);
     var shotRunner=new Thread(() => {
-        foreach(var name in Pulsewave.Themes.BuiltInTemplates.Names)
+        foreach(var name in Pulsewave.Themes.BuiltInTemplates.Names.Concat(Pulsewave.Themes.BuiltInTemplates.LegacyNames))
         {
-            string dir=Pulsewave.Themes.BuiltInTemplates.Ensure(Pulsewave.Themes.BuiltInTemplates.Prefix+name,System.IO.Path.Combine(shots,"folders"))!;
+            string dir=Pulsewave.Themes.BuiltInTemplates.Ensure(Pulsewave.Themes.BuiltInTemplates.Prefix+name,System.IO.Path.Combine(shots,"folders"),legacy:true)!;
             var problems=Pulsewave.Regression.TemplateChecks.Problems(Pulsewave.Themes.ThemeStore.Load(dir),dir,System.IO.Path.Combine(shots,name+".png"));
             if(args.Contains("--stress")) problems.AddRange(Pulsewave.Regression.TemplateChecks.StressProblems(Pulsewave.Themes.ThemeStore.Load(dir),dir));
             Console.WriteLine($"{name}: {(problems.Count==0 ? "OK" : string.Join("; ",problems))}");
@@ -58,7 +58,7 @@ if(args.Contains("--shortcut-shot"))
     var shotThread=new Thread(() => { try {
         var settings=Pulsewave.SettingsStore.LoadFile(Pulsewave.SettingsStore.FilePath);
         var views=settings.Shortcuts.Select(Pulsewave.Themes.ShortcutView.From).ToList();
-        string dir=Pulsewave.Themes.BuiltInTemplates.Ensure(Pulsewave.Themes.BuiltInTemplates.Prefix+template, System.IO.Path.Combine(System.IO.Path.GetTempPath(),"pw-shortcut-shot"))!;
+        string dir=Pulsewave.Themes.BuiltInTemplates.Ensure(Pulsewave.Themes.BuiltInTemplates.Prefix+template, System.IO.Path.Combine(System.IO.Path.GetTempPath(),"pw-shortcut-shot"),legacy:true)!;
         var theme=Pulsewave.Themes.ThemeStore.Load(dir);
         var view=new Pulsewave.Themes.ThemeView(theme,dir,playVideo:false);
         var data=Pulsewave.Themes.ThemeSampleData.Context();
@@ -564,7 +564,7 @@ foreach (var screen in System.Windows.Forms.Screen.AllScreens)
     Check(id.Length > 0, "Windows monitor interface lookup: " + screen.DeviceName);
 }
 
-// The Classic layout, rendered off-screen from the real XAML.
+// The window's real XAML: since 0.14 it holds only the theme, the pages and the covers (Classic was removed).
 Exception? renderError=null;
 var renderThread=new Thread(() => {
     try {
@@ -574,29 +574,9 @@ var renderThread=new Thread(() => {
         // The pack:// icon resolves against the app assembly, not this test host; it is not layout.
         document.Root!.Attribute("Icon")?.Remove();
         var window=(System.Windows.Window)System.Windows.Markup.XamlReader.Parse(document.ToString());
-        foreach (var pair in new Dictionary<string,string> {
-            ["ClockTime"]="23:59", ["ClockDate"]="WEDNESDAY, SEPTEMBER 30", ["UptimeLabel"]="123D  23H  59M",
-            ["CpuLoad"]="100", ["CpuTemp"]="100°C", ["CpuPower"]="250 W", ["CpuFan"]="2500 RPM",
-            ["GpuLoad"]="100", ["GpuTemp"]="85°C", ["GpuPower"]="350 W", ["GpuFps"]="240",
-            ["MemoryLoad"]="100%", ["DownRate"]="125.00 MB/s", ["UpRate"]="25.00 MB/s", ["GpuVram"]="16.0 GB",
-            ["HeaderStatus"]="LAYOUT TEST · SIMULATED", ["SensorCount"]="12 / 12 OK",
-            ["NowPlayingStatus"]="▶  PLAYING", ["NowPlayingTitle"]="Midnight City (Extended Remix Version)", ["NowPlayingArtist"]="M83 and a Very Long Artist Name"
-        }) ((System.Windows.Controls.TextBlock)window.FindName(pair.Key)).Text=pair.Value;
-        ((System.Windows.FrameworkElement)window.FindName("NowPlayingArtist")).Visibility=System.Windows.Visibility.Visible;
-        var view=(System.Windows.FrameworkElement)window.Content;
-        view.Measure(new System.Windows.Size(1920,480)); view.Arrange(new System.Windows.Rect(0,0,1920,480)); view.UpdateLayout();
-        Check(view.ActualWidth==1920 && view.ActualHeight==480,"Real WPF XAML measures and arranges at 1920x480");
-        System.Windows.Rect Bounds(string name)
-        {
-            var element=(System.Windows.FrameworkElement)window.FindName(name);
-            return element.TransformToAncestor(view).TransformBounds(new System.Windows.Rect(0,0,element.ActualWidth,element.ActualHeight));
-        }
-        var timePanel=Bounds("TimePanel"); var nowPlaying=Bounds("NowPlayingBlock"); var nowPlayingText=Bounds("NowPlayingArtist");
-        Check(Bounds("ClockDate").Bottom<=nowPlaying.Top && nowPlaying.Bottom<=timePanel.Bottom-12 && nowPlayingText.Right<=timePanel.Right-12,
-            "Now playing with a long title and artist stays inside the Time panel below the clock");
-        var image=new System.Windows.Media.Imaging.RenderTargetBitmap(1920,480,96,96,System.Windows.Media.PixelFormats.Pbgra32);
-        image.Render(view);
-        Pulsewave.Themes.ThemeMedia.SavePng(image,System.IO.Path.Combine(testOutput,"layout-preview.png"));
+        Check(window.Title=="Lumen HUD" && window.FindName("ThemeHost") is System.Windows.Controls.Viewbox && window.FindName("DetailHost") is System.Windows.Controls.Viewbox &&
+              window.FindName("ClassicView")==null && window.FindName("BlankCover")!=null,
+            "The window is titled Lumen HUD and holds the theme, the pages and the screen covers; the Classic layout is gone");
         window.Close();
     } catch(Exception ex) {renderError=ex;}
 });

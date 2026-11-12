@@ -94,7 +94,7 @@ public sealed class ThemeEditorWindow : Window
         _saved = saved;
         _discardFolderIfNeverSaved = discardFolderIfNeverSaved;
         if (discardFolderIfNeverSaved) _doc.MarkUnsaved(); // closing asks before a draft is thrown away
-        Title ="Pulsewave · Theme editor · " + _doc.Theme.Name;
+        Title ="Lumen HUD · Theme editor · " + _doc.Theme.Name;
         Width = 1500; Height = 820; MinWidth = 1000; MinHeight = 560;
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Background = Frozen(Color.FromRgb(14, 20, 36));
@@ -250,7 +250,7 @@ public sealed class ThemeEditorWindow : Window
     private void Refresh(bool rebuildProperties)
     {
         var theme = _doc.Theme;
-        Title = "Pulsewave · Theme editor · " + theme.Name + (_doc.IsDirty ? " *" : "");
+        Title = "Lumen HUD · Theme editor · " + theme.Name + (_doc.IsDirty ? " *" : "");
         _stage.Width = _overlay.Width = theme.Width;
         _stage.Height = _overlay.Height = theme.Height;
         string key = $"{theme.BackgroundVideo}|{theme.BackgroundImage}|{theme.BackgroundColor}|{theme.BackgroundFit}|{theme.BackgroundVideoRotation}|{theme.Width}x{theme.Height}";

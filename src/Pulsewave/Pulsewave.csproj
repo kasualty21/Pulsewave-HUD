@@ -8,22 +8,25 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>Pulsewave</AssemblyName>
-    <Version>0.13.0</Version>
+    <AssemblyName>LumenHUD</AssemblyName>
+    <Version>0.14.0</Version>
+    <Product>Lumen HUD</Product>
     <RootNamespace>Pulsewave</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>Assets\Pulsewave-logo.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\LumenHUD-logo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <!-- WPF's own touch layer is off: the HUD handles touch itself so it never moves the mouse cursor and is not counted twice (TouchInput.cs). Other windows get touch as ordinary clicks. -->
     <RuntimeHostConfigurationOption Include="Switch.System.Windows.Input.Stylus.DisableStylusAndTouchSupport" Value="true" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Assets\Pulsewave-logo.ico" />
+    <Resource Include="Assets\LumenHUD-logo.ico" />
   </ItemGroup>
   <ItemGroup>
     <!-- Built-in theme templates, read-only in the app (see Themes/BuiltInTemplates.cs). -->
     <EmbeddedResource Include="Templates\*.json" LogicalName="Pulsewave.Templates.%(Filename)%(Extension)" />
+    <!-- Legacy templates (before Lumen): not in the gallery; Themes → Import legacy theme copies one into the user's themes. -->
+    <EmbeddedResource Include="Templates\Legacy\*.json" LogicalName="Pulsewave.Legacy.%(Filename)%(Extension)" />
   </ItemGroup>
 </Project>
 

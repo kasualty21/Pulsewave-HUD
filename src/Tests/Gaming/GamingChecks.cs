@@ -217,7 +217,7 @@ internal static class GamingChecks
                 // Halo Gaming's frame-time chart, fed a minute of readings: amber only where frames took over 33 ms.
                 foreach (var name in new[] { "30-halo-gaming", "31-halo-gaming-column" })
                 {
-                    string dir = BuiltInTemplates.Ensure(BuiltInTemplates.Prefix + name, Path.Combine(root, "templates"))!;
+                    string dir = BuiltInTemplates.Ensure(BuiltInTemplates.Prefix + name, Path.Combine(root, "templates"), legacy: true)!;
                     var theme = ThemeStore.Load(dir);
                     var chart = theme.Elements.Single(e => e.Kind == ThemeElementKind.Chart && e.DataName == "FRAMETIME");
                     int Amber(bool spikes)

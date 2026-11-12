@@ -42,16 +42,21 @@ internal static class TemplateChecks
                 Check(found.Any(p => p.Contains("overlaps")) && found.Any(p => p.Contains("leaves the screen")) && found.Any(p => p.Contains("'faint' contrast")),
                     "The quality gate catches overlapping text, off-screen readouts and low contrast");
                 var names = BuiltInTemplates.Names;
-                Check(names.Count >= 8, $"{names.Count} built-in templates ship with Pulsewave");
-                foreach (var name in names)
+                Check(names.SequenceEqual(["40-lumen", "41-lumen-column", "42-lumen-gaming", "43-lumen-gaming-column", "44-lumen-productivity", "45-lumen-productivity-column"]) &&
+                      BuiltInTemplates.LegacyNames.Count == 39 && BuiltInTemplates.LegacyNames.All(n => int.Parse(n[..2]) <= 39) &&
+                      !BuiltInTemplates.Names.Intersect(BuiltInTemplates.LegacyNames).Any(),
+                    "Lumen HUD ships the six Lumen templates; the 39 from before Lumen are legacy (importable, not built-in)");
+                // Legacy templates keep passing the gate too: they can be imported and must work as they did.
+                foreach (var name in names.Concat(BuiltInTemplates.LegacyNames))
                 {
-                    string dir = BuiltInTemplates.Ensure(BuiltInTemplates.Prefix + name, root)!;
+                    string dir = BuiltInTemplates.Ensure(BuiltInTemplates.Prefix + name, root, legacy: true)!;
                     var problems = Problems(ThemeStore.Load(dir), dir);
                     problems.AddRange(StressProblems(ThemeStore.Load(dir), dir));
                     Check(problems.Count == 0, $"Template '{name}' passes the quality gate, also with worst-case values" + (problems.Count > 0 ? ": " + string.Join("; ", problems) : ""));
                 }
-                Check(BuiltInTemplates.Ensure("builtin:../escape", root) == null && BuiltInTemplates.Ensure("builtin:nope", root) == null,
-                    "Unknown or path-like template names are refused");
+                Check(BuiltInTemplates.Ensure("builtin:../escape", root) == null && BuiltInTemplates.Ensure("builtin:nope", root) == null &&
+                      BuiltInTemplates.Ensure("builtin:28-halo", root) == null,
+                    "Unknown or path-like template names are refused, and a legacy template is no longer a built-in");
                 var listed = BuiltInTemplates.List(root);
                 Check(listed.Count == names.Count && listed.All(t => t.Definition != null && File.Exists(Path.Combine(t.Directory, "preview.png"))),
                     "The gallery lists every template with a rendered preview");

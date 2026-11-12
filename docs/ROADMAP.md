@@ -107,4 +107,9 @@ Keep Wallpaper Engine independent, maintain the uncluttered dedicated display, p
 ## V0.13 — Lumen baseline (released 2026-11-09, user-directed)
 - Lumen (templates 40–45), the restyled HUD pages and the shared tokens are the design baseline; see `DESIGN.md`. Released as V0.13.0; see `validation/V0.13.0-release-evidence.md`.
 - Checked by the user on the HYTE Y70 with preview builds: the three Lumen columns and the pages. Not yet seen on hardware: the three 1920×480 bar templates, the pages at bar size, Lumen Gaming during a real game.
-- Candidates, not started and not agreed: move the editor widgets and the editor's controls to the Lumen kit; Lumen as the theme for new installs (today Classic).
+- Candidates, not started and not agreed: move the editor widgets and the editor's controls to the Lumen kit. (Lumen as the theme for new installs was done in 0.14.)
+
+## V0.14 — Lumen HUD (released 2026-11-12, user-directed)
+- Pulsewave renamed Lumen HUD with a new logo; settings copied from %LOCALAPPDATA%\Pulsewave on first start; the Launch with Windows entry taken over.
+- Lumen Lifestyle (40/41) is the base theme; Classic removed; the 39 templates from before Lumen moved to `src/Pulsewave/Templates/Legacy`, importable, and imported automatically when the settings use one.
+- Not done: renaming the GitHub repository (left to the user).

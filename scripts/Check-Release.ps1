@@ -58,7 +58,7 @@ try {
     Invoke-Dotnet 'regression' @('run','--project',$tests,'-c','Release')
     $publish = Join-Path $evidence 'publish-win-x64'
     Invoke-Dotnet 'publish' @('publish',$project,'-c','Release','-r','win-x64','--self-contained','true','-p:PublishSingleFile=true','-p:IncludeNativeLibrariesForSelfExtract=true','-p:DebugType=None','-p:DebugSymbols=false','-o',$publish)
-    $exe = Join-Path $publish 'Pulsewave.exe'
+    $exe = Join-Path $publish 'LumenHUD.exe'
     if (-not (Test-Path -LiteralPath $exe)) { throw 'Published executable missing.' }
     $exeVersion = (Get-Item -LiteralPath $exe).VersionInfo.ProductVersion
     if (($exeVersion -split '\+')[0] -ne $version) { throw "Published version $exeVersion differs from source $version." }
@@ -69,7 +69,7 @@ try {
     $binary = [pscustomobject]@{Path=$exe;ProductVersion=$exeVersion;SHA256=(Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash}
     $archive = $null
     if ($CreateSourceArchive) {
-        $archivePath = Join-Path $evidence ("Pulsewave-v$version-source-candidate.zip")
+        $archivePath = Join-Path $evidence ("LumenHUD-v$version-source-candidate.zip")
         $package = Join-Path $evidence 'package'
         New-Item -ItemType Directory -Path $package | Out-Null
         foreach ($entry in $manifest) {

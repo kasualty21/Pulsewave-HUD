@@ -88,7 +88,7 @@ internal static class LauncherChecks
         Check(swapped && removed && lists["Productivity"].SequenceEqual([4]),
             "Lists keep their picks on the same shortcuts when the main list is reordered or a shortcut removed, and drop a slot given a new shortcut");
         var builtIn = new[] { "28-halo", "30-halo-gaming", "31-halo-gaming-column", "32-halo-productivity", "33-halo-productivity-column" }
-            .Select(id => ThemeStore.Load(BuiltInTemplates.Ensure(BuiltInTemplates.Prefix + id, Path.Combine(root, "templates"))!).ShortcutList).ToList();
+            .Select(id => ThemeStore.Load(BuiltInTemplates.Ensure(BuiltInTemplates.Prefix + id, Path.Combine(root, "templates"), legacy: true)!).ShortcutList).ToList();
         Check(builtIn.SequenceEqual([null, "Gaming", "Gaming", "Productivity", "Productivity"]),
             "Halo Gaming and Halo Productivity (bar and column) follow their own shortcut lists; Halo Lifestyle keeps the main list");
 
@@ -169,7 +169,7 @@ internal static class LauncherChecks
         Check(printed == "Opus · ctx 8% · 5h 24% · wk 41%" && claude.Session?.UsedPercent == 23.5 && claude.Week?.ResetsAt == DateTimeOffset.FromUnixTimeSeconds(1738857600),
             "The Claude Code status line relay saves the 5-hour and weekly limits and prints model, context and usage");
         Check(ClaudeStatusLine.Relay("{\"model\":{\"display_name\":\"Opus\"}}", usageFile) == "Opus" && AiUsageReader.ReadClaude(usageFile).Session?.UsedPercent == 23.5 &&
-              ClaudeStatusLine.Relay("not json", usageFile) == "Pulsewave",
+              ClaudeStatusLine.Relay("not json", usageFile) == "Lumen HUD",
             "Refreshes without limits (API keys, the first refresh) keep the last saved usage");
         var reader = new AiUsageReader(codex, usageFile);
         var both = reader.Read(DateTime.Now);
@@ -240,7 +240,7 @@ internal static class LauncherChecks
         Check(icon is { PixelWidth: >= 32 } && Opaque(icon) > 0.1 && Opaque(icon) < 1 && ShortcutIcons.Load(new AppShortcut { Target = "https://example.com" }) == null,
             "Shortcut icons come from the shell with transparency (web addresses use a glyph)");
 
-        string dir = BuiltInTemplates.Ensure(BuiltInTemplates.Prefix + "19-launchpad", Path.Combine(root, "templates"))!;
+        string dir = BuiltInTemplates.Ensure(BuiltInTemplates.Prefix + "19-launchpad", Path.Combine(root, "templates"), legacy: true)!;
         var theme = ThemeStore.Load(dir);
         var view = new ThemeView(theme, dir, playVideo: false);
         view.Measure(new Size(theme.Width, theme.Height));

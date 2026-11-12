@@ -14,7 +14,7 @@ public sealed class PlexTokenForm : Forms.Form
 
     public PlexTokenForm(Action<string?> onChanged)
     {
-        Text = "Pulsewave · Plexamp now playing";
+        Text = "Lumen HUD · Plexamp now playing";
         StartPosition = Forms.FormStartPosition.CenterScreen;
         FormBorderStyle = Forms.FormBorderStyle.FixedDialog;
         MaximizeBox = false; MinimizeBox = false;

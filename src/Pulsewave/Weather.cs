@@ -53,7 +53,7 @@ internal static class WeatherClient
 {
     private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(12) };
 
-    static WeatherClient() => Http.DefaultRequestHeaders.UserAgent.ParseAdd("Pulsewave/0.8 (desktop HUD)");
+    static WeatherClient() => Http.DefaultRequestHeaders.UserAgent.ParseAdd("LumenHUD/0.14 (desktop HUD)");
 
     public static async Task<IReadOnlyList<WeatherPlace>> FindAsync(string name, CancellationToken token = default)
     {

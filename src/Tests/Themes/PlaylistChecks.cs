@@ -29,9 +29,51 @@ internal static class PlaylistChecks
         string root = Path.Combine(outputRoot, "playlist-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
         var available = ThemeCycle.Available(root);
-        Check(available[0].Id == ThemeStore.ClassicId && available.Count == 1 + BuiltInTemplates.Names.Count &&
-              available.Any(t => t.Id == "builtin:09-vinyl" && t.Name == "Vinyl"),
-            "Every theme is available to the playlist by its gallery name");
+        Check(available[0].Id == BuiltInTemplates.Default && available.Count == BuiltInTemplates.Names.Count &&
+              available.Any(t => t.Id == "builtin:40-lumen" && t.Name == "Lumen Lifestyle") && available.All(t => t.Id.Length > 0),
+            "Every theme is available to the playlist by its gallery name, Lumen Lifestyle first; Classic is gone");
+
+        // 0.14: settings that use a legacy template get it imported once and point at the copy; Classic leaves the playlist.
+        string themes = Path.Combine(root, "user-themes");
+        var upgraded = new MonitorSettings
+        {
+            ActiveTheme = "builtin:30-halo-gaming", ThemePlaylist = ["", "builtin:30-halo-gaming", "builtin:40-lumen", "builtin:36-paper"],
+            ThemePalettes = new(StringComparer.Ordinal) { ["builtin:36-paper"] = "Ocean", ["builtin:42-lumen-gaming"] = "Ember" },
+            TrayDoubleClick = "theme:builtin:38-noir", Hotkeys = [new HotkeyBinding { Keys = "Ctrl+Alt+1", Action = "theme:builtin:30-halo-gaming" }]
+        };
+        upgraded.Gaming.Theme = "builtin:31-halo-gaming-column";
+        upgraded.Gaming.Themes["steam:1"] = "none";
+        upgraded.Schedule = [new ScheduleRule { Theme = "builtin:36-paper" }, new ScheduleRule { Theme = "" }];
+        var imported = LegacyThemes.Migrate(upgraded, themes);
+        var again = LegacyThemes.Migrate(upgraded, themes);
+        string halo = upgraded.ActiveTheme, paper = upgraded.Schedule[0].Theme;
+        Check(imported.SequenceEqual(["Halo Gaming", "Paper", "Halo Gaming Column", "Noir"]) && again.Count == 0 &&
+              halo == "Halo Gaming" && Directory.Exists(Path.Combine(themes, halo)) && ThemeStore.Load(Path.Combine(themes, halo)).Name == "Halo Gaming" &&
+              upgraded.ThemePlaylist.SequenceEqual([halo, "builtin:40-lumen", paper]) && paper == "Paper" && upgraded.Schedule[1].Theme == "" &&
+              upgraded.Gaming.Theme == "Halo Gaming Column" && upgraded.Gaming.Themes["steam:1"] == "none" &&
+              upgraded.ThemePalettes["Paper"] == "Ocean" && upgraded.ThemePalettes["builtin:42-lumen-gaming"] == "Ember" && !upgraded.ThemePalettes.ContainsKey("builtin:36-paper") &&
+              upgraded.TrayDoubleClick == "theme:Noir" && upgraded.Hotkeys![0].Action == "theme:" + halo,
+            "Upgrading imports each legacy theme the settings use once (shown, playlist, gaming, schedule, colors, hotkeys, double-click) and points them at the copy; Lumen and Classic's blank stay out");
+        string manual = LegacyThemes.Import("09-vinyl", themes);
+        Check(manual == "Vinyl" && LegacyThemes.List().Count == 39 && LegacyThemes.List().Any(l => l is ("28-halo", "Halo Lifestyle", 1920, 480)) &&
+              ThemeStore.Load(Path.Combine(themes, manual)).Source == "Legacy template",
+            "Themes → Import → Legacy theme copies a template from before Lumen into your own themes");
+
+        // 0.14 renamed the app: Pulsewave's folder is copied into Lumen HUD's once, without templates, and left as it was.
+        string from = Path.Combine(root, "Pulsewave"), to = Path.Combine(root, "Lumen HUD");
+        Directory.CreateDirectory(Path.Combine(from, "themes", "Mine"));
+        Directory.CreateDirectory(Path.Combine(from, "templates", "40-lumen"));
+        File.WriteAllText(Path.Combine(from, "settings.json"), "{\"ActiveTheme\":\"Mine\"}");
+        File.WriteAllText(Path.Combine(from, "themes", "Mine", "theme.json"), "{}");
+        File.WriteAllText(Path.Combine(from, "templates", "40-lumen", "theme.json"), "{}");
+        File.WriteAllText(Path.Combine(from, "plex-token.dat"), "x");
+        Directory.CreateDirectory(to);
+        File.WriteAllText(Path.Combine(to, "plex-token.dat"), "newer");
+        SettingsStore.CopyPulsewaveFolder(from, to);
+        Check(File.ReadAllText(Path.Combine(to, "settings.json")).Contains("Mine") && File.Exists(Path.Combine(to, "themes", "Mine", "theme.json")) &&
+              !Directory.Exists(Path.Combine(to, "templates")) && File.ReadAllText(Path.Combine(to, "plex-token.dat")) == "newer" &&
+              File.Exists(Path.Combine(from, "settings.json")) && File.Exists(Path.Combine(from, "themes", "Mine", "theme.json")),
+            "Pulsewave's settings, themes and other files are copied into Lumen HUD's folder (templates rebuilt, nothing overwritten) and the Pulsewave folder is left as it was");
 
         Check(Hotkey.TryParse("Ctrl+Alt+PageDown", out var next) && next.Key == Forms.Keys.PageDown &&
               next.Modifiers == (HotkeyModifiers.Ctrl | HotkeyModifiers.Alt) && next.ToString() == "Ctrl+Alt+PageDown",

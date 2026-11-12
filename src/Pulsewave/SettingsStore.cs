@@ -30,7 +30,8 @@ public sealed class MonitorSettings
     public bool AlwaysOnTop { get; set; } = false;
     // Off restores the system uptime readout in the Time panel and stops media reads.
     public bool ShowNowPlaying { get; set; } = true;
-    // Folder name of the custom theme in the themes folder; empty is the Classic dashboard.
+    // The user's theme: "builtin:<template>" or a folder in the themes folder; empty (new settings, or Classic before
+    // 0.14) shows Lumen Lifestyle and is saved as it.
     public string ActiveTheme { get; set; } = "";
     // Themes the playlist rotates through, in order (ids as in ActiveTheme); empty means every theme.
     public List<string> ThemePlaylist { get; set; } = new();
@@ -113,11 +114,14 @@ public sealed class MonitorSettings
 public static class SettingsStore
 {
     public static string DirectoryPath => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Pulsewave");
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Lumen HUD");
     public static string FilePath => Path.Combine(DirectoryPath, "settings.json");
     // Preserve V0.7.0 and earlier preferences by reading the previous folder once.
     private static string LegacyFilePath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GraphiteMonitor", "settings.json");
+    /// <summary>Where Pulsewave (0.7.1–0.13) kept its settings, themes and sessions; copied over once by Lumen HUD 0.14.</summary>
+    internal static string PulsewaveDirectoryPath => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Pulsewave");
 
     private static readonly JsonSerializerOptions Options = new()
     {
@@ -129,8 +133,42 @@ public static class SettingsStore
     private static readonly object WriteLock = new();
     public static MonitorSettings Load()
     {
+        if (!File.Exists(FilePath) && File.Exists(Path.Combine(PulsewaveDirectoryPath, "settings.json")))
+            CopyPulsewaveFolder(PulsewaveDirectoryPath, DirectoryPath);
         if (!File.Exists(FilePath) && File.Exists(LegacyFilePath)) MigrateLegacySettings();
         return LoadFile(FilePath);
+    }
+
+    /// <summary>
+    /// Copies Pulsewave's folder (settings and their backup, the user's themes, gaming sessions, the Plex token, weather
+    /// and AI usage) into Lumen HUD's, file by file without overwriting; settings.json goes last, so a copy cut short is
+    /// simply redone. The Pulsewave folder is left as it was (the old version still runs from it). Templates are skipped:
+    /// they are written again from this version.
+    /// </summary>
+    internal static void CopyPulsewaveFolder(string from, string to)
+    {
+        try
+        {
+            foreach (var file in Directory.EnumerateFiles(from, "*", SearchOption.AllDirectories))
+            {
+                string relative = Path.GetRelativePath(from, file);
+                if (relative.StartsWith("templates" + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) ||
+                    relative.Equals("settings.json", StringComparison.OrdinalIgnoreCase)) continue;
+                string target = Path.Combine(to, relative);
+                if (File.Exists(target)) continue;
+                Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+                File.Copy(file, target);
+            }
+            Directory.CreateDirectory(to);
+            string settings = Path.Combine(to, "settings.json");
+            if (!File.Exists(settings)) File.Copy(Path.Combine(from, "settings.json"), settings);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            if (!File.Exists(Path.Combine(to, "settings.json")))
+                throw new InvalidDataException("Could not copy your Pulsewave settings from " + from +
+                    ". They are unchanged there; close Pulsewave and check file access.", ex);
+        }
     }
 
     private static void MigrateLegacySettings()
@@ -175,7 +213,7 @@ public static class SettingsStore
         catch (Exception ex) when (ex is JsonException or InvalidDataException)
         {
             throw new InvalidDataException("Settings could not be read. Original unchanged: " + filePath +
-                ". Close Pulsewave and repair it or restore a known-good settings.json.bak, then reload.", ex);
+                ". Close Lumen HUD and repair it or restore a known-good settings.json.bak, then reload.", ex);
         }
     }
     private static MonitorSettings Parse(string json)
@@ -248,7 +286,7 @@ public static class SettingsStore
                 catch (Exception ex) when (ex is JsonException or InvalidDataException)
                 {
                     throw new InvalidDataException("Save blocked to preserve damaged settings: " + filePath +
-                        ". Close Pulsewave and repair it or restore settings.json.bak, then reload.", ex);
+                        ". Close Lumen HUD and repair it or restore settings.json.bak, then reload.", ex);
                 }
             }
             string stagingPath = filePath + "." + Guid.NewGuid().ToString("N") + ".tmp";

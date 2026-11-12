@@ -282,7 +282,7 @@ internal static class GameDetector
     private static readonly HashSet<string> NeverGames = new(StringComparer.OrdinalIgnoreCase)
     {
         "explorer.exe", "chrome.exe", "msedge.exe", "firefox.exe", "brave.exe", "opera.exe", "vivaldi.exe", "arc.exe", "vlc.exe", "mpv.exe", "mpc-hc64.exe",
-        "PotPlayerMini64.exe", "obs64.exe", "Discord.exe", "Teams.exe", "ms-teams.exe", "Zoom.exe", "steamwebhelper.exe", "steam.exe", "Pulsewave.exe",
+        "PotPlayerMini64.exe", "obs64.exe", "Discord.exe", "Teams.exe", "ms-teams.exe", "Zoom.exe", "steamwebhelper.exe", "steam.exe", "Pulsewave.exe", "LumenHUD.exe",
         "Plex.exe", "Plexamp.exe", "Spotify.exe", "Netflix.exe", "ApplicationFrameHost.exe", "wallpaper64.exe", "wallpaper32.exe", "LockApp.exe",
         "devenv.exe", "Code.exe", "blender.exe", "Photoshop.exe", "Resolve.exe", "Premiere Pro.exe"
     };

@@ -76,7 +76,7 @@ internal static class TouchChecks
                     return list.Items.Cast<System.Windows.Forms.ListViewItem>().Count(i => (string)i.Tag! is "tower" or "wide" or "broken" or "");
                 }
                 int all = Shown(""), vertical = Shown("vertical"), horizontal = Shown("horizontal"), fits = Shown("fits");
-                Check(all == 4 && vertical == 1 && horizontal == 2 && fits == 1,
+                Check(all == 3 && vertical == 1 && horizontal == 1 && fits == 1, // no Classic tile since 0.14
                     $"The Themes gallery opens on the saved shape filter (all {all}, vertical {vertical}, horizontal {horizontal}, fits {fits})");
 
                 // Playlist: y70 then tower are ticked. Filtering hides themes without unticking or reordering them.
@@ -104,10 +104,13 @@ internal static class TouchChecks
         Check(ThemeCycle.Order(["y70"], ["", "bar", "y70"], ["", "bar"]).SequenceEqual(["y70"]) &&
               ThemeCycle.Order([], ["", "bar", "y70"], ["", "bar"]).SequenceEqual(["", "bar"]),
             "A playlist plays the themes picked for it whatever their shape");
-        var sizes = BuiltInTemplates.Names.Select(n => JsonSerializer.Deserialize<ThemeDefinition>(BuiltInTemplates.Read(n), ThemeStore.Json)!).ToList();
-        Check(sizes.Any(t => (t.Width, t.Height) == (2560, 682)) && sizes.Any(t => t.Height > t.Width) && sizes.Any(t => (t.Width, t.Height) == (1920, 1200)) &&
-              sizes.Count(t => (t.Width, t.Height) == (1920, 480)) == 27,
-            "Built-in templates include the HYTE Y70, a vertical and tablet layouts beside the twenty-seven 8.8\" ones");
+        ThemeDefinition Of(string name) => JsonSerializer.Deserialize<ThemeDefinition>(BuiltInTemplates.Read(name), ThemeStore.Json)!;
+        var sizes = BuiltInTemplates.Names.Select(Of).ToList();
+        var legacy = BuiltInTemplates.LegacyNames.Select(Of).ToList();
+        Check(sizes.Count(t => (t.Width, t.Height) == (1920, 480)) == 3 && sizes.Count(t => (t.Width, t.Height) == (682, 2560)) == 3 &&
+              legacy.Any(t => (t.Width, t.Height) == (2560, 682)) && legacy.Any(t => (t.Width, t.Height) == (1920, 1200)) &&
+              legacy.Count(t => (t.Width, t.Height) == (1920, 480)) == 24,
+            "Built-in Lumen covers the 8.8\" bar and the Y70 column (three each); the legacy themes keep the Y70 landscape, tablet and twenty-four bar layouts");
 
         var art = new ThemeElement { Kind = ThemeElementKind.AlbumArt };
         var title = new ThemeElement { Kind = ThemeElementKind.Data, DataName = "MEDIA_TITLE" };
@@ -167,10 +170,19 @@ internal static class TouchChecks
     // Gallery tiles: how much of the 2:1 tile a theme's preview covers, and a contact sheet of all of them.
     private static void Thumbnails(string outputRoot, string? shots)
     {
-        var tiles = new List<(string Name, System.Drawing.Bitmap Image)> { ("Classic", (System.Drawing.Bitmap)ThemesForm.ClassicThumbnail()) };
+        var tiles = new List<(string Name, System.Drawing.Bitmap Image)>();
         // As the gallery lists them, with previews rendered off-screen.
         foreach (var info in BuiltInTemplates.List(Path.Combine(outputRoot, "thumb-templates")))
             tiles.Add((info.Id, (System.Drawing.Bitmap)ThemesForm.Thumbnail(info)));
+        // Legacy themes, as they look once imported.
+        foreach (var name in BuiltInTemplates.LegacyNames)
+        {
+            string dir = BuiltInTemplates.Ensure(BuiltInTemplates.Prefix + name, Path.Combine(outputRoot, "thumb-templates"), legacy: true)!;
+            var theme = ThemeStore.Load(dir);
+            if (!File.Exists(Path.Combine(dir, "preview.png"))) ThemeMedia.SavePreview(dir, theme);
+            theme.Preview = "preview.png";
+            tiles.Add((name, (System.Drawing.Bitmap)ThemesForm.Thumbnail(new ThemeInfo(name, dir, theme, null))));
+        }
         double Covered(System.Drawing.Bitmap b)
         {
             var back = b.GetPixel(0, 0);
@@ -200,7 +212,7 @@ internal static class TouchChecks
 
     private static void Rendered(string outputRoot, string? shots)
     {
-        string dir = BuiltInTemplates.Ensure(BuiltInTemplates.Prefix + "18-desk-tablet", Path.Combine(outputRoot, "touch-templates"))!;
+        string dir = BuiltInTemplates.Ensure(BuiltInTemplates.Prefix + "18-desk-tablet", Path.Combine(outputRoot, "touch-templates"), legacy: true)!;
         var theme = ThemeStore.Load(dir);
         var view = new ThemeView(theme, dir, playVideo: false);
         view.Measure(new Size(theme.Width, theme.Height));

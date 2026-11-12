@@ -12,6 +12,7 @@ public sealed record ThemeInfo(string Id, string Directory, ThemeDefinition? Def
 /// <summary>Installed themes, one folder each under %LOCALAPPDATA%\Pulsewave\themes.</summary>
 public static class ThemeStore
 {
+    /// <summary>No theme chosen: the HUD shows its base theme, Lumen Lifestyle (Classic until 0.14).</summary>
     public const string ClassicId = "";
     private const int MaxElements = 4000;
 
@@ -59,7 +60,7 @@ public static class ThemeStore
     internal static void Validate(ThemeDefinition theme, string themeDirectory)
     {
         if (theme.Format is < 1 or > ThemeDefinition.CurrentFormat)
-            throw new InvalidDataException($"Theme format {theme.Format} needs a newer Pulsewave.");
+            throw new InvalidDataException($"Theme format {theme.Format} needs a newer Lumen HUD.");
         if (theme.Width is < 1 or > 8192 || theme.Height is < 1 or > 8192)
             throw new InvalidDataException("Theme size is invalid.");
         theme.Elements ??= new();

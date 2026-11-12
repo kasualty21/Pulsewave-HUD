@@ -244,7 +244,7 @@ internal static class EditorChecks
             "The data picker shows every reading once, in sections in a set order, and search narrows it by name, label or section");
         Check(ThemeEditorDefaults.Thresholds("CPUTEMP") == (90, 98) && ThemeEditorDefaults.Thresholds("GPUTEMP") == (83, 90) && ThemeEditorDefaults.Thresholds("RAMLOAD") == (85, 95),
             "Turning warning colors on starts from sensible levels for the reading");
-        var older = BuiltInTemplates.Names.Where(n => int.Parse(n[..2]) <= 25).ToList();
+        var older = BuiltInTemplates.LegacyNames.Where(n => int.Parse(n[..2]) <= 25).ToList();
         Check(older.Count == 25 && older.All(n => TemplateRefresh.Apply(BuiltInTemplates.Read(n)) == BuiltInTemplates.Read(n)) &&
               !older.Any(n => BuiltInTemplates.Read(n).Contains("\"MEDIA_STATE\"")),
             "The older built-in templates carry the feature refresh (warning colors, Media page taps, track time, readable dates, tinted tiles), and re-running it changes nothing");

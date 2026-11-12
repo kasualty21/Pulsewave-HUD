@@ -61,7 +61,7 @@ public sealed class SensorManagerForm : Forms.Form
     public SensorManagerForm(MonitorSettings settings)
     {
         _settings = settings;
-        Text = "Pulsewave · Sensor Manager";
+        Text = "Lumen HUD · Sensor Manager";
         StartPosition = Forms.FormStartPosition.Manual;
         var primary = Forms.Screen.PrimaryScreen?.WorkingArea ?? new Rectangle(0, 0, 1920, 1080);
         Size = new Size(Math.Min(1560, primary.Width), Math.Min(790, primary.Height));
@@ -380,13 +380,13 @@ public sealed class SensorManagerForm : Forms.Form
         }
         var left = DashboardMetrics.Where(m => !picks.ContainsKey(m.Id) &&
             SensorCatalog.Resolve(_rows[m.Id].Mapping, _settings.RegistryHive, _catalog, out _) is not { HasValue: true }).Select(m => m.Label).ToList();
-        string text = paired.Count == 0 ? "Nothing new to pair: every reading HWiNFO exports that Pulsewave recognises is already paired."
+        string text = paired.Count == 0 ? "Nothing new to pair: every reading HWiNFO exports that Lumen HUD recognises is already paired."
             : $"Paired {paired.Count}:\n  " + string.Join("\n  ", paired);
         if (left.Count > 0)
             text += $"\n\nStill unpaired: {string.Join(", ", left)}. Tick them in HWiNFO → Sensor Settings → HWiNFO Gadget " +
                     "(\"Report value in Gadget\"), click Rescan, then Auto-pair again, or pick them by hand.";
-        if (paired.Count == 0) { Forms.MessageBox.Show(this, text, "Pulsewave · Auto-pair", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Information); return; }
-        if (Forms.MessageBox.Show(this, text + "\n\nSave these mappings now?", "Pulsewave · Auto-pair",
+        if (paired.Count == 0) { Forms.MessageBox.Show(this, text, "Lumen HUD · Auto-pair", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Information); return; }
+        if (Forms.MessageBox.Show(this, text + "\n\nSave these mappings now?", "Lumen HUD · Auto-pair",
                 Forms.MessageBoxButtons.YesNo, Forms.MessageBoxIcon.Question) == Forms.DialogResult.Yes)
             SaveMappings();
         else

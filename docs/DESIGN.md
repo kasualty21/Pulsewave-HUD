@@ -1,6 +1,6 @@
 # Design baseline: Lumen
 
-Lumen is Pulsewave's baseline look. New templates, editor widgets and HUD pages start from it; the other built-in templates (Halo, One UI, Graphite, Paper, Noir and 01–25) stay as alternatives and are not restyled.
+Lumen is Lumen HUD's look and its only built-in theme family; Lumen Lifestyle is the base theme a new HUD starts on. New templates, editor widgets and HUD pages start from it. The templates from before Lumen (01–39: Halo, One UI, Graphite, Paper, Noir and the rest) are legacy themes in `src/Pulsewave/Templates/Legacy`, importable from Themes → Import, and are not restyled.
 
 The one source of colors and fonts is `src/Pulsewave/Themes/Lumen.cs`. Do not copy its values into other files.
 
@@ -42,4 +42,4 @@ Each family comes as an all-round, a Gaming and a Productivity version, for the 
 
 - The editor's ready-made widgets (`ThemeWidgets.cs`) and the editor's own controls (`EditorStyle.cs`) still use the Halo kit.
 - The tray windows (Themes, Shortcuts, Schedule and the rest) keep their existing style.
-- Pulsewave Classic keeps its Midnight look by design.
+- The logo (`scripts/make-logo.py` → `src/Pulsewave/Assets/LumenHUD-logo.*`) is drawn from these tokens: a glass tile with an aurora, a Lumen gauge whose end is a point of light, and a DIN-style L.

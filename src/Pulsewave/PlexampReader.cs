@@ -51,7 +51,7 @@ internal sealed class PlexampReader : IDisposable
     {
         _clockMs = clockMs;
         _http.DefaultRequestHeaders.Add("X-Plex-Client-Identifier", "pulsewave-now-playing");
-        _http.DefaultRequestHeaders.Add("X-Plex-Product", "Pulsewave");
+        _http.DefaultRequestHeaders.Add("X-Plex-Product", "Lumen HUD");
         _http.DefaultRequestHeaders.Add("Accept", "application/xml");
     }
 

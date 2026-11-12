@@ -23,7 +23,7 @@ public sealed class TelemetryForm : Forms.Form
         _engine = engine;
         _settings = settings;
         _onSettingsSaved = onSettingsSaved;
-        Text = "Pulsewave · Telemetry & session stats";
+        Text = "Lumen HUD · Telemetry & session stats";
         StartPosition = Forms.FormStartPosition.CenterScreen;
         var work = Forms.Screen.PrimaryScreen?.WorkingArea;
         Size = new Size(Math.Min(1080, work?.Width ?? 1080), Math.Min(620, work?.Height ?? 620));
@@ -160,7 +160,7 @@ public sealed class TelemetryForm : Forms.Form
             Forms.MessageBox.Show(this,
                 "Exported retained timestamped samples. The min/avg/max above cover the full current session." +
                 (_engine.SamplesWereDiscarded ? " Early samples exceeded the recording cap and are absent from this CSV." : ""),
-                "Pulsewave · CSV exported", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Information);
+                "Lumen HUD · CSV exported", Forms.MessageBoxButtons.OK, Forms.MessageBoxIcon.Information);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -186,7 +186,7 @@ public sealed class TelemetrySettingsForm : Forms.Form
     public TelemetrySettingsForm(MonitorSettings settings)
     {
         _settings = settings;
-        Text = "Pulsewave · Polling & alerts";
+        Text = "Lumen HUD · Polling & alerts";
         Size = new Size(575, 425);
         MinimumSize = new Size(530, 405);
         StartPosition = Forms.FormStartPosition.CenterParent;

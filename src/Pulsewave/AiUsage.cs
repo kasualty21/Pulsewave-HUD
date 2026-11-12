@@ -238,7 +238,7 @@ public static class ClaudeStatusLine
     {
         JsonNode? root;
         try { root = JsonNode.Parse(input); }
-        catch (JsonException) { return "Pulsewave"; }
+        catch (JsonException) { return "Lumen HUD"; }
         var limits = root?["rate_limits"];
         var parts = new List<string>();
         if (root?["model"]?["display_name"]?.GetValue<string>() is { Length: > 0 } model) parts.Add(model);
@@ -254,7 +254,7 @@ public static class ClaudeStatusLine
             }
             Save(usageFile, windows);
         }
-        return parts.Count > 0 ? string.Join(" · ", parts) : "Pulsewave";
+        return parts.Count > 0 ? string.Join(" · ", parts) : "Lumen HUD";
     }
 
     /// <summary>Saves Claude usage windows (percent used, reset as Unix seconds) for the HUD, keeping windows not given.</summary>

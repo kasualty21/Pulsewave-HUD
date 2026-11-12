@@ -37,14 +37,14 @@ internal sealed class GamingForm : Forms.Form
     public GamingForm(GamingSettings settings, Func<IReadOnlyList<GameEntry>> catalog, Func<IReadOnlyList<string>> suggested,
         Func<string?> save, Action<string, string> track, Action<string> ignore, IReadOnlyList<(string Id, string Name)>? themes = null)
     {
-        _themes = (themes ?? []).Where(t => t.Id.Length > 0).ToList(); // Classic isn't offered: "don't switch" leaves the user's theme
+        _themes = (themes ?? []).Where(t => t.Id.Length > 0).ToList(); // no blank entry: "don't switch" leaves the user's theme
         _settings = settings;
         _catalog = catalog;
         _suggested = suggested;
         _save = save;
         _track = track;
         _ignore = ignore;
-        Text = "Pulsewave · Gaming";
+        Text = "Lumen HUD · Gaming";
         StartPosition = Forms.FormStartPosition.CenterScreen;
         Size = new Size(1000, 640);
         MinimumSize = new Size(860, 520);
@@ -56,7 +56,7 @@ internal sealed class GamingForm : Forms.Form
         var title = new Forms.Label
         {
             Dock = Forms.DockStyle.Top, Height = 66, Padding = new Forms.Padding(18, 12, 18, 0), ForeColor = Muted,
-            Text = "GAMING\nPulsewave times sessions of the games it recognises: Steam, GOG and Xbox games, the games Windows itself has recognised, " +
+            Text = "GAMING\nLumen HUD times sessions of the games it recognises: Steam, GOG and Xbox games, the games Windows itself has recognised, " +
                    "and games you add here. Only program locations are read; nothing is captured."
         };
 

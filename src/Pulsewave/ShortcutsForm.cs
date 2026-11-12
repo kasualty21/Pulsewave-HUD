@@ -40,7 +40,7 @@ public sealed class ShortcutsForm : Forms.Form
         _items = shortcuts.Select(s => s.Copy()).ToList();
         CopyLists(lists);
         _save = save;
-        Text = "Pulsewave · Shortcuts";
+        Text = "Lumen HUD · Shortcuts";
         StartPosition = Forms.FormStartPosition.CenterScreen;
         Size = new Size(980, 640);
         MinimumSize = new Size(820, 520);
@@ -352,7 +352,7 @@ public sealed class ShortcutsForm : Forms.Form
         dialog.Controls.Add(buttons);
         dialog.Controls.Add(new Forms.Label { Dock = Forms.DockStyle.Top, Height = 58, Padding = new Forms.Padding(8, 8, 8, 0),
             Text = fresh.Count == 0 ? "Every installed game is already a shortcut."
-                : $"Tick the games to add. Pulsewave holds up to {AppShortcut.MaxCount} shortcuts; {free} {(free == 1 ? "slot is" : "slots are")} free." });
+                : $"Tick the games to add. Lumen HUD holds up to {AppShortcut.MaxCount} shortcuts; {free} {(free == 1 ? "slot is" : "slots are")} free." });
         dialog.AcceptButton = ok;
         if (dialog.ShowDialog(this) != Forms.DialogResult.OK) return;
         AddDropped(fresh.Where(ticked.Contains).Select(g => g.ToShortcut()).ToList(), 0);
